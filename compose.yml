@@ -1,0 +1,14 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - NOTION_TOKEN=${NOTION_TOKEN}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - APP_PIN=${APP_PIN}
+      - TZ=${TZ:-UTC}
+    # Only reachable through nginx on the host
+    ports:
+      - "127.0.0.1:3000:3000"

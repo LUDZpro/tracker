@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "floor-logger",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--env-file=/Users/tachafine/Documents/solutions/tracker/preview.env",
+        "/Users/tachafine/Documents/solutions/tracker/app/.next/standalone/server.js"
+      ],
+      "port": 3199,
+      "autoPort": true
+    }
+  ]
+}

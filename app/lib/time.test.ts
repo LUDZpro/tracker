@@ -1,0 +1,49 @@
+import { describe, expect, it } from 'vitest';
+import {
+  minutesBetween,
+  shiftDateKey,
+  wallHHMM,
+  wallMinutes,
+  wallParts,
+  withWallDate,
+  withWallTime,
+} from './time';
+
+describe('wall-clock helpers', () => {
+  it('parses the wall part regardless of offset', () => {
+    expect(wallParts('2026-07-06T07:12:00+01:00')).toEqual({
+      year: 2026, month: 7, day: 6, hour: 7, minute: 12,
+    });
+    expect(wallMinutes('2026-07-06T07:12:00-05:00')).toBe(7 * 60 + 12);
+    expect(wallHHMM('2026-07-06T07:12:00+01:00')).toBe('07:12');
+  });
+
+  it('computes chronological distance with offsets respected', () => {
+    expect(minutesBetween('2026-07-05T23:30:00+01:00', '2026-07-06T07:00:00+01:00')).toBe(450);
+  });
+
+  it('shifts date keys across month boundaries', () => {
+    expect(shiftDateKey('2026-07-01', -1)).toBe('2026-06-30');
+    expect(shiftDateKey('2026-07-06', -3)).toBe('2026-07-03');
+  });
+
+  it('replaces the wall time, preserving date and offset', () => {
+    expect(withWallTime('2026-07-06T07:12:00+01:00', 8, 35)).toBe('2026-07-06T08:35:00+01:00');
+    expect(withWallTime('2026-07-06T07:12:00-05:00', 0, 0)).toBe('2026-07-06T00:00:00-05:00');
+    expect(withWallTime('2026-07-06T07:12:00+01:00', 9, 5)).toBe('2026-07-06T09:05:00+01:00');
+  });
+
+  it('clamps out-of-range wall time components', () => {
+    expect(withWallTime('2026-07-06T07:12:00+01:00', 25, 75)).toBe('2026-07-06T23:59:00+01:00');
+    expect(withWallTime('2026-07-06T07:12:00+01:00', -1, -1)).toBe('2026-07-06T00:00:00+01:00');
+  });
+
+  it('replaces the wall date, preserving time and offset', () => {
+    expect(withWallDate('2026-07-06T07:12:00+01:00', '2026-07-05')).toBe(
+      '2026-07-05T07:12:00+01:00',
+    );
+    expect(withWallDate('2026-07-06T07:12:00+01:00', 'garbage')).toBe(
+      '2026-07-06T07:12:00+01:00',
+    );
+  });
+});

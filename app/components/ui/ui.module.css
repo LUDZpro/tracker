@@ -1,0 +1,184 @@
+/* ——— wheel time picker (UX-PATCH-03) ——— */
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.dayRow {
+  display: flex;
+  gap: var(--space-1);
+  justify-content: center;
+}
+
+.wheelRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.wheelCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.wheelWindow {
+  position: relative;
+  height: 132px; /* 3 rows of 44px, selected in the center */
+  width: 84px;
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  overflow: hidden;
+}
+
+.wheel {
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  padding-block: 44px; /* lets first/last items reach the center */
+  overscroll-behavior: contain;
+}
+
+.wheel::-webkit-scrollbar {
+  display: none;
+}
+
+.wheelItem {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  font-size: var(--text-lg);
+  color: var(--dim);
+  cursor: pointer;
+  user-select: none;
+}
+
+.wheelItemActive {
+  color: var(--wheel-accent, var(--sleep));
+  font-weight: 700;
+  font-size: var(--text-xl);
+}
+
+/* Center highlight + soft fade on the off rows (no blur cost). */
+.wheelMask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--surface) 0%, transparent 34%, transparent 66%, var(--surface) 100%);
+  opacity: 0.75;
+}
+
+.wheelMask::before,
+.wheelMask::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: var(--hairline);
+}
+
+.wheelMask::before {
+  top: 44px;
+}
+
+.wheelMask::after {
+  bottom: 44px;
+}
+
+.wheelColon {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--dim);
+  padding-bottom: 2px;
+}
+
+.wheelArrow {
+  background: none;
+  border: none;
+  color: var(--dim);
+  font-size: 12px;
+  padding: var(--space-1) var(--space-3);
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.wheelArrow:active {
+  color: var(--ink);
+}
+
+.wheelArrow:disabled {
+  opacity: 0.4;
+}
+
+/* ——— direct input mode ——— */
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.timeInput {
+  width: 84px;
+  min-height: 56px;
+  text-align: center;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.timeInput::-webkit-outer-spin-button,
+.timeInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.timeInput:focus {
+  outline: none;
+  border-color: var(--wheel-accent, var(--sleep));
+}
+
+.inputColon {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--dim);
+}
+
+.inputActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-left: var(--space-1);
+}
+
+.inputToggle {
+  background: none;
+  border: none;
+  color: var(--dim);
+  font-size: var(--text-sm);
+  padding: var(--space-1) var(--space-2);
+  cursor: pointer;
+  min-height: 40px;
+}
+
+.inputToggle .num {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.inputToggle small {
+  color: var(--dim);
+}

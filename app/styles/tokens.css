@@ -1,0 +1,36 @@
+:root {
+  /* palette — instrument panel at night */
+  --bg: #0e1116;
+  --surface: #171c24;
+  --surface-raised: #1d2430;
+  --ink: #e8e6e1;
+  --dim: #8a94a6;
+  --hairline: rgba(232, 230, 225, 0.08);
+  --sleep: #7c8cf8;
+  --sleep-dim: rgba(124, 140, 248, 0.28);
+  --intake: #e0a458;
+  --state: #5bc0be;
+  --danger: #e4572e;
+
+  /* type */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+
+  /* rhythm */
+  --space-1: 0.375rem;
+  --space-2: 0.75rem;
+  --space-3: 1.25rem;
+  --space-4: 2rem;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+
+  /* interaction */
+  --tap-min: 64px;
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}

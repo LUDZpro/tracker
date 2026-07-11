@@ -1,0 +1,110 @@
+/* ——— sleep band ——— */
+
+.bandSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+}
+
+.bandTrack {
+  fill: var(--surface);
+  stroke: var(--hairline);
+}
+
+.bandFill {
+  fill: var(--sleep-dim);
+  stroke: var(--sleep);
+  stroke-opacity: 0.6;
+}
+
+.bandLabel {
+  fill: var(--dim);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.handle {
+  cursor: grab;
+}
+
+.handleDot {
+  fill: var(--sleep);
+  stroke: var(--bg);
+  stroke-width: 3;
+}
+
+.bandReadout {
+  margin: var(--space-1) 0 0;
+  text-align: center;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.bandReadout small {
+  color: var(--dim);
+  font-weight: 400;
+  font-size: var(--text-xs);
+}
+
+.bandEmpty {
+  color: var(--dim);
+  text-align: center;
+}
+
+/* ——— prompt cards ——— */
+
+.promptCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-inline-start: 3px solid var(--sleep);
+}
+
+.promptText {
+  margin: 0;
+  color: var(--ink);
+}
+
+.fuzzyRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.optionCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.optionBtn {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.optionBtn:active {
+  transform: scale(0.97);
+}
+
+.confirmBtn {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-lg);
+  background: var(--sleep);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.skipBtn {
+  min-height: 44px;
+  color: var(--dim);
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  align-self: center;
+}
+

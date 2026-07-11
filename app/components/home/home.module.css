@@ -1,0 +1,356 @@
+/* ——— today strip ——— */
+
+.strip {
+  padding: var(--space-2) 0 0;
+}
+
+.stripSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.track {
+  fill: var(--surface);
+  stroke: var(--hairline);
+}
+
+.gridline {
+  stroke: var(--hairline);
+  stroke-width: 1;
+}
+
+.axisLabel {
+  fill: var(--dim);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.nowLine {
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-dasharray: 3 4;
+  opacity: 0.7;
+}
+
+.emptyHint {
+  margin: var(--space-1) 0 0;
+  color: var(--dim);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.tick {
+  cursor: pointer;
+  transition:
+    width var(--duration-fast) var(--ease-out-expo),
+    height var(--duration-fast) var(--ease-out-expo);
+}
+
+/* ——— history pager ——— */
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.pagerBtn {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  color: var(--sleep);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.pagerBtn:disabled {
+  color: var(--dim);
+  opacity: 0.5;
+}
+
+.pagerLabel {
+  color: var(--dim);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.pagerSpacer {
+  min-width: 44px;
+}
+
+/* ——— today list ——— */
+
+.todayList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rowSlot {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.rowSlot:last-child {
+  border-bottom: 0;
+}
+
+.deleteReveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-inline-end: var(--space-3);
+  background: rgba(228, 87, 46, 0.18);
+  color: var(--danger);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.row {
+  position: relative;
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-1);
+  text-align: start;
+  background: var(--bg);
+  transition: transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.rowSelected {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  box-shadow: inset 2px 0 0 var(--sleep);
+}
+
+.rowTime {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  font-weight: 600;
+  min-width: 3.4em;
+}
+
+.rowIcon {
+  width: 1.4em;
+  text-align: center;
+  font-size: var(--text-base);
+}
+
+.rowLabel {
+  flex: 1;
+  color: var(--ink);
+  font-size: var(--text-base);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowBadge {
+  color: var(--dim);
+  font-size: var(--text-xs);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 1px var(--space-1);
+  white-space: nowrap;
+}
+
+.rowLock {
+  color: var(--dim);
+  font-size: var(--text-xs);
+}
+
+.daySeparator {
+  color: var(--dim);
+  font-size: var(--text-xs);
+  text-align: center;
+  letter-spacing: 0.08em;
+  padding: var(--space-1) 0;
+}
+
+.undoRow {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  color: var(--dim);
+  font-size: var(--text-sm);
+}
+
+.undoRowBtn {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* ——— sleep CTA ——— */
+
+.ctaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ctaMain {
+  min-height: 84px;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.ctaMain:active {
+  transform: scale(0.97);
+}
+
+.ctaSleep {
+  background: linear-gradient(160deg, var(--surface-raised), var(--surface));
+  border: 1px solid var(--sleep-dim);
+  color: var(--sleep);
+  box-shadow: 0 0 32px rgba(124, 140, 248, 0.12) inset;
+}
+
+.ctaWake {
+  background: var(--sleep);
+  color: var(--bg);
+  box-shadow: 0 8px 40px rgba(124, 140, 248, 0.35);
+}
+
+.ctaTimeLink {
+  background: none;
+  border: none;
+  color: var(--dim);
+  font-size: var(--text-sm);
+  min-height: 40px;
+  align-self: center;
+  padding: 0 var(--space-2);
+}
+
+.ctaTimeLink:active {
+  color: var(--ink);
+}
+
+/* ——— action grid ——— */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.gridBtn {
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  transition: transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.gridBtn:active {
+  transform: scale(0.96);
+  border-color: var(--accent);
+}
+
+.gridDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+/* ——— last line / queue banner ——— */
+
+.lastLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--dim);
+  font-size: var(--text-sm);
+  min-height: 44px;
+}
+
+.undoBtn {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.queueBanner {
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: rgba(224, 164, 88, 0.12);
+  border: 1px solid rgba(224, 164, 88, 0.4);
+  color: var(--intake);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+/* ——— page shell ——— */
+
+.page {
+  min-height: 100dvh;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: max(env(safe-area-inset-top), var(--space-2)) var(--space-3)
+    max(env(safe-area-inset-bottom), var(--space-3));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.navLink {
+  color: var(--sleep);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}

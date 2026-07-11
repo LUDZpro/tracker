@@ -1,0 +1,185 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 10, 14, 0.7);
+  display: flex;
+  align-items: flex-end;
+  z-index: 40;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-bottom: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: var(--space-2) var(--space-3)
+    max(env(safe-area-inset-bottom), var(--space-3));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: slide-up var(--duration-normal) var(--ease-out-expo);
+  transition: transform var(--duration-fast) var(--ease-out-expo);
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.grabber {
+  width: 44px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--dim);
+  opacity: 0.5;
+  margin: 0 auto;
+}
+
+.sheetTitle {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chipRow .bigChip {
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+  flex: 1;
+  font-size: var(--text-lg);
+}
+
+.scaleRow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+}
+
+.scaleBtn {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--dim);
+}
+
+.scaleBtn[aria-pressed='true'] {
+  background: var(--state);
+  border-color: var(--state);
+  color: var(--bg);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.stepper button {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.stepperValue {
+  min-width: 6rem;
+  text-align: center;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.logBtn {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-lg);
+  background: var(--sleep);
+  color: var(--bg);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.logBtn:disabled {
+  opacity: 0.4;
+}
+
+/* ——— time field (collapsed "now" row → wheel picker) ——— */
+
+.timeField {
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  background: none;
+  border: 1px dashed var(--hairline);
+  color: var(--dim);
+  font-size: var(--text-base);
+  padding: var(--space-1) var(--space-2);
+}
+
+.timeField .num {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.timeFieldOpen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.timeFieldReset {
+  background: none;
+  border: none;
+  color: var(--dim);
+  font-size: var(--text-sm);
+  min-height: 32px;
+}
+
+/* ——— edit sheet ——— */
+
+.readOnlyNotice {
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--dim);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.editFooter {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-2);
+}
+
+.deleteBtn {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
