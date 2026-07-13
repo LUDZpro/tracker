@@ -16,6 +16,10 @@ const ICON_BY_TYPE: Record<AppEvent['type'], string> = {
   caffeine: '☕',
   mood: '◐',
   energy: '◑',
+  // Nutrition/Gym never reach Floor's strip/list (filtered in /api/today),
+  // but these keep the lookup exhaustive rather than throwing if they did.
+  meal: '🍽',
+  'gym-session': '💪',
 };
 
 export function eventIcon(ev: AppEvent): string {
@@ -36,6 +40,10 @@ export function eventSummary(ev: AppEvent): string {
     case 'mood':
     case 'energy':
       return ev.intensity !== undefined ? `${ev.type} · ${ev.intensity}/5` : ev.type;
+    case 'meal':
+      return ev.mealName ?? 'meal';
+    case 'gym-session':
+      return `${ev.exercises?.length ?? 0} exercises`;
   }
 }
 

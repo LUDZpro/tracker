@@ -12,10 +12,12 @@ interface Props {
   onClose: () => void;
   /** Long-press entry: open with the time picker already expanded. */
   pickTime?: boolean;
+  /** Desktop capture buttons are per-kind (Coffee/Tea/Energy drink). */
+  initialKind?: CaffeineKind;
 }
 
-export default function CaffeineSheet({ onLog, onClose, pickTime }: Props) {
-  const [kind, setKind] = useState<CaffeineKind>('coffee');
+export default function CaffeineSheet({ onLog, onClose, pickTime, initialKind }: Props) {
+  const [kind, setKind] = useState<CaffeineKind>(initialKind ?? 'coffee');
   const [at, setAt] = useState<string | null>(pickTime ? toLocalISO(new Date()) : null);
 
   const logIt = () => {

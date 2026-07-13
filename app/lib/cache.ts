@@ -1,26 +1,63 @@
 /**
- * 60s in-memory cache for /api/today. Single-instance deployment, so a
- * module-level slot is sufficient. Every write route calls invalidateToday().
+ * In-memory caches for the read-heavy GET routes. Single-instance
+ * deployment, so module-level state is sufficient — no Redis needed.
+ * Every write route calls the matching invalidate* function.
  */
+import type { EventType } from './types';
 
 const TTL_MS = 60_000;
+const HISTORY_TTL_MS = 30_000;
 
 interface Slot<T> {
   data: T;
   at: number;
 }
 
-let slot: Slot<unknown> | null = null;
+let todaySlot: Slot<unknown> | null = null;
 
 export function getCachedToday<T>(now = Date.now()): T | null {
-  if (slot && now - slot.at < TTL_MS) return slot.data as T;
+  if (todaySlot && now - todaySlot.at < TTL_MS) return todaySlot.data as T;
   return null;
 }
 
 export function setCachedToday<T>(data: T, now = Date.now()): void {
-  slot = { data, at: now };
+  todaySlot = { data, at: now };
+}
+
+// Week (desktop 7-day column): derived from the same event log as today,
+// so the two slots always invalidate together — every write route already
+// calls invalidateToday(), and week must never outlive it.
+let weekSlot: Slot<unknown> | null = null;
+
+export function getCachedWeek<T>(now = Date.now()): T | null {
+  if (weekSlot && now - weekSlot.at < TTL_MS) return weekSlot.data as T;
+  return null;
+}
+
+export function setCachedWeek<T>(data: T, now = Date.now()): void {
+  weekSlot = { data, at: now };
 }
 
 export function invalidateToday(): void {
-  slot = null;
+  todaySlot = null;
+  weekSlot = null;
+}
+
+// History (Nutrition/Gym): only the first page (no `before` cursor) is
+// cached — scrolled-further pages are one-shot fetches the user explicitly
+// asked for, not worth caching.
+const historySlots = new Map<EventType, Slot<unknown>>();
+
+export function getCachedHistory<T>(type: EventType, now = Date.now()): T | null {
+  const s = historySlots.get(type);
+  if (s && now - s.at < HISTORY_TTL_MS) return s.data as T;
+  return null;
+}
+
+export function setCachedHistory<T>(type: EventType, data: T, now = Date.now()): void {
+  historySlots.set(type, { data, at: now });
+}
+
+export function invalidateHistory(type: EventType): void {
+  historySlots.delete(type);
 }

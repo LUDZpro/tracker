@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { invalidateToday } from '@/lib/cache';
+import { invalidateHistory, invalidateToday } from '@/lib/cache';
 import { errorResponse, jsonError, readJson } from '@/lib/http';
 import { createEvent } from '@/lib/notion';
 import { validateEventPayload } from '@/lib/validation';
@@ -12,6 +12,7 @@ export async function POST(req: Request) {
   try {
     const id = await createEvent(result.value);
     invalidateToday();
+    invalidateHistory(result.value.type);
     return NextResponse.json({ id }, { status: 201 });
   } catch (e) {
     return errorResponse(e);

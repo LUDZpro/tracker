@@ -46,7 +46,11 @@ export async function GET(req: Request) {
     // Wake-windows ≈ one per day; look back far enough to delimit window n.
     const lookbackMs = (BASE_LOOKBACK_DAYS + offset) * 24 * 60 * 60 * 1000;
     const since = toLocalISO(new Date(Date.now() - lookbackMs));
-    const events = await queryEventsSince(since);
+    // Nutrition/Gym live in the same Notion log but are separate trackers
+    // with their own tab + /api/history — keep them out of Floor's strip/list.
+    const events = (await queryEventsSince(since)).filter(
+      (e) => e.type !== 'meal' && e.type !== 'gym-session',
+    );
     const nowDate = new Date();
     const nowIso = toLocalISO(nowDate);
 

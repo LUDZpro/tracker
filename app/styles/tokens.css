@@ -1,16 +1,53 @@
 :root {
-  /* palette — instrument panel at night */
-  --bg: #0e1116;
-  --surface: #171c24;
-  --surface-raised: #1d2430;
-  --ink: #e8e6e1;
-  --dim: #8a94a6;
-  --hairline: rgba(232, 230, 225, 0.08);
-  --sleep: #7c8cf8;
-  --sleep-dim: rgba(124, 140, 248, 0.28);
-  --intake: #e0a458;
-  --state: #5bc0be;
-  --danger: #e4572e;
+  /* palette — quiet night console (desktop prototype) */
+  --canvas: #0d0e15;
+  --app: #161826;
+  --night: #12131e;
+  --sheet: #1b1d2c;
+  --rail: #292b31;
+
+  --accent: #9184d9;
+  --a200: #e7e5fe;
+  --a300: #d2cefd;
+  --a400: #b5abfc;
+  --a500: #968ae0;
+  --a600: #796cbf;
+  --a700: #5d5294;
+  --a800: #423a6a;
+  --a900: #2b2741;
+
+  --t1: #e9e9ed;
+  --t2: #9397ab;
+  --t3: #75798c;
+  --t4: #595d6c;
+  --t5: #41445a;
+
+  --line: rgba(233, 233, 237, 0.08);
+  --edge: rgba(233, 233, 237, 0.12);
+
+  --ok: #6fbf9a;
+  --ok-d: #20342c;
+  --warn: #d8a657;
+  --warn-d: #33291a;
+  --bad: #d2706b;
+  --bad-d: #331f1e;
+  --cyan: #5bbfc0;
+
+  --sh-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --sh-lg: 0 20px 60px rgba(0, 0, 0, 0.55);
+
+  /* legacy aliases — every pre-redesign component reads these */
+  --bg: var(--canvas);
+  --surface: #1b1d2c;
+  --surface-raised: #232532;
+  --ink: var(--t1);
+  --dim: var(--t2);
+  --hairline: var(--line);
+  --sleep: var(--accent);
+  --sleep-dim: rgba(145, 132, 217, 0.28);
+  --intake: var(--warn);
+  --state: var(--cyan);
+  --danger: var(--bad);
 
   /* type */
   --text-xs: 0.75rem;
@@ -30,6 +67,8 @@
 
   /* interaction */
   --tap-min: 64px;
+  --tabbar-h: 60px;
+  --rail-w: 56px;
   --duration-fast: 150ms;
   --duration-normal: 300ms;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);

@@ -1,4 +1,4 @@
-/* Generates the PWA icons (a miniature "today strip" on the night palette)
+/* Generates the PWA icons (the "tracker." mark on the night palette)
  * as raw PNGs using only node:zlib — no image dependencies. */
 
 import { deflateSync } from 'node:zlib';
@@ -6,11 +6,9 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const BG = [14, 17, 22];
-const SURFACE = [29, 36, 48];
-const SLEEP = [124, 140, 248];
-const INTAKE = [224, 164, 88];
-const STATE = [91, 192, 190];
+const BG = [18, 19, 30]; // --night
+const BASELINE = [89, 93, 108]; // --t4
+const ACCENT = [145, 132, 217]; // --accent
 
 const CRC_TABLE = new Int32Array(256).map((_, n) => {
   let c = n;
@@ -66,15 +64,27 @@ function makeIcon(size) {
     }
   };
 
+  const disc = (cx, cy, r, [red, g, b]) => {
+    for (let y = Math.round(cy - r); y < Math.round(cy + r); y++) {
+      for (let x = Math.round(cx - r); x < Math.round(cx + r); x++) {
+        const dx = x - cx;
+        const dy = y - cy;
+        if (dx * dx + dy * dy > r * r) continue;
+        const i = (y * size + x) * 4;
+        px[i] = red;
+        px[i + 1] = g;
+        px[i + 2] = b;
+        px[i + 3] = 255;
+      }
+    }
+  };
+
   fill(0, 0, size, size, BG);
   const s = (f) => size * f;
-  // horizontal track with a sleep band segment
-  fill(s(0.14), s(0.52), s(0.86), s(0.66), SURFACE);
-  fill(s(0.2), s(0.52), s(0.52), s(0.66), SLEEP);
-  // event ticks above the track
-  fill(s(0.58), s(0.34), s(0.61), s(0.48), INTAKE);
-  fill(s(0.68), s(0.34), s(0.71), s(0.48), STATE);
-  fill(s(0.78), s(0.34), s(0.81), s(0.48), SLEEP);
+  // tracker mark: baseline, accent bar, accent dot (matches app/icon.svg)
+  fill(s(0.19), s(0.66), s(0.81), s(0.72), BASELINE);
+  fill(s(0.63), s(0.22), s(0.69), s(0.72), ACCENT);
+  disc(s(0.345), s(0.69), s(0.105), ACCENT);
   return encodePng(size, px);
 }
 

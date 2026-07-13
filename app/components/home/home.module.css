@@ -323,11 +323,21 @@
   min-height: 100dvh;
   max-width: 28rem;
   margin: 0 auto;
-  padding: max(env(safe-area-inset-top), var(--space-2)) var(--space-3)
-    max(env(safe-area-inset-bottom), var(--space-3));
+  padding-top: max(env(safe-area-inset-top), var(--space-2));
+  padding-inline: var(--space-3);
+  /* Room for the fixed TabBar below every page's content. */
+  padding-bottom: calc(max(env(safe-area-inset-bottom), var(--space-3)) + var(--tabbar-h));
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+/* Desktop: mobile-styled pages (nutrition/gym/sleep) sit right of the rail. */
+@media (min-width: 1024px) {
+  .page {
+    margin-left: calc(var(--rail-w) + ((100% - var(--rail-w) - 28rem) / 2));
+    padding-bottom: var(--space-4);
+  }
 }
 
 .pageHeader {

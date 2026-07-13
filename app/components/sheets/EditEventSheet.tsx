@@ -2,15 +2,18 @@
 
 import { useState } from 'react';
 import Sheet from './Sheet';
+import GymEditFields from './GymEditFields';
+import MealEditFields from './MealEditFields';
 import WheelTimePicker from '@/components/ui/WheelTimePicker';
 import { COLOR_BY_CATEGORY, eventSummary } from '@/components/home/eventPresentation';
 import { patchEvent } from '@/lib/client/api';
-import { CAFFEINE_KINDS, type AppEvent, type EventPatch } from '@/lib/types';
+import { CAFFEINE_KINDS, type AppEvent, type EventPatch, type ExerciseRow } from '@/lib/types';
 import styles from './sheets.module.css';
 
 const NAP_PRESETS = [20, 45, 90] as const;
 const NAP_STEP = 5;
 const NAP_MAX = 600;
+const DEFAULT_GYM_DURATION = 45;
 
 interface Props {
   event: AppEvent;
@@ -27,10 +30,19 @@ export default function EditEventSheet({ event, nowIso, onClose, onSaved, onDele
   const [kind, setKind] = useState(event.kind);
   const [intensity, setIntensity] = useState(event.intensity);
   const [duration, setDuration] = useState(event.duration ?? 45);
+  const [mealName, setMealName] = useState(event.mealName ?? '');
+  const [description, setDescription] = useState(event.description ?? '');
+  const [proteinG, setProteinG] = useState(event.proteinG !== undefined ? String(event.proteinG) : '');
+  const [calories, setCalories] = useState(event.calories !== undefined ? String(event.calories) : '');
+  const [sessionDuration, setSessionDuration] = useState(event.sessionDuration ?? DEFAULT_GYM_DURATION);
+  const [exercises, setExercises] = useState<ExerciseRow[]>(event.exercises ?? []);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const timeChanged = occurredAt !== event.occurredAt;
+  const proteinNum = proteinG.trim() === '' ? undefined : Number(proteinG);
+  const caloriesNum = calories.trim() === '' ? undefined : Number(calories);
+  const exercisesChanged = JSON.stringify(exercises) !== JSON.stringify(event.exercises ?? []);
   const patch: EventPatch = {
     // A picked/typed time is explicit — always exact (UX-PATCH-03 §1).
     ...(timeChanged ? { occurred_at: occurredAt, precision: 'exact' } : {}),
@@ -41,11 +53,26 @@ export default function EditEventSheet({ event, nowIso, onClose, onSaved, onDele
       ? { intensity }
       : {}),
     ...(event.type === 'nap' && duration !== event.duration ? { duration } : {}),
+    ...(event.type === 'meal' && mealName.trim() && mealName !== event.mealName
+      ? { mealName: mealName.trim() }
+      : {}),
+    ...(event.type === 'meal' && description !== (event.description ?? '') ? { description } : {}),
+    ...(event.type === 'meal' && proteinNum !== undefined && proteinNum !== event.proteinG
+      ? { proteinG: proteinNum }
+      : {}),
+    ...(event.type === 'meal' && caloriesNum !== undefined && caloriesNum !== event.calories
+      ? { calories: caloriesNum }
+      : {}),
+    ...(event.type === 'gym-session' && sessionDuration !== (event.sessionDuration ?? DEFAULT_GYM_DURATION)
+      ? { sessionDuration }
+      : {}),
+    ...(event.type === 'gym-session' && exercisesChanged ? { exercises } : {}),
   };
   const dirty = Object.keys(patch).length > 0;
+  const mealNameBlank = event.type === 'meal' && mealName.trim().length === 0;
 
   const save = async () => {
-    if (!dirty || saving) return;
+    if (!dirty || saving || mealNameBlank) return;
     setSaving(true);
     setError(null);
     const res = await patchEvent(event.id, patch);
@@ -141,6 +168,31 @@ export default function EditEventSheet({ event, nowIso, onClose, onSaved, onDele
         </>
       )}
 
+      {event.type === 'meal' && (
+        <MealEditFields
+          mealName={mealName}
+          onMealNameChange={setMealName}
+          description={description}
+          onDescriptionChange={setDescription}
+          proteinG={proteinG}
+          onProteinGChange={setProteinG}
+          calories={calories}
+          onCaloriesChange={setCalories}
+          readOnly={readOnly}
+        />
+      )}
+
+      {event.type === 'gym-session' && (
+        <GymEditFields
+          duration={sessionDuration}
+          onDurationChange={setSessionDuration}
+          exercises={exercises}
+          onExercisesChange={setExercises}
+          readOnly={readOnly}
+        />
+      )}
+
+      {mealNameBlank && <p className="error-inline">Meal name is required</p>}
       {error && <p className="error-inline">{error}</p>}
 
       {!readOnly && (
@@ -154,7 +206,7 @@ export default function EditEventSheet({ event, nowIso, onClose, onSaved, onDele
           >
             Delete
           </button>
-          <button className={styles.logBtn} onClick={save} disabled={!dirty || saving}>
+          <button className={styles.logBtn} onClick={save} disabled={!dirty || saving || mealNameBlank}>
             {saving ? 'Saving…' : 'Save'}
           </button>
         </div>

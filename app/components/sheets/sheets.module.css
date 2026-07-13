@@ -34,6 +34,45 @@
   }
 }
 
+/* Desktop (≥1024px): the same sheets render as centered dialogs. */
+@media (min-width: 1024px) {
+  .backdrop {
+    align-items: center;
+    justify-content: center;
+    background: rgba(13, 14, 21, 0.72);
+  }
+
+  .sheet {
+    width: 540px;
+    max-width: 540px;
+    max-height: 86vh;
+    overflow-y: auto;
+    margin: 0;
+    background: var(--sheet);
+    border: 0;
+    border-radius: 16px;
+    box-shadow: var(--sh-lg);
+    padding: 20px 22px;
+    animation: dialog-in var(--duration-fast) var(--ease-out-expo);
+  }
+
+  .grabber {
+    display: none;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .grabber {
   width: 44px;
   height: 4px;
@@ -121,6 +160,140 @@
 
 .logBtn:disabled {
   opacity: 0.4;
+}
+
+/* ——— text/number inputs (meal description+macros, exercise names) ——— */
+
+.textInput {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: var(--text-base);
+  padding: 0 var(--space-2);
+}
+
+.textInput:focus {
+  outline: none;
+  border-color: var(--sleep);
+  border-width: 2px;
+}
+
+.textarea {
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: var(--text-base);
+  padding: var(--space-2);
+  resize: vertical;
+  font-family: inherit;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--sleep);
+  border-width: 2px;
+}
+
+.macroRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.macroField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.macroField span {
+  color: var(--dim);
+  font-size: var(--text-xs);
+}
+
+.macroField input {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: var(--text-base);
+  padding: 0 var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.macroField input:focus {
+  outline: none;
+  border-color: var(--sleep);
+  border-width: 2px;
+}
+
+/* ——— exercise row (gym session array editor) ——— */
+
+.exerciseList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.exerciseRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+}
+
+.exerciseFields {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.exerciseNum {
+  min-height: 44px;
+  width: 100%;
+  min-width: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: var(--text-base);
+  padding: 0 var(--space-1);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.exerciseNum:focus {
+  outline: none;
+  border-color: var(--state);
+  border-width: 2px;
+}
+
+.exerciseX {
+  color: var(--dim);
+  flex-shrink: 0;
+}
+
+.unitToggle {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.exerciseRemove {
+  min-width: 32px;
+  min-height: 32px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: var(--text-base);
 }
 
 /* ——— time field (collapsed "now" row → wheel picker) ——— */

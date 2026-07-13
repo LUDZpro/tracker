@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { invalidateToday } from '@/lib/cache';
+import { invalidateHistory, invalidateToday } from '@/lib/cache';
 import { errorResponse, jsonError, readJson } from '@/lib/http';
-import { eventTitle } from '@/lib/mapping';
+import { buildNotesJson, eventTitle } from '@/lib/mapping';
 import { queryEventsSince, retrieveEvent, updateEventFields } from '@/lib/notion';
 import { buildSleepPairs, checkSleepSpan, overlapsPairs } from '@/lib/sleep';
 import { toLocalISO } from '@/lib/time';
@@ -53,22 +53,45 @@ export async function PATCH(req: Request, ctx: Ctx) {
 
     // Value edits must keep the Notion title ("category:type — value") honest.
     const valueEdited =
-      patch.kind !== undefined || patch.intensity !== undefined || patch.duration !== undefined;
+      patch.kind !== undefined ||
+      patch.intensity !== undefined ||
+      patch.duration !== undefined ||
+      patch.mealName !== undefined ||
+      patch.description !== undefined ||
+      patch.proteinG !== undefined ||
+      patch.calories !== undefined ||
+      patch.sessionDuration !== undefined ||
+      patch.exercises !== undefined;
     const merged: AppEvent = {
       ...ev,
       ...(patch.kind !== undefined ? { kind: patch.kind } : {}),
       ...(patch.intensity !== undefined ? { intensity: patch.intensity } : {}),
       ...(patch.duration !== undefined ? { duration: patch.duration } : {}),
+      ...(patch.mealName !== undefined ? { mealName: patch.mealName } : {}),
+      ...(patch.description !== undefined ? { description: patch.description } : {}),
+      ...(patch.proteinG !== undefined ? { proteinG: patch.proteinG } : {}),
+      ...(patch.calories !== undefined ? { calories: patch.calories } : {}),
+      ...(patch.sessionDuration !== undefined ? { sessionDuration: patch.sessionDuration } : {}),
+      ...(patch.exercises !== undefined ? { exercises: patch.exercises } : {}),
     };
+    // gym-session's minutes share nap's Duration (min) column.
+    const durationForNotion = patch.sessionDuration ?? patch.duration;
+    const notesEdited =
+      patch.description !== undefined ||
+      patch.proteinG !== undefined ||
+      patch.calories !== undefined ||
+      patch.exercises !== undefined;
 
     await updateEventFields(id, {
       occurredAt: patch.occurred_at,
       precision: patch.precision,
       intensity: patch.intensity,
-      duration: patch.duration,
+      duration: durationForNotion,
       ...(valueEdited ? { title: eventTitle(merged) } : {}),
+      ...(notesEdited ? { notes: buildNotesJson(merged) ?? '' } : {}),
     });
     invalidateToday();
+    invalidateHistory(ev.type);
     return NextResponse.json({ ok: true });
   } catch (e) {
     return errorResponse(e);

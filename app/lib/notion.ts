@@ -1,5 +1,5 @@
 import { fromNotionPage, toNotionProperties } from './mapping';
-import type { AppEvent, EventPayload } from './types';
+import type { AppEvent, EventPayload, EventType } from './types';
 
 /**
  * The ONLY Notion data source this app may write to (event log).
@@ -67,6 +67,7 @@ export async function updateEventFields(
     duration?: number;
     intensity?: number;
     title?: string;
+    notes?: string;
   },
 ): Promise<void> {
   const properties: Record<string, unknown> = {};
@@ -75,6 +76,9 @@ export async function updateEventFields(
   if (patch.duration !== undefined) properties['Duration (min)'] = { number: patch.duration };
   if (patch.intensity !== undefined) properties.Intensity = { number: patch.intensity };
   if (patch.title) properties.Event = { title: [{ text: { content: patch.title } }] };
+  if (patch.notes !== undefined) {
+    properties.Notes = { rich_text: [{ text: { content: patch.notes } }] };
+  }
   await notionFetch(`/pages/${id}`, {
     method: 'PATCH',
     body: JSON.stringify({ properties }),
@@ -125,4 +129,31 @@ export async function queryEventsSince(sinceIso: string): Promise<AppEvent[]> {
     cursor = data.has_more ? data.next_cursor : undefined;
   } while (cursor);
   return events;
+}
+
+/** One calendar-day-paged page of events of a single type, newest first.
+ *  `before` is a plain ISO timestamp (the previous page's oldest event),
+ *  never Notion's opaque next_cursor — keeps the client-facing cursor simple. */
+export async function queryEventsByType(
+  type: EventType,
+  opts: { before?: string; limit: number },
+): Promise<{ events: AppEvent[]; hasMore: boolean }> {
+  const filters: Record<string, unknown>[] = [{ property: 'Type', rich_text: { equals: type } }];
+  if (opts.before) filters.push({ property: 'Occurred at', date: { before: opts.before } });
+
+  const body: Record<string, unknown> = {
+    filter: filters.length > 1 ? { and: filters } : filters[0],
+    sorts: [{ property: 'Occurred at', direction: 'descending' }],
+    page_size: opts.limit,
+  };
+  const data = await notionFetch(`/data_sources/${DATA_SOURCE_ID}/query`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  const events: AppEvent[] = [];
+  for (const page of data.results ?? []) {
+    const ev = fromNotionPage(page);
+    if (ev) events.push(ev);
+  }
+  return { events, hasMore: Boolean(data.has_more) };
 }

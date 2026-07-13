@@ -1,12 +1,11 @@
 {
-  "name": "Floor Logger",
-  "short_name": "Floor",
+  "name": "Tracker",
+  "short_name": "Tracker",
   "description": "One-tap personal event logging",
   "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0E1116",
-  "theme_color": "#0E1116",
+  "background_color": "#0d0e15",
+  "theme_color": "#0d0e15",
   "icons": [
     {
       "src": "/icons/icon-192.png",

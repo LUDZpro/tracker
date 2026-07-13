@@ -10,7 +10,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-plex), system-ui, sans-serif;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
   font-size: var(--text-base);
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;

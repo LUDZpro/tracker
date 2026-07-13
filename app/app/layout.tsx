@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { IBM_Plex_Sans } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import SwRegistrar from '@/components/pwa/SwRegistrar';
 import '@/styles/tokens.css';
 import '@/styles/global.css';
@@ -7,21 +7,21 @@ import '@/styles/global.css';
 // Nonce-based CSP requires per-request rendering.
 export const dynamic = 'force-dynamic';
 
-const plex = IBM_Plex_Sans({
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
-  variable: '--font-plex',
+  variable: '--font-sans',
 });
 
 export const metadata: Metadata = {
-  title: 'Floor Logger',
+  title: 'Tracker',
   description: 'One-tap personal event logging',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Floor Logger',
+    title: 'Tracker',
   },
   icons: {
     apple: '/icons/icon-192.png',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0E1116',
+  themeColor: '#0d0e15',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -37,7 +37,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={plex.variable}>
+    <html lang="en" className={inter.variable}>
       <body>
         {children}
         <SwRegistrar />

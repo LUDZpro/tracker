@@ -1,6 +1,13 @@
 'use client';
 
-import type { EventPatch, EventPayload, TodayResponse } from '@/lib/types';
+import type {
+  EventPatch,
+  EventPayload,
+  EventType,
+  HistoryResponse,
+  TodayResponse,
+  WeekResponse,
+} from '@/lib/types';
 
 export type PostResult =
   | { status: 'created'; id: string }
@@ -46,6 +53,31 @@ export async function fetchToday(offset = 0): Promise<TodayResponse> {
     throw new Error('Unauthorized');
   }
   if (res.status === 404) throw new Error('No more history');
+  if (!res.ok) throw new Error(await readError(res));
+  return res.json();
+}
+
+/** Last 7 days of every event type (desktop goal cards + week column). */
+export async function fetchWeek(): Promise<WeekResponse> {
+  const res = await fetch('/api/week');
+  if (res.status === 401) {
+    window.location.href = '/login';
+    throw new Error('Unauthorized');
+  }
+  if (!res.ok) throw new Error(await readError(res));
+  return res.json();
+}
+
+/** One calendar-day-paged page of Nutrition/Gym history; `before` is the
+ *  previous page's `nextCursor` (an ISO timestamp), omitted for the first page. */
+export async function fetchHistory(type: EventType, before?: string): Promise<HistoryResponse> {
+  const params = new URLSearchParams({ type });
+  if (before) params.set('before', before);
+  const res = await fetch(`/api/history?${params}`);
+  if (res.status === 401) {
+    window.location.href = '/login';
+    throw new Error('Unauthorized');
+  }
   if (!res.ok) throw new Error(await readError(res));
   return res.json();
 }
