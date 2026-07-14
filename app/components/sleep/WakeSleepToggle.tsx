@@ -15,29 +15,30 @@ interface Props {
 
 export default function WakeSleepToggle({ lastSleep, onLog, onOpenSheet, meta }: Props) {
   const isAsleep = lastSleep.start && !lastSleep.end;
-  const isAwake = !isAsleep;
+  const canWake = Boolean(isAsleep);
+  const canSleep = !isAsleep;
 
   const { guard: wakeGuard, handlers: wakeHandlers } = useLongPress(() => {
-    if (isAwake) onOpenSheet('wake', true);
+    if (canWake) onOpenSheet('wake', true);
   });
 
   const { guard: sleepGuard, handlers: sleepHandlers } = useLongPress(() => {
-    if (isAsleep) onOpenSheet('sleep', true);
+    if (canSleep) onOpenSheet('sleep', true);
   });
 
   return (
     <div className={styles.toggle}>
       <button
-        className={`${styles.side} ${styles.wake} ${!isAwake ? styles.disabled : ''}`}
+        className={`${styles.side} ${styles.wake} ${!canWake ? styles.disabled : ''}`}
         onClick={wakeGuard(() => {
-          if (isAwake) {
+          if (canWake) {
             onLog(
               { type: 'wake_up', occurred_at: toLocalISO(new Date()), precision: 'exact' },
               'Wake'
             );
           }
         })}
-        disabled={!isAwake}
+        disabled={!canWake}
         {...wakeHandlers}
       >
         <span className={styles.fill} aria-hidden />
@@ -48,16 +49,16 @@ export default function WakeSleepToggle({ lastSleep, onLog, onOpenSheet, meta }:
         </span>
       </button>
       <button
-        className={`${styles.side} ${styles.sleep} ${!isAsleep ? styles.disabled : ''}`}
+        className={`${styles.side} ${styles.sleep} ${!canSleep ? styles.disabled : ''}`}
         onClick={sleepGuard(() => {
-          if (isAsleep) {
+          if (canSleep) {
             onLog(
               { type: 'sleep_start', occurred_at: toLocalISO(new Date()), precision: 'exact' },
               'Sleep'
             );
           }
         })}
-        disabled={!isAsleep}
+        disabled={!canSleep}
         {...sleepHandlers}
       >
         <span className={styles.fill} aria-hidden />

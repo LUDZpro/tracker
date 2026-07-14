@@ -168,7 +168,7 @@ export default function ActionGrid({ onOpen, onLog, today, events }: Props) {
           onOpenSheet={onOpen}
           meta={{
             wake: today.last_sleep.end ? wallHHMM(today.last_sleep.end.occurredAt) : '',
-            sleep: today.last_sleep.start && !today.last_sleep.end ? wallHHMM(today.last_sleep.start.occurredAt) : '',
+            sleep: today.last_sleep.start ? wallHHMM(today.last_sleep.start.occurredAt) : '',
           }}
         />
       </div>
