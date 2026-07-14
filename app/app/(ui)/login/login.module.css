@@ -119,3 +119,11 @@
   color: var(--dim);
   font-size: var(--text-sm);
 }
+
+.skipBtnStrong {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-weight: 600;
+}

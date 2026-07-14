@@ -31,6 +31,15 @@ export default function LoginPage() {
   // offer to create a passkey before heading in.
   const [offerEnroll, setOfferEnroll] = useState(false);
 
+  const rememberBioDismissed = () => {
+    setBioDismissed(true);
+    try {
+      localStorage.setItem(BIO_DISMISSED_KEY, '1');
+    } catch {
+      /* non-critical */
+    }
+  };
+
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -155,21 +164,19 @@ export default function LoginPage() {
       localStorage.removeItem(BIO_DISMISSED_KEY);
       window.location.href = '/';
     } catch {
+      rememberBioDismissed();
       setBusy(false);
       setError('Biometric setup did not finish. Try again or continue without it.');
     }
   };
 
   const skipEnrollment = () => {
-    try {
-      localStorage.setItem(BIO_DISMISSED_KEY, '1');
-    } catch {
-      /* non-critical */
-    }
+    rememberBioDismissed();
     window.location.href = '/';
   };
 
   if (offerEnroll) {
+    const setupFailed = Boolean(error);
     return (
       <main className={styles.wrap}>
         <h1 className={styles.title}>{APP_NAME}</h1>
@@ -180,10 +187,13 @@ export default function LoginPage() {
           </p>
           {error && <p className="error-inline">{error}</p>}
           <button className={styles.unlock} onClick={enroll} disabled={busy}>
-            {busy ? 'Setting up…' : 'Enable biometrics'}
+            {busy ? 'Setting up…' : setupFailed ? 'Try again' : 'Enable biometrics'}
           </button>
-          <button className={styles.skipBtn} onClick={skipEnrollment}>
-            Not now
+          <button
+            className={`${styles.skipBtn} ${setupFailed ? styles.skipBtnStrong : ''}`}
+            onClick={skipEnrollment}
+          >
+            {setupFailed ? 'Continue without biometrics' : 'Not now'}
           </button>
         </div>
       </main>
