@@ -152,7 +152,10 @@ export default function LoginPage() {
         credentials: 'same-origin',
         cache: 'no-store',
       });
-      if (!optRes.ok) throw new Error('Could not start enrollment');
+      if (!optRes.ok) {
+        const data = await optRes.json().catch(() => ({}));
+        throw new Error(data.error || 'Could not start enrollment');
+      }
       const attestation = await startRegistration({ optionsJSON: await optRes.json() });
       const res = await fetch('/api/webauthn/register/verify', {
         method: 'POST',
@@ -160,13 +163,18 @@ export default function LoginPage() {
         credentials: 'same-origin',
         body: JSON.stringify(attestation),
       });
-      if (!res.ok) throw new Error('Could not save the passkey');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Could not save the passkey');
+      }
       localStorage.removeItem(BIO_DISMISSED_KEY);
       window.location.href = '/';
-    } catch {
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error('[WebAuthn Enrollment Error]', msg, e);
       rememberBioDismissed();
       setBusy(false);
-      setError('Biometric setup did not finish. Try again or continue without it.');
+      setError(`Biometric setup did not finish (${msg}). Try again or continue without it.`);
     }
   };
 

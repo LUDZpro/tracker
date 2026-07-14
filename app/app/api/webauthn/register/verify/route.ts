@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       requireUserVerification: true,
     });
     if (!result.verified || !result.registrationInfo) {
-      return jsonError(400, 'Could not verify the passkey');
+      return jsonError(400, 'Passkey verification failed');
     }
     const { credential } = result.registrationInfo;
     await addCredential({
@@ -35,7 +35,9 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
     });
     return new NextResponse(null, { status: 204 });
-  } catch {
-    return jsonError(400, 'Could not verify the passkey');
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Unknown error';
+    console.error('[WebAuthn Register Verify Error]', msg, e);
+    return jsonError(400, `Passkey verification failed: ${msg}`);
   }
 }

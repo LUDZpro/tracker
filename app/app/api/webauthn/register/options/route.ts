@@ -9,7 +9,7 @@ import { readCredentials } from '@/lib/webauthn/store';
 /** Auth'd (middleware): start enrolling this device's platform authenticator. */
 export async function POST(req: Request) {
   try {
-    const { rpID } = rpFromRequest(req);
+    const { rpID, origin } = rpFromRequest(req);
     const creds = await readCredentials();
     const options = await generateRegistrationOptions({
       rpName: 'Tracker',
@@ -30,6 +30,8 @@ export async function POST(req: Request) {
     saveChallenge('register', options.challenge);
     return NextResponse.json(options, { headers: { 'Cache-Control': 'no-store' } });
   } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Unknown error';
+    console.error('[WebAuthn Register Options Error]', msg, e);
     return errorResponse(e);
   }
 }
