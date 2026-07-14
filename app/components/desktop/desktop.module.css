@@ -290,6 +290,38 @@
   text-align: left;
 }
 
+/* Coffee · Tea · Energy — three compact cards on one row. */
+.subRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-bottom: 7px;
+}
+
+.capCompact {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 82px;
+  padding: 12px 6px 10px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.capCompact .capLbl {
+  flex: none;
+  text-align: center;
+}
+
+.capCompact .capMeta {
+  text-align: center;
+}
+
+.capCompact kbd {
+  display: none;
+}
+
 .cap:hover {
   border-color: var(--a700);
 }

@@ -41,31 +41,33 @@ const caffeine = (kind: CaffeineKind) => (): EventPayload => ({
   kind,
 });
 
-const CAPTURES: CaptureDef[] = [
+/** Sits full-width right after the wake/sleep toggle. */
+const NAP_CAPTURE: CaptureDef = {
+  sheet: 'nap',
+  label: 'Nap',
+  icon: 'nap',
+  kbd: 'N',
+  holdPayload: () => ({
+    type: 'nap',
+    occurred_at: nowIso(),
+    precision: 'exact',
+    duration: DEFAULT_NAP_MINUTES,
+  }),
+};
+
+/** Coffee · Tea · Energy — laid out as one compact three-up row. */
+const SUBSTANCE_CAPTURES: CaptureDef[] = [
   { sheet: 'coffee', label: 'Coffee', icon: 'coffee', kbd: 'C', holdPayload: caffeine('coffee') },
   { sheet: 'tea', label: 'Tea', icon: 'tea', kbd: 'T', holdPayload: caffeine('tea') },
-  {
-    sheet: 'energy-drink',
-    label: 'Energy drink',
-    icon: 'bolt',
-    kbd: 'E',
-    holdPayload: caffeine('energy'),
-  },
-  {
-    sheet: 'nap',
-    label: 'Nap',
-    icon: 'nap',
-    kbd: 'N',
-    holdPayload: () => ({
-      type: 'nap',
-      occurred_at: nowIso(),
-      precision: 'exact',
-      duration: DEFAULT_NAP_MINUTES,
-    }),
-  },
+  { sheet: 'energy-drink', label: 'Energy', icon: 'bolt', kbd: 'E', holdPayload: caffeine('energy') },
+];
+
+const MEAL_GYM_CAPTURES: CaptureDef[] = [
   { sheet: 'meal', label: 'Meal', icon: 'meal', kbd: 'M', holdPayload: null },
   { sheet: 'gym', label: 'Gym', icon: 'gym', kbd: 'G', holdPayload: null },
 ];
+
+const CAPTURES: CaptureDef[] = [NAP_CAPTURE, ...SUBSTANCE_CAPTURES, ...MEAL_GYM_CAPTURES];
 
 export const KEY_TO_SHEET: Record<string, DesktopSheet> = Object.fromEntries(
   CAPTURES.map((c) => [c.kbd, c.sheet]),
@@ -126,11 +128,13 @@ const FLASH_MS = 600;
 function CaptureButton({
   def,
   meta,
+  compact = false,
   onLogNow,
   onOpenSheet,
 }: {
   def: CaptureDef;
   meta: string | null;
+  compact?: boolean;
   onLogNow: (payload: EventPayload, label: string) => void;
   onOpenSheet: (sheet: DesktopSheet) => void;
 }) {
@@ -150,7 +154,7 @@ function CaptureButton({
 
   return (
     <button
-      className={`${styles.cap} ${holding ? styles.holding : ''} ${flash ? styles.flash : ''}`}
+      className={`${styles.cap} ${compact ? styles.capCompact : ''} ${holding ? styles.holding : ''} ${flash ? styles.flash : ''}`}
       {...handlers}
       onPointerDown={(e) => {
         setHolding(true);
@@ -243,7 +247,25 @@ export default function CaptureColumn({ todayEvents, lastSleep, onLogNow, onOpen
             sleep: lastSleep.start ? wallHHMM(lastSleep.start.occurredAt) : '',
           }}
         />
-        {CAPTURES.map((def) => (
+        <CaptureButton
+          def={NAP_CAPTURE}
+          meta={metaFor(NAP_CAPTURE, todayEvents)}
+          onLogNow={onLogNow}
+          onOpenSheet={onOpenSheet}
+        />
+        <div className={styles.subRow}>
+          {SUBSTANCE_CAPTURES.map((def) => (
+            <CaptureButton
+              key={def.sheet}
+              def={def}
+              compact
+              meta={metaFor(def, todayEvents)}
+              onLogNow={onLogNow}
+              onOpenSheet={onOpenSheet}
+            />
+          ))}
+        </div>
+        {MEAL_GYM_CAPTURES.map((def) => (
           <CaptureButton
             key={def.sheet}
             def={def}
