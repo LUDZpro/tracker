@@ -314,7 +314,7 @@ export default function DesktopHome() {
             ●
           </span>
           <span>{logger.last.label}</span>
-          {logger.last.id && (
+          {logger.last.id && logger.last.payload.type !== 'nap' && (
             <button className={styles.toastA} onClick={editLast}>
               adjust time
             </button>

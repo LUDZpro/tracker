@@ -20,6 +20,7 @@ const ICON_BY_TYPE: Record<AppEvent['type'], string> = {
   // but these keep the lookup exhaustive rather than throwing if they did.
   meal: '🍽',
   'gym-session': '💪',
+  trigger: '⚑',
 };
 
 export function eventIcon(ev: AppEvent): string {
@@ -44,6 +45,8 @@ export function eventSummary(ev: AppEvent): string {
       return ev.mealName ?? 'meal';
     case 'gym-session':
       return `${ev.exercises?.length ?? 0} exercises`;
+    case 'trigger':
+      return 'trigger · thought record';
   }
 }
 

@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { eventIcon, eventSummary, precisionBadge, COLOR_BY_CATEGORY } from './eventPresentation';
+import { EventIcon, rowText, toneFor } from '@/components/desktop/presentation';
+import { precisionBadge } from './eventPresentation';
 import { shiftDateKey, wallDateKey, wallHHMM } from '@/lib/time';
 import type { AppEvent } from '@/lib/types';
 import styles from './home.module.css';
@@ -62,6 +63,8 @@ function Row({
   };
 
   const badge = precisionBadge(ev);
+  const text = rowText(ev);
+  const tone = toneFor(ev.type);
 
   return (
     <li className={styles.rowSlot}>
@@ -73,21 +76,29 @@ function Row({
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         onClick={() => {
+          if (selected) {
+            onOpen(ev);
+            return;
+          }
           onSelect(ev.id);
-          onOpen(ev);
         }}
       >
         <time className={styles.rowTime}>{wallHHMM(ev.occurredAt)}</time>
         <span
           className={styles.rowIcon}
-          style={{ color: COLOR_BY_CATEGORY[ev.category] }}
+          data-tone={tone}
           aria-hidden
         >
-          {eventIcon(ev)}
+          <EventIcon ev={ev} size={12} />
         </span>
-        <span className={styles.rowLabel}>{eventSummary(ev)}</span>
+        <span className={styles.rowLabel}>
+          {text.main}
+          {text.meta && <em> · {text.meta}</em>}
+        </span>
+        {text.value && <span className={styles.rowValue}>{text.value}</span>}
         {badge && <span className={styles.rowBadge}>{badge}</span>}
-        {ev.editable === false && <span className={styles.rowLock} aria-label="read-only">🔒</span>}
+        {selected && ev.editable !== false && <span className={styles.rowAction}>edit</span>}
+        {ev.editable === false && <span className={styles.rowLock} aria-label="read-only">lock</span>}
       </button>
     </li>
   );
@@ -118,7 +129,7 @@ export default function TodayList({
     if (prevKey !== null && key !== prevKey) {
       items.push(
         <li key={`sep-${key}`} className={styles.daySeparator} aria-hidden>
-          ─ {separatorLabel(key, todayKey)} ─
+          {separatorLabel(key, todayKey)}
         </li>,
       );
     }

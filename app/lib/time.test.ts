@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  addMinutes,
   minutesBetween,
   shiftDateKey,
   wallHHMM,
@@ -20,6 +21,12 @@ describe('wall-clock helpers', () => {
 
   it('computes chronological distance with offsets respected', () => {
     expect(minutesBetween('2026-07-05T23:30:00+01:00', '2026-07-06T07:00:00+01:00')).toBe(450);
+  });
+
+  it('adds minutes while preserving the explicit offset', () => {
+    expect(addMinutes('2026-07-06T00:15:00+01:00', -30)).toBe('2026-07-05T23:45:00+01:00');
+    expect(addMinutes('2026-07-06T23:45:00-05:00', 30)).toBe('2026-07-07T00:15:00-05:00');
+    expect(addMinutes('2026-07-06T23:45:00Z', 30)).toBe('2026-07-07T00:15:00Z');
   });
 
   it('shifts date keys across month boundaries', () => {

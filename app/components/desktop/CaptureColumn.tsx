@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { Icon } from './presentation';
 import { useLongPress } from '@/hooks/useLongPress';
-import { toLocalISO, wallHHMM } from '@/lib/time';
+import { buildSleepPairs } from '@/lib/sleep';
+import { minutesBetween, toLocalISO, wallHHMM } from '@/lib/time';
 import type { AppEvent, CaffeineKind, EventPayload } from '@/lib/types';
 import styles from './desktop.module.css';
 
@@ -29,6 +30,8 @@ interface CaptureDef {
 }
 
 const nowIso = () => toLocalISO(new Date());
+const DEFAULT_NAP_MINUTES = 45;
+const NAP_MAX_MINUTES = 180;
 
 const caffeine = (kind: CaffeineKind) => (): EventPayload => ({
   type: 'caffeine',
@@ -66,7 +69,12 @@ const CAPTURES: CaptureDef[] = [
     label: 'Nap',
     icon: 'nap',
     kbd: 'N',
-    holdPayload: () => ({ type: 'nap', occurred_at: nowIso(), precision: 'exact' }),
+    holdPayload: () => ({
+      type: 'nap',
+      occurred_at: nowIso(),
+      precision: 'exact',
+      duration: DEFAULT_NAP_MINUTES,
+    }),
   },
   { sheet: 'meal', label: 'Meal', icon: 'meal', kbd: 'M', holdPayload: null },
   { sheet: 'gym', label: 'Gym', icon: 'gym', kbd: 'G', holdPayload: null },
@@ -78,6 +86,17 @@ export const KEY_TO_SHEET: Record<string, DesktopSheet> = Object.fromEntries(
 
 /** "×3 · 19:15"-style per-button recap of what's already logged today. */
 function metaFor(def: CaptureDef, todayEvents: AppEvent[]): string | null {
+  if (def.sheet === 'nap') {
+    const pairs = buildSleepPairs(todayEvents).filter((pair) => {
+      const duration = minutesBetween(pair.start.occurredAt, pair.end.occurredAt);
+      return duration > 0 && duration <= NAP_MAX_MINUTES;
+    });
+    const last = pairs[pairs.length - 1];
+    if (!last) return null;
+    const duration = minutesBetween(last.start.occurredAt, last.end.occurredAt);
+    return `${duration}m · ${wallHHMM(last.end.occurredAt)}`;
+  }
+
   const match = (e: AppEvent): boolean => {
     switch (def.sheet) {
       case 'wake':
@@ -91,7 +110,7 @@ function metaFor(def: CaptureDef, todayEvents: AppEvent[]): string | null {
       case 'energy-drink':
         return e.type === 'caffeine' && e.kind === 'energy';
       case 'nap':
-        return e.type === 'nap';
+        return false;
       case 'meal':
         return e.type === 'meal';
       case 'gym':

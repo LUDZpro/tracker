@@ -8,7 +8,8 @@ export type EventType =
   | 'mood'
   | 'energy'
   | 'meal'
-  | 'gym-session';
+  | 'gym-session'
+  | 'trigger';
 
 export type Precision = 'exact' | '~5min' | '~hour' | '~part_of_day';
 
@@ -35,6 +36,9 @@ export const CATEGORY_BY_TYPE: Record<EventType, Category> = {
   energy: 'state',
   meal: 'action',
   'gym-session': 'action',
+  // Written by POST /api/cbt when a thought record is saved — the floor feed
+  // shows *when* anxiety hit; the record's content lives in the CBT database.
+  trigger: 'state',
 };
 
 export const PRECISIONS: readonly Precision[] = [

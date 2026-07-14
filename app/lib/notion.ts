@@ -26,7 +26,8 @@ function token(): string {
   return t;
 }
 
-async function notionFetch(path: string, init: RequestInit): Promise<any> {
+/** Shared low-level fetch — also used by lib/cbt/notion.ts (separate database). */
+export async function notionFetch(path: string, init: RequestInit): Promise<any> {
   const res = await fetch(`${NOTION_API}${path}`, {
     ...init,
     headers: {

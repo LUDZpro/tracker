@@ -8,6 +8,7 @@
  */
 
 const WALL_RE = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/;
+const TZ_RE = /(Z|[+-]\d{2}:\d{2})$/;
 
 export interface WallParts {
   year: number;
@@ -44,6 +45,33 @@ export function wallMinutes(iso: string): number {
 /** True chronological distance in minutes (offsets respected). */
 export function minutesBetween(fromIso: string, toIso: string): number {
   return Math.round((Date.parse(toIso) - Date.parse(fromIso)) / 60000);
+}
+
+/** Add minutes to an ISO timestamp while preserving its explicit timezone offset. */
+export function addMinutes(iso: string, minutes: number): string {
+  const tz = iso.match(TZ_RE)?.[1];
+  const t = Date.parse(iso);
+  if (!tz || Number.isNaN(t)) return iso;
+
+  const target = new Date(t + minutes * 60000);
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  if (tz === 'Z') {
+    return (
+      `${target.getUTCFullYear()}-${pad(target.getUTCMonth() + 1)}-${pad(target.getUTCDate())}` +
+      `T${pad(target.getUTCHours())}:${pad(target.getUTCMinutes())}:00Z`
+    );
+  }
+
+  const sign = tz[0] === '-' ? -1 : 1;
+  const offHours = Number(tz.slice(1, 3));
+  const offMinutes = Number(tz.slice(4, 6));
+  const offsetMs = sign * (offHours * 60 + offMinutes) * 60000;
+  const wall = new Date(target.getTime() + offsetMs);
+  return (
+    `${wall.getUTCFullYear()}-${pad(wall.getUTCMonth() + 1)}-${pad(wall.getUTCDate())}` +
+    `T${pad(wall.getUTCHours())}:${pad(wall.getUTCMinutes())}:00${tz}`
+  );
 }
 
 /** Shift a wall date key by n days (n may be negative). */

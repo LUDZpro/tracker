@@ -10,6 +10,7 @@ const LINKS = [
   { href: '/nutrition', label: 'Nutrition', icon: 'meal' },
   { href: '/gym', label: 'Gym', icon: 'gym' },
   { href: '/sleep', label: 'Sleep', icon: 'sleep' },
+  { href: '/cbt', label: 'Mind', icon: 'mind' },
 ] as const;
 
 /** Desktop-only left rail (≥1024px); mobile keeps the bottom TabBar. */

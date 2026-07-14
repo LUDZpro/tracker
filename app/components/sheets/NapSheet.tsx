@@ -37,7 +37,7 @@ export default function NapSheet({ onLog, onClose, pickTime }: Props) {
   };
 
   return (
-    <Sheet title="Nap" onClose={onClose}>
+    <Sheet title="Nap ended" onClose={onClose}>
       <div className={styles.chipRow}>
         {PRESETS.map((m) => (
           <button
@@ -73,7 +73,7 @@ export default function NapSheet({ onLog, onClose, pickTime }: Props) {
       )}
       <TimeField at={at} onChange={setAt} accent="var(--sleep)" />
       <button className={styles.logBtn} onClick={logIt}>
-        Log it
+        Log sleep/wake
       </button>
     </Sheet>
   );

@@ -21,6 +21,7 @@ const TONE_BY_TYPE: Record<EventType, Tone> = {
   'gym-session': 'gym',
   mood: 'state',
   energy: 'state',
+  trigger: 'state',
 };
 
 export function toneFor(type: EventType): Tone {
@@ -39,7 +40,9 @@ type IconName =
   | 'mood'
   | 'energy'
   | 'clock'
-  | 'list';
+  | 'list'
+  | 'trigger'
+  | 'mind';
 
 const ICON_BODY: Record<IconName, React.ReactNode> = {
   wake: (
@@ -85,6 +88,18 @@ const ICON_BODY: Record<IconName, React.ReactNode> = {
     </>
   ),
   list: <path d="M4 6h16M4 12h16M4 18h10" />,
+  trigger: (
+    <>
+      <path d="M5 21V4" />
+      <path d="M5 4c3-1.6 6 1.6 9 0s5 0 5 0v9s-2-1.6-5 0-6-1.6-9 0" />
+    </>
+  ),
+  mind: (
+    <>
+      <path d="M12 3a7 7 0 0 1 7 7c0 2.4-1.2 4-2.4 5.4L16 21h-6l-.4-3H8a2 2 0 0 1-2-2v-2H4.5l1.7-3.4A7 7 0 0 1 12 3Z" />
+      <path d="M10.5 9.5c.4-1 1.6-1.5 2.6-1" />
+    </>
+  ),
 };
 
 const CAFFEINE_ICON: Record<CaffeineKind, IconName> = {
@@ -112,6 +127,8 @@ function iconNameFor(type: EventType, kind?: CaffeineKind): IconName {
       return 'mood';
     case 'energy':
       return 'energy';
+    case 'trigger':
+      return 'trigger';
   }
 }
 
@@ -189,5 +206,7 @@ export function rowText(ev: AppEvent): RowText {
       const label = ev.type === 'mood' ? 'Mood' : 'Energy';
       return { main: ev.intensity !== undefined ? `${label} · ${ev.intensity}/5` : label };
     }
+    case 'trigger':
+      return { main: 'Trigger', meta: 'thought record' };
   }
 }

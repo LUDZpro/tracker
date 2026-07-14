@@ -1,0 +1,872 @@
+/* CBT section — same night-console tokens, its own calmer, more spacious voice. */
+
+.wrap {
+  min-height: 100dvh;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 0 var(--space-3)
+    calc(max(env(safe-area-inset-bottom), var(--space-3)) + var(--tabbar-h) + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: var(--app);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.pageHeader {
+  padding-top: max(env(safe-area-inset-top), var(--space-3));
+}
+
+.pageHeader h1 {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.pageHeader p {
+  margin: 6px 0 0;
+  color: var(--t3);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  max-width: 34ch;
+}
+
+/* ---- entry CTA ---------------------------------------------------------- */
+
+.ctaCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  padding: 18px;
+  border: 1px solid var(--a800);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--a900), var(--night) 70%);
+  color: var(--t1);
+  cursor: pointer;
+  transition: border-color var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.ctaCard:hover,
+.ctaCard:focus-visible {
+  border-color: var(--a600);
+}
+
+.ctaCard:active {
+  transform: scale(0.985);
+}
+
+.ctaTriangle {
+  width: 52px;
+  height: 46px;
+  flex-shrink: 0;
+  color: var(--a700);
+}
+
+.ctaText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.ctaText b {
+  font-size: var(--text-base);
+  font-weight: 620;
+}
+
+.ctaText span {
+  color: var(--t3);
+  font-size: var(--text-xs);
+}
+
+.ctaArrow {
+  color: var(--accent);
+  font-size: var(--text-lg);
+}
+
+/* ---- insights ------------------------------------------------------------ */
+
+.insights {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--night);
+}
+
+.insightStats {
+  display: flex;
+  gap: 24px;
+}
+
+.insightStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.insightStat b {
+  font-size: var(--text-lg);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.reliefPositive {
+  color: var(--ok);
+}
+
+.insightStat span {
+  color: var(--t4);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.insightBars h3 {
+  margin: 0 0 8px;
+  color: var(--t3);
+  font-size: var(--text-xs);
+  font-weight: 550;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.insightBarRow {
+  display: grid;
+  grid-template-columns: 20px minmax(9rem, auto) 1fr 2.2rem;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: var(--text-xs);
+}
+
+.insightBarIcon {
+  color: var(--a500);
+  display: inline-flex;
+}
+
+.insightBarLabel {
+  color: var(--t2);
+}
+
+.insightBarTrack {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.insightBarFill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width var(--duration-normal) var(--ease-out-expo);
+}
+
+.insightBarCount {
+  color: var(--t3);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- record cards -------------------------------------------------------- */
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--night);
+  overflow: hidden;
+}
+
+.card[data-open] {
+  border-color: var(--edge);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cardEmotion {
+  flex-shrink: 0;
+  display: inline-flex;
+}
+
+.cardMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cardTrigger {
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardMeta {
+  color: var(--t4);
+  font-size: var(--text-xs);
+}
+
+.cardDelta {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  width: 74px;
+}
+
+.cardDeltaNums {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+}
+
+.cardDeltaNums b {
+  font-weight: 650;
+}
+
+.cardDeltaNums i {
+  color: var(--t4);
+  font-style: normal;
+  font-size: var(--text-xs);
+}
+
+.reliefTrack {
+  position: relative;
+  width: 100%;
+  height: 8px;
+}
+
+.reliefBar,
+.reliefBarAfter {
+  position: absolute;
+  left: 0;
+  border-radius: 2px;
+  opacity: 0.45;
+  height: 3px;
+  top: 0;
+}
+
+.reliefBarAfter {
+  top: 5px;
+  opacity: 1;
+}
+
+.cardBody {
+  padding: 4px 14px 14px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardBody h4 {
+  margin: 10px 0 0;
+  color: var(--t4);
+  font-size: var(--text-xs);
+  font-weight: 550;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cardTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border: 1px solid var(--a800);
+  border-radius: 999px;
+  color: var(--a400);
+  font-size: var(--text-xs);
+}
+
+.cardEvidence {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.cardEvidence h4 {
+  margin: 10px 0 4px;
+}
+
+.cardEvidence ul {
+  margin: 0;
+  padding-left: 16px;
+  color: var(--t2);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.cardDelete {
+  background: none;
+  border: none;
+  color: var(--bad);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.undoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 14px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  color: var(--t3);
+  font-size: var(--text-sm);
+}
+
+.undoRow button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.emptyHint {
+  color: var(--t3);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  text-align: center;
+  padding: 22px 12px;
+}
+
+/* ---- guided flow --------------------------------------------------------- */
+
+.flow {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas);
+}
+
+.flowHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: max(env(safe-area-inset-top), 12px) 16px 10px;
+}
+
+.flowProgress {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.flowDot {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--t5);
+  transition: background var(--duration-fast);
+}
+
+.flowDot[data-state='done'] {
+  background: var(--a700);
+}
+
+.flowDot[data-state='now'] {
+  background: var(--accent);
+}
+
+.flowClose {
+  background: none;
+  border: none;
+  color: var(--t3);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.flowBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 20px 20px;
+  max-width: 34rem;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stepCount {
+  margin: 0;
+  color: var(--t4);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+
+.stepTitle {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.stepHint {
+  margin: 0;
+  color: var(--t3);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.flowTextarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-md);
+  background: var(--night);
+  color: var(--t1);
+  font: inherit;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  resize: none;
+}
+
+.flowTextarea:focus {
+  outline: none;
+  border-color: var(--a600);
+}
+
+.thoughtQuote {
+  margin: 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--bad);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--bad-d);
+  color: var(--t1);
+  font-size: var(--text-sm);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.reframeQuote {
+  border-left-color: var(--ok);
+  background: var(--ok-d);
+}
+
+.flowFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px calc(max(env(safe-area-inset-bottom), 12px) + 8px);
+  max-width: 34rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.flowBack {
+  background: none;
+  border: none;
+  color: var(--t3);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  padding: 12px 8px;
+}
+
+.flowNext {
+  min-width: 9rem;
+  padding: 13px 22px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: var(--canvas);
+  font-size: var(--text-sm);
+  font-weight: 650;
+  cursor: pointer;
+  transition: opacity var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.flowNext:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.flowNext:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* ---- SUDS dial ----------------------------------------------------------- */
+
+.dial {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  padding-top: 6px;
+}
+
+.dialArc {
+  width: min(260px, 78%);
+}
+
+.dialFill {
+  transition: stroke-dasharray var(--duration-fast) linear, stroke var(--duration-fast);
+}
+
+.dialNumber {
+  font-size: 44px;
+  font-weight: 680;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.dialUnit {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.dialEnds {
+  width: min(280px, 86%);
+  display: flex;
+  justify-content: space-between;
+  color: var(--t4);
+  font-size: var(--text-xs);
+  margin-top: -6px;
+}
+
+.dialRange {
+  width: min(280px, 86%);
+  accent-color: var(--suds, var(--accent));
+  height: 28px;
+}
+
+/* ---- emotions ------------------------------------------------------------ */
+
+.emotionRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.emotionBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--night);
+  color: var(--t3);
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: color var(--duration-fast), border-color var(--duration-fast),
+    background var(--duration-fast);
+}
+
+.emotionBtn[aria-pressed='true'] {
+  color: var(--emo);
+  border-color: var(--emo);
+  background: color-mix(in srgb, var(--emo) 12%, var(--night));
+}
+
+/* ---- distortions --------------------------------------------------------- */
+
+.distortionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.distortionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--night);
+  color: var(--t2);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--duration-fast), background var(--duration-fast);
+}
+
+.distortionIcon {
+  color: var(--t4);
+  display: inline-flex;
+  transition: color var(--duration-fast);
+}
+
+.distortionLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--t1);
+}
+
+.distortionBlurb {
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--t4);
+}
+
+.distortionCard[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--a900);
+}
+
+.distortionCard[aria-pressed='true'] .distortionIcon {
+  color: var(--accent);
+}
+
+/* ---- evidence scale ------------------------------------------------------ */
+
+.evidence {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.beamSvg {
+  width: min(300px, 88%);
+  margin: 0 auto;
+}
+
+.panCount {
+  font-size: 9px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.evidenceCols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.evidencePane {
+  min-width: 0; /* grid items otherwise refuse to shrink below content width */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--night);
+}
+
+.evidencePane[data-side='for'] {
+  border-top: 2px solid var(--bad);
+}
+
+.evidencePane[data-side='against'] {
+  border-top: 2px solid var(--ok);
+}
+
+.evidenceTitle {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+.evidenceHint {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--t4);
+}
+
+.evidenceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.evidenceChip {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: var(--sheet);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--t1);
+}
+
+.evidenceChip button {
+  background: none;
+  border: none;
+  color: var(--t4);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.evidenceAddRow {
+  display: flex;
+  gap: 6px;
+}
+
+.evidenceAddRow input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: var(--sheet);
+  color: var(--t1);
+  font: inherit;
+  font-size: var(--text-xs);
+}
+
+.evidenceAddRow input:focus {
+  outline: none;
+  border-color: var(--a600);
+}
+
+.evidenceAddRow button {
+  width: 32px;
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: var(--sheet);
+  color: var(--accent);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.evidenceAddRow button:disabled {
+  color: var(--t5);
+}
+
+/* ---- delta --------------------------------------------------------------- */
+
+.deltaRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: var(--text-lg);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.deltaArrow {
+  color: var(--t4);
+  font-size: var(--text-base);
+}
+
+.deltaBadge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ok-d);
+  color: var(--ok);
+  font-size: var(--text-xs);
+  font-weight: 650;
+}
+
+/* ---- desktop (≥1024px) --------------------------------------------------- */
+
+@media (min-width: 1024px) {
+  .wrap {
+    max-width: 42rem;
+    margin-left: calc(var(--rail-w) + ((100% - var(--rail-w) - 42rem) / 2));
+    padding-bottom: var(--space-4);
+  }
+
+  .emotionRow {
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .distortionGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* flow becomes a centered dialog over a dimmed backdrop */
+  .flow {
+    background: rgba(13, 14, 21, 0.72);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .flowHeader,
+  .flowBody,
+  .flowFooter {
+    background: var(--sheet);
+    max-width: 40rem;
+  }
+
+  .flowHeader {
+    width: 40rem;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding-top: 16px;
+    box-shadow: var(--sh-lg);
+  }
+
+  .flowBody {
+    width: 40rem;
+    flex: 0 1 auto; /* size to content — don't stretch a sparse step to full height */
+    min-height: 18rem;
+    max-height: min(64vh, 640px);
+  }
+
+  .flowFooter {
+    width: 40rem;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    padding-bottom: 18px;
+    box-shadow: var(--sh-lg);
+  }
+}

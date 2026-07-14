@@ -10,7 +10,7 @@ import type {
 } from '@/lib/types';
 
 export type PostResult =
-  | { status: 'created'; id: string }
+  | { status: 'created'; id: string; ids: string[] }
   | { status: 'queued' }
   | { status: 'error'; message: string };
 
@@ -35,8 +35,8 @@ export async function postEvent(
       body: JSON.stringify(payload),
     });
     if (res.status === 201) {
-      const { id } = await res.json();
-      return { status: 'created', id };
+      const { id, ids } = await res.json();
+      return { status: 'created', id, ids: Array.isArray(ids) ? ids : [id] };
     }
     if (res.status === 202) return { status: 'queued' };
     return { status: 'error', message: await readError(res) };
@@ -111,13 +111,5 @@ export async function backfillSleep(body: {
     body: JSON.stringify(body),
   });
   if (res.ok || res.status === 202) return { ok: true };
-  return { ok: false, message: await readError(res) };
-}
-
-export async function convertToNap(
-  id: string,
-): Promise<{ ok: true } | { ok: false; message: string }> {
-  const res = await fetch(`/api/event/${id}/convert-nap`, { method: 'POST' });
-  if (res.ok) return { ok: true };
   return { ok: false, message: await readError(res) };
 }

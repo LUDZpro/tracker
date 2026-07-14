@@ -19,7 +19,7 @@ export default function LastLine({ last, canUndo, onUndo, onEdit }: Props) {
       <span className="num">
         last: {last.label} {last.queued ? '(queued)' : '✓'}
       </span>
-      {canUndo && onEdit && last.id && (
+      {canUndo && onEdit && last.id && last.payload.type !== 'nap' && (
         <button className={styles.undoBtn} onClick={() => onEdit(last)}>
           edit
         </button>

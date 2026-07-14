@@ -10,6 +10,7 @@ const UNDO_WINDOW_MS = 12_000; // UX-PATCH-03: [edit] [undo] strip for 12s
 
 export interface LastLogged {
   id: string | null; // null while the event sits in the offline queue
+  ids: string[]; // nap logs create sleep+wake marker pages
   tag: string;
   label: string;
   at: string;
@@ -43,6 +44,7 @@ export function useLogger(refresh: () => Promise<void> | void) {
 
       setLast({
         id: res.status === 'created' ? res.id : null,
+        ids: res.status === 'created' ? res.ids : [],
         tag,
         label: `${label} ${wallHHMM(payload.occurred_at)}`,
         at: payload.occurred_at,
@@ -62,7 +64,7 @@ export function useLogger(refresh: () => Promise<void> | void) {
     navigator.vibrate?.(50);
     setCanUndo(false);
     try {
-      if (last.id) await undoEvent(last.id);
+      if (last.ids.length > 0) await Promise.all(last.ids.map((id) => undoEvent(id)));
       else await cancelQueued(last.tag);
       setLast(null);
       refresh();

@@ -1,27 +1,31 @@
 'use client';
 
-import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ActionGrid, { type SheetKind } from '@/components/home/ActionGrid';
 import HistoryPager from '@/components/home/HistoryPager';
 import LastLine from '@/components/home/LastLine';
+import MobileGoalCards from '@/components/home/MobileGoalCards';
+import MobileTopbar from '@/components/home/MobileTopbar';
 import QueueBanner from '@/components/home/QueueBanner';
-import SleepCta from '@/components/home/SleepCta';
+import ScaleQuickLog from '@/components/home/ScaleQuickLog';
 import TodayList from '@/components/home/TodayList';
-import TodayStrip from '@/components/home/TodayStrip';
 import CaffeineSheet from '@/components/sheets/CaffeineSheet';
 import EditEventSheet from '@/components/sheets/EditEventSheet';
+import GymSheet from '@/components/sheets/GymSheet';
+import MealSheet from '@/components/sheets/MealSheet';
 import NapSheet from '@/components/sheets/NapSheet';
 import ScaleSheet from '@/components/sheets/ScaleSheet';
+import TimeSheet from '@/components/sheets/TimeSheet';
 import DuplicateCard, { type DuplicateAttempt } from '@/components/sleep/DuplicateCard';
 import MissingNightCard from '@/components/sleep/MissingNightCard';
 import { useLogger, type LastLogged } from '@/hooks/useLogger';
 import { useQueue } from '@/hooks/useQueue';
 import { useToday } from '@/hooks/useToday';
+import { useWeek } from '@/hooks/useWeek';
 import { undoEvent } from '@/lib/client/api';
 import { isNightSkipped } from '@/lib/client/skips';
-import { wallDateKey } from '@/lib/time';
-import { CATEGORY_BY_TYPE, type AppEvent, type EventPayload } from '@/lib/types';
+import { toLocalISO, wallDateKey } from '@/lib/time';
+import { CATEGORY_BY_TYPE, type AppEvent, type CaffeineKind, type EventPayload } from '@/lib/types';
 import styles from '@/components/home/home.module.css';
 
 const MAX_OFFSET = 7;
@@ -46,9 +50,18 @@ export default function MobileHome() {
   const [offset, setOffset] = useState(0);
   const [maxReached, setMaxReached] = useState<number | null>(null);
   const { today, error: loadError, refresh } = useToday(offset);
-  const logger = useLogger(refresh);
-  const queued = useQueue(useCallback(() => refresh(), [refresh]));
-  const [sheet, setSheet] = useState<{ kind: SheetKind; withTime: boolean } | null>(null);
+  const { week, refresh: refreshWeek } = useWeek();
+  const refreshAll = useCallback(() => {
+    refresh();
+    refreshWeek();
+  }, [refresh, refreshWeek]);
+  const logger = useLogger(refreshAll);
+  const queued = useQueue(refreshAll);
+  const [sheet, setSheet] = useState<{
+    kind: SheetKind;
+    withTime: boolean;
+    initialKind?: CaffeineKind;
+  } | null>(null);
   const [duplicate, setDuplicate] = useState<DuplicateAttempt | null>(null);
   const [resolvedNight, setResolvedNight] = useState<string | null>(null);
 
@@ -91,12 +104,12 @@ export default function MobileHome() {
             next.delete(ev.id);
             return next;
           });
-          refresh();
+          refreshAll();
         }
       }, DELETE_UNDO_MS);
       deleteTimers.current.set(ev.id, timer);
     },
-    [refresh],
+    [refreshAll],
   );
 
   const undoDelete = useCallback((id: string) => {
@@ -150,6 +163,31 @@ export default function MobileHome() {
     [displayEvents, pendingDeletes],
   );
 
+  const todayEvents = useMemo(() => {
+    if (!today) return stripEvents;
+    const byId = new Map<string, AppEvent>();
+    const key = today.axis_date;
+    for (const ev of week?.events ?? []) {
+      if (wallDateKey(ev.occurredAt) === key) byId.set(ev.id, ev);
+    }
+    for (const ev of stripEvents) {
+      const alreadyMerged = [...byId.values()].some(
+        (existing) => existing.type === ev.type && existing.occurredAt === ev.occurredAt,
+      );
+      if (!alreadyMerged) byId.set(ev.id, ev);
+    }
+    const seen = new Set<string>();
+    return [...byId.values()]
+      .filter((e) => !pendingDeletes.has(e.id))
+      .filter((e) => {
+        const key = `${e.type}:${e.occurredAt}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => Date.parse(a.occurredAt) - Date.parse(b.occurredAt));
+  }, [pendingDeletes, stripEvents, today, week]);
+
   const openRow = (ev: AppEvent) => {
     if (ev.id.startsWith('ghost-')) return; // still syncing — one refresh away
     setEditing(ev);
@@ -187,17 +225,10 @@ export default function MobileHome() {
 
   return (
     <main className={styles.page}>
-      <header className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Tracker</h1>
-        <Link href="/sleep" className={styles.navLink}>
-          Sleep →
-        </Link>
-      </header>
-
-      <QueueBanner count={queued} />
-
       {today ? (
         <>
+          <MobileTopbar today={today} events={todayEvents} />
+          <QueueBanner count={queued} />
           <HistoryPager
             offset={offset}
             axisDate={today.axis_date}
@@ -212,29 +243,22 @@ export default function MobileHome() {
               setOffset((o) => Math.max(o - 1, 0));
             }}
           />
-          <TodayStrip
-            today={today}
-            events={stripEvents}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-          />
-          <TodayList
-            events={displayEvents}
-            nowIso={today.now}
-            selectedId={selectedId}
-            pendingDeleteIds={pendingDeletes}
-            onSelect={setSelectedId}
-            onOpen={openRow}
-            onDelete={requestDelete}
-            onUndoDelete={undoDelete}
-          />
-          {live && <SleepCta state={today.state} onLog={log} />}
+          {live && (
+            <ActionGrid
+              onOpen={(kind, withTime, initialKind) => setSheet({ kind, withTime, initialKind })}
+              onLog={log}
+              today={today}
+              events={stripEvents}
+            />
+          )}
+          {live && <ScaleQuickLog events={stripEvents} onLog={log} />}
+          {live && <MobileGoalCards today={today} todayEvents={todayEvents} />}
           {live && duplicate && (
             <DuplicateCard
               attempt={duplicate}
               onResolved={() => {
                 setDuplicate(null);
-                refresh();
+                refreshAll();
               }}
               onCancel={() => setDuplicate(null)}
             />
@@ -245,10 +269,27 @@ export default function MobileHome() {
               todayKey={todayKey}
               onDone={() => {
                 setResolvedNight(todayKey);
-                refresh();
+                refreshAll();
               }}
             />
           )}
+          <section className={styles.section}>
+            <span className={styles.eyebrow}>Record</span>
+            <div className={styles.dayHeader}>
+              <span>{live ? 'Today' : 'History'} · {today.axis_date}</span>
+              <span>{todayEvents.length} entries</span>
+            </div>
+            <TodayList
+              events={todayEvents}
+              nowIso={today.now}
+              selectedId={selectedId}
+              pendingDeleteIds={pendingDeletes}
+              onSelect={setSelectedId}
+              onOpen={openRow}
+              onDelete={requestDelete}
+              onUndoDelete={undoDelete}
+            />
+          </section>
         </>
       ) : (
         <p className={styles.emptyHint}>{loadError ?? 'Loading…'}</p>
@@ -256,7 +297,6 @@ export default function MobileHome() {
 
       {live && (
         <>
-          <ActionGrid onOpen={(kind, withTime) => setSheet({ kind, withTime })} />
           <LastLine
             last={logger.last}
             canUndo={logger.canUndo}
@@ -276,7 +316,12 @@ export default function MobileHome() {
         <NapSheet onLog={log} onClose={() => setSheet(null)} pickTime={sheet.withTime} />
       )}
       {sheet?.kind === 'caffeine' && (
-        <CaffeineSheet onLog={log} onClose={() => setSheet(null)} pickTime={sheet.withTime} />
+        <CaffeineSheet
+          onLog={log}
+          onClose={() => setSheet(null)}
+          pickTime={sheet.withTime}
+          initialKind={sheet.initialKind}
+        />
       )}
       {(sheet?.kind === 'mood' || sheet?.kind === 'energy') && (
         <ScaleSheet
@@ -286,12 +331,35 @@ export default function MobileHome() {
           pickTime={sheet.withTime}
         />
       )}
+      {sheet?.kind === 'meal' && <MealSheet onLog={log} onClose={() => setSheet(null)} />}
+      {sheet?.kind === 'gym' && <GymSheet onLog={log} onClose={() => setSheet(null)} />}
+      {(sheet?.kind === 'wake' || sheet?.kind === 'sleep') && today && (
+        <TimeSheet
+          title={sheet.kind === 'wake' ? 'Wake' : 'Sleep'}
+          confirmLabel={sheet.kind === 'wake' ? 'Log wake' : 'Log sleep'}
+          initialIso={toLocalISO(new Date())}
+          nowIso={today.now}
+          allowPrevDay
+          accent="var(--sleep)"
+          onConfirm={(iso) => {
+            log(
+              {
+                type: sheet.kind === 'wake' ? 'wake_up' : 'sleep_start',
+                occurred_at: iso,
+                precision: 'exact',
+              },
+              sheet.kind === 'wake' ? 'Wake' : 'Sleep',
+            );
+          }}
+          onClose={() => setSheet(null)}
+        />
+      )}
       {editing && today && (
         <EditEventSheet
           event={editing}
           nowIso={today.now}
           onClose={() => setEditing(null)}
-          onSaved={refresh}
+          onSaved={refreshAll}
           onDelete={requestDelete}
         />
       )}
