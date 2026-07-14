@@ -1,6 +1,7 @@
 'use client';
 
 import { Icon } from '@/components/desktop/presentation';
+import WakeSleepToggle from '@/components/sleep/WakeSleepToggle';
 import { useLongPress } from '@/hooks/useLongPress';
 import { buildSleepPairs } from '@/lib/sleep';
 import { minutesBetween, toLocalISO, wallHHMM } from '@/lib/time';
@@ -11,9 +12,9 @@ export type SheetKind = 'caffeine' | 'nap' | 'mood' | 'energy' | 'meal' | 'gym' 
 
 type QuickAction =
   | {
-      id: 'wake' | 'sleep' | 'nap';
+      id: 'nap';
       label: string;
-      icon: 'wake' | 'sleep' | 'nap';
+      icon: 'nap';
       tone: 'sleep';
       payload: () => EventPayload;
       longPress: () => void;
@@ -118,22 +119,6 @@ export default function ActionGrid({ onOpen, onLog, today, events }: Props) {
 
   const actions: QuickAction[] = [
     {
-      id: 'wake',
-      label: 'Wake',
-      icon: 'wake',
-      tone: 'sleep',
-      payload: () => nowPayload('wake_up'),
-      longPress: () => onOpen('wake', true),
-    },
-    {
-      id: 'sleep',
-      label: 'Sleep',
-      icon: 'sleep',
-      tone: 'sleep',
-      payload: () => nowPayload('sleep_start'),
-      longPress: () => onOpen('sleep', true),
-    },
-    {
       id: 'nap',
       label: 'Nap',
       icon: 'nap',
@@ -168,8 +153,6 @@ export default function ActionGrid({ onOpen, onLog, today, events }: Props) {
   ];
 
   const metaById: Record<QuickAction['id'], string> = {
-    wake: today.last_sleep.end ? wallHHMM(today.last_sleep.end.occurredAt) : latestMeta(events, 'wake_up'),
-    sleep: today.last_sleep.start ? wallHHMM(today.last_sleep.start.occurredAt) : latestMeta(events, 'sleep_start'),
     nap: latestNapMeta(events),
     coffee: latestMeta(events, 'caffeine', 'coffee'),
     tea: latestMeta(events, 'caffeine', 'tea'),
@@ -178,6 +161,17 @@ export default function ActionGrid({ onOpen, onLog, today, events }: Props) {
 
   return (
     <section className={styles.captureSection} aria-label="Log an event">
+      <div className={styles.wakeSleepreserved}>
+        <WakeSleepToggle
+          lastSleep={today.last_sleep}
+          onLog={onLog}
+          onOpenSheet={onOpen}
+          meta={{
+            wake: today.last_sleep.end ? wallHHMM(today.last_sleep.end.occurredAt) : '',
+            sleep: today.last_sleep.start && !today.last_sleep.end ? wallHHMM(today.last_sleep.start.occurredAt) : '',
+          }}
+        />
+      </div>
       <div className={styles.qgrid}>
         {actions.map((action) => (
           <CaptureButton

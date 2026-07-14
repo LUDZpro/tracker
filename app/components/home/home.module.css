@@ -718,6 +718,10 @@
   font-size: var(--text-sm);
 }
 
+.wakeSleepreserved {
+  width: 100%;
+}
+
 @media (min-width: 1024px) {
   /* Tracker pages breathe on desktop: 42rem reading column right of the rail
      (matches the CBT section) instead of the mobile 28rem strip. */

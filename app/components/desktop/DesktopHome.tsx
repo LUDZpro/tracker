@@ -254,6 +254,7 @@ export default function DesktopHome() {
         <section className={styles.col} aria-label="Capture">
           <CaptureColumn
             todayEvents={todayEvents.filter((e) => !pendingDeletes.has(e.id))}
+            lastSleep={today?.last_sleep || { start: null, end: null }}
             onLogNow={log}
             onOpenSheet={setSheet}
           />

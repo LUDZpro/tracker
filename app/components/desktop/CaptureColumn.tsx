@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Icon } from './presentation';
+import WakeSleepToggle from '@/components/sleep/WakeSleepToggle';
 import { useLongPress } from '@/hooks/useLongPress';
 import { buildSleepPairs } from '@/lib/sleep';
 import { minutesBetween, toLocalISO, wallHHMM } from '@/lib/time';
@@ -41,20 +42,6 @@ const caffeine = (kind: CaffeineKind) => (): EventPayload => ({
 });
 
 const CAPTURES: CaptureDef[] = [
-  {
-    sheet: 'wake',
-    label: 'Wake',
-    icon: 'wake',
-    kbd: 'W',
-    holdPayload: () => ({ type: 'wake_up', occurred_at: nowIso(), precision: 'exact' }),
-  },
-  {
-    sheet: 'sleep',
-    label: 'Sleep',
-    icon: 'sleep',
-    kbd: 'S',
-    holdPayload: () => ({ type: 'sleep_start', occurred_at: nowIso(), precision: 'exact' }),
-  },
   { sheet: 'coffee', label: 'Coffee', icon: 'coffee', kbd: 'C', holdPayload: caffeine('coffee') },
   { sheet: 'tea', label: 'Tea', icon: 'tea', kbd: 'T', holdPayload: caffeine('tea') },
   {
@@ -235,17 +222,27 @@ function RateRow({ kind, todayEvents, onLogNow }: RateRowProps) {
 
 interface Props {
   todayEvents: AppEvent[];
+  lastSleep: { start: AppEvent | null; end: AppEvent | null };
   onLogNow: (payload: EventPayload, label: string) => void;
   onOpenSheet: (sheet: DesktopSheet) => void;
 }
 
 /** Left column: one-hold logging plus mood/energy quick rating. */
-export default function CaptureColumn({ todayEvents, onLogNow, onOpenSheet }: Props) {
+export default function CaptureColumn({ todayEvents, lastSleep, onLogNow, onOpenSheet }: Props) {
   return (
     <>
       <div className={styles.sec}>
         <span className={styles.eyebrow}>Capture</span>
         <p className={styles.hint}>click opens the control · hold to log now</p>
+        <WakeSleepToggle
+          lastSleep={lastSleep}
+          onLog={onLogNow}
+          onOpenSheet={onOpenSheet}
+          meta={{
+            wake: lastSleep.end ? wallHHMM(lastSleep.end.occurredAt) : '',
+            sleep: lastSleep.start && !lastSleep.end ? wallHHMM(lastSleep.start.occurredAt) : '',
+          }}
+        />
         {CAPTURES.map((def) => (
           <CaptureButton
             key={def.sheet}
