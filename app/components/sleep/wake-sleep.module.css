@@ -112,25 +112,36 @@
 /* Desktop wide layout */
 @media (min-width: 1024px) {
   .toggle {
-    gap: 9px;
+    display: block;
+    margin-bottom: 7px;
   }
 
   .side {
-    min-height: 76px;
-    padding: 11px 0 10px;
+    width: 100%;
+    min-height: auto;
+    margin-bottom: 7px;
+    padding: 10px 12px;
+    border-radius: 10px;
     flex-direction: row;
-    justify-content: center;
-    gap: 8px;
+    justify-content: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .side:not(.disabled):active {
+    transform: none;
   }
 
   .label {
     flex: 1;
+    text-align: left;
   }
 
   .meta {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
+    position: static;
+    min-height: auto;
+    font-size: 10.5px;
+    transform: none;
   }
 }

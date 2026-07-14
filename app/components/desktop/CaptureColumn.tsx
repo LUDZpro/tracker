@@ -240,7 +240,7 @@ export default function CaptureColumn({ todayEvents, lastSleep, onLogNow, onOpen
           onOpenSheet={onOpenSheet}
           meta={{
             wake: lastSleep.end ? wallHHMM(lastSleep.end.occurredAt) : '',
-            sleep: lastSleep.start && !lastSleep.end ? wallHHMM(lastSleep.start.occurredAt) : '',
+            sleep: lastSleep.start ? wallHHMM(lastSleep.start.occurredAt) : '',
           }}
         />
         {CAPTURES.map((def) => (
