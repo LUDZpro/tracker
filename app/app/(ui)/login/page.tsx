@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import styles from './login.module.css';
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'];
+const APP_NAME = 'tracker.';
+const BIO_DISMISSED_KEY = 'tracker.bioSetupDismissed';
 
 async function platformAuthAvailable(): Promise<boolean> {
   try {
@@ -22,6 +24,9 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [bioSupported, setBioSupported] = useState(false);
   const [bioEnrolled, setBioEnrolled] = useState(false);
+  const [bioDismissed, setBioDismissed] = useState(false);
+  const [bioChecked, setBioChecked] = useState(false);
+  const [autoBioTried, setAutoBioTried] = useState(false);
   // After a successful PIN unlock on a biometric-capable, un-enrolled device,
   // offer to create a passkey before heading in.
   const [offerEnroll, setOfferEnroll] = useState(false);
@@ -32,13 +37,23 @@ export default function LoginPage() {
       const supported = await platformAuthAvailable();
       if (!alive) return;
       setBioSupported(supported);
-      if (!supported) return;
       try {
-        const res = await fetch('/api/webauthn/status');
+        setBioDismissed(localStorage.getItem(BIO_DISMISSED_KEY) === '1');
+      } catch {
+        /* storage can be blocked; keep the normal offer flow */
+      }
+      if (!supported) {
+        setBioChecked(true);
+        return;
+      }
+      try {
+        const res = await fetch('/api/webauthn/status', { cache: 'no-store' });
         const data = await res.json();
         if (alive) setBioEnrolled(Boolean(data?.enrolled));
       } catch {
         /* status probe failing just hides the button */
+      } finally {
+        if (alive) setBioChecked(true);
       }
     })();
     return () => {
@@ -63,7 +78,7 @@ export default function LoginPage() {
         body: JSON.stringify({ pin }),
       });
       if (res.status === 204) {
-        if (bioSupported && !bioEnrolled) {
+        if (bioSupported && !bioEnrolled && !bioDismissed) {
           setOfferEnroll(true); // hold the redirect for the one-tap passkey offer
           return;
         }
@@ -86,12 +101,17 @@ export default function LoginPage() {
     setError(null);
     try {
       const { startAuthentication } = await import('@simplewebauthn/browser');
-      const optRes = await fetch('/api/webauthn/login/options', { method: 'POST' });
+      const optRes = await fetch('/api/webauthn/login/options', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+      });
       if (!optRes.ok) throw new Error('Biometric sign-in unavailable');
       const assertion = await startAuthentication({ optionsJSON: await optRes.json() });
       const res = await fetch('/api/webauthn/login/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify(assertion),
       });
       if (res.status === 204) {
@@ -107,40 +127,62 @@ export default function LoginPage() {
     }
   };
 
+  useEffect(() => {
+    if (!bioChecked || !bioSupported || !bioEnrolled || autoBioTried || busy) return;
+    setAutoBioTried(true);
+    bioLogin();
+  }, [bioChecked, bioSupported, bioEnrolled, autoBioTried, busy]);
+
   const enroll = async () => {
     setBusy(true);
     setError(null);
     try {
       const { startRegistration } = await import('@simplewebauthn/browser');
-      const optRes = await fetch('/api/webauthn/register/options', { method: 'POST' });
+      const optRes = await fetch('/api/webauthn/register/options', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+      });
       if (!optRes.ok) throw new Error('Could not start enrollment');
       const attestation = await startRegistration({ optionsJSON: await optRes.json() });
       const res = await fetch('/api/webauthn/register/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify(attestation),
       });
       if (!res.ok) throw new Error('Could not save the passkey');
-    } catch {
-      /* enrollment is best-effort — never block getting into the app */
-    } finally {
+      localStorage.removeItem(BIO_DISMISSED_KEY);
       window.location.href = '/';
+    } catch {
+      setBusy(false);
+      setError('Biometric setup did not finish. Try again or continue without it.');
     }
+  };
+
+  const skipEnrollment = () => {
+    try {
+      localStorage.setItem(BIO_DISMISSED_KEY, '1');
+    } catch {
+      /* non-critical */
+    }
+    window.location.href = '/';
   };
 
   if (offerEnroll) {
     return (
       <main className={styles.wrap}>
-        <h1 className={styles.title}>Floor Logger</h1>
+        <h1 className={styles.title}>{APP_NAME}</h1>
         <div className={styles.enrollCard}>
           <p className={styles.enrollLead}>Unlock faster next time?</p>
           <p className={styles.enrollHint}>
             Use Face ID, Touch ID or your fingerprint instead of the PIN on this device.
           </p>
+          {error && <p className="error-inline">{error}</p>}
           <button className={styles.unlock} onClick={enroll} disabled={busy}>
             {busy ? 'Setting up…' : 'Enable biometrics'}
           </button>
-          <button className={styles.skipBtn} onClick={() => (window.location.href = '/')}>
+          <button className={styles.skipBtn} onClick={skipEnrollment}>
             Not now
           </button>
         </div>
@@ -150,7 +192,7 @@ export default function LoginPage() {
 
   return (
     <main className={styles.wrap}>
-      <h1 className={styles.title}>Floor Logger</h1>
+      <h1 className={styles.title}>{APP_NAME}</h1>
       <p className={styles.dots} aria-label={`${pin.length} digits entered`}>
         {pin.length === 0 ? 'Enter PIN' : '●'.repeat(pin.length)}
       </p>
