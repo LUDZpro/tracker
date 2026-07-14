@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildSleepPairs,
+  daySleepSpans,
   checkSleepSpan,
   currentState,
   lastSleep,
@@ -170,5 +171,54 @@ describe('checkSleepSpan / overlapsPairs', () => {
     expect(overlapsPairs(pairs, '2026-07-06T08:00:00+01:00', '2026-07-06T09:00:00+01:00')).toBe(false);
     const ids = [pairs[0].start.id, pairs[0].end.id];
     expect(overlapsPairs(pairs, '2026-07-06T01:00:00+01:00', '2026-07-06T02:00:00+01:00', ids)).toBe(false);
+  });
+});
+
+describe('daySleepSpans', () => {
+  const D = '2026-07-06';
+
+  it('returns both sleeps when two happen in one day', () => {
+    const events = [
+      ev('sleep_start', '2026-07-06T01:00:00+01:00'),
+      ev('wake_up', '2026-07-06T08:00:00+01:00'),
+      ev('sleep_start', '2026-07-06T14:40:00+01:00'),
+      ev('wake_up', '2026-07-06T15:04:00+01:00'),
+    ];
+    expect(daySleepSpans(events, D)).toEqual([
+      { from: 60, to: 480 },
+      { from: 880, to: 904 },
+    ]);
+  });
+
+  it('clips a span that crosses midnight into the axis day', () => {
+    const events = [
+      ev('sleep_start', '2026-07-05T23:30:00+01:00'),
+      ev('wake_up', '2026-07-06T07:00:00+01:00'),
+    ];
+    expect(daySleepSpans(events, D)).toEqual([{ from: 0, to: 420 }]);
+    expect(daySleepSpans(events, '2026-07-05', 24 * 60)).toEqual([
+      { from: 23 * 60 + 30, to: 24 * 60 },
+    ]);
+  });
+
+  it('paints a wake without a start marker from midnight', () => {
+    const events = [ev('wake_up', '2026-07-06T07:00:00+01:00')];
+    expect(daySleepSpans(events, D)).toEqual([{ from: 0, to: 420 }]);
+    expect(daySleepSpans(events, '2026-07-05')).toEqual([]);
+  });
+
+  it('ends an open sleep at endOfDayMin (now) on the current day', () => {
+    const events = [ev('sleep_start', '2026-07-06T22:00:00+01:00')];
+    expect(daySleepSpans(events, D, 23 * 60)).toEqual([{ from: 22 * 60, to: 23 * 60 }]);
+  });
+
+  it('ignores sleeps entirely outside the axis day', () => {
+    const events = [
+      ev('sleep_start', '2026-07-04T23:00:00+01:00'),
+      ev('wake_up', '2026-07-05T07:00:00+01:00'),
+      ev('sleep_start', '2026-07-07T01:00:00+01:00'),
+      ev('wake_up', '2026-07-07T08:00:00+01:00'),
+    ];
+    expect(daySleepSpans(events, D)).toEqual([]);
   });
 });

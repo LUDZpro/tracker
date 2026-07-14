@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { rowText, toneFor } from './presentation';
+import { EventIcon, rowText, toneFor } from './presentation';
+import { daySleepSpans } from '@/lib/sleep';
 import { wallDateKey, wallHHMM, wallMinutes } from '@/lib/time';
 import type { AppEvent, TodayResponse } from '@/lib/types';
 import styles from './desktop.module.css';
@@ -19,22 +20,6 @@ const TONE_CLASS: Record<string, string> = {
 
 function pct(minutes: number): string {
   return `${(minutes / DAY_MIN) * 100}%`;
-}
-
-/** Clip the window's sleep pair to the axis date; null when outside it. */
-function sleepSpan(
-  lastSleep: TodayResponse['last_sleep'],
-  axisKey: string,
-): { from: number; to: number } | null {
-  const { start, end } = lastSleep;
-  if (!start && !end) return null;
-  const startsToday = start && wallDateKey(start.occurredAt) === axisKey;
-  const endsToday = end && wallDateKey(end.occurredAt) === axisKey;
-  if (!startsToday && !endsToday) return null;
-  return {
-    from: startsToday ? wallMinutes(start.occurredAt) : 0,
-    to: endsToday ? wallMinutes(end.occurredAt) : DAY_MIN,
-  };
 }
 
 interface Props {
@@ -64,8 +49,11 @@ export default function Topbar({ today, events, onOpen }: Props) {
   const axisEvents = axisKey
     ? events.filter((e) => wallDateKey(e.occurredAt) === axisKey)
     : [];
-  const span = today && axisKey ? sleepSpan(today.last_sleep, axisKey) : null;
   const isCurrentDay = today !== null && axisKey === wallDateKey(today.now);
+  // Every sleep of the day, not just the latest pair — two sleeps both render.
+  const spans = axisKey
+    ? daySleepSpans(events, axisKey, isCurrentDay && today ? wallMinutes(today.now) : DAY_MIN)
+    : [];
 
   return (
     <header className={styles.topbar}>
@@ -82,12 +70,13 @@ export default function Topbar({ today, events, onOpen }: Props) {
         </div>
         <div className={styles.tl} aria-label="Today, midnight to midnight">
           <div className={styles.tlBase} />
-          {span && (
+          {spans.map((span) => (
             <div
+              key={`${span.from}-${span.to}`}
               className={styles.sleepspan}
               style={{ left: pct(span.from), width: pct(Math.max(span.to - span.from, 8)) }}
             />
-          )}
+          ))}
           {axisEvents.map((e) => {
             const { main } = rowText(e);
             return (
@@ -97,6 +86,7 @@ export default function Topbar({ today, events, onOpen }: Props) {
                 style={{ left: pct(wallMinutes(e.occurredAt)) }}
                 onClick={() => onOpen(e)}
               >
+                <EventIcon ev={e} size={11} />
                 <span className={styles.tip}>
                   {wallHHMM(e.occurredAt)} · {main}
                 </span>

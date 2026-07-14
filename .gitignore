@@ -5,3 +5,6 @@ node_modules/
 *.tsbuildinfo
 next-env.d.ts
 preview.env
+
+# WebAuthn passkey store (local dev)
+app/data/

@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import NavLink from './NavLink';
 import { Icon } from '@/components/desktop/presentation';
 import styles from './nav.module.css';
 
@@ -23,7 +23,7 @@ export default function TabBar() {
       {TABS.map((t) => {
         const active = pathname === t.href;
         return (
-          <Link
+          <NavLink
             key={t.href}
             href={t.href}
             className={styles.tab}
@@ -31,7 +31,7 @@ export default function TabBar() {
           >
             <Icon name={t.icon} size={19} />
             {t.label}
-          </Link>
+          </NavLink>
         );
       })}
     </nav>

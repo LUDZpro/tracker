@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { fetchCbtRecords } from '@/lib/client/cbt';
 import type { CbtHistoryResponse } from '@/lib/cbt/types';
 
@@ -51,7 +51,8 @@ export function useCbtRecords() {
     }
   }, [pages]);
 
-  const records = pages.flatMap((p) => p.records);
+  // Stable identity between re-renders — see the matching note in useHistory.
+  const records = useMemo(() => pages.flatMap((p) => p.records), [pages]);
   const hasMore = pages.length > 0 && pages[pages.length - 1].nextCursor !== null;
 
   return { records, hasMore, loading, error, loadMore, refresh };

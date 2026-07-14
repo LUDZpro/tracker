@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import NavLink from './NavLink';
 import { Icon } from '@/components/desktop/presentation';
 import styles from '@/components/desktop/desktop.module.css';
 
@@ -30,7 +30,7 @@ export default function Rail() {
       {LINKS.map((l) => {
         const active = pathname === l.href;
         return (
-          <Link
+          <NavLink
             key={l.href}
             href={l.href}
             title={l.label}
@@ -38,7 +38,7 @@ export default function Rail() {
             aria-current={active ? 'page' : undefined}
           >
             <Icon name={l.icon} size={18} />
-          </Link>
+          </NavLink>
         );
       })}
     </nav>

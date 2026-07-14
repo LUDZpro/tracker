@@ -1,6 +1,6 @@
 # Tracker (Floor Logger)
 
-Single-user, PIN-gated PWA that one-tap-logs personal events (sleep, caffeine, mood/energy, naps, meals, gym) into one Notion database. Next.js 15 App Router + React 19, TypeScript, CSS Modules, vitest. **No other runtime dependencies — keep it that way unless there's a strong reason.**
+Single-user, PIN-gated PWA that one-tap-logs personal events (sleep, caffeine, mood/energy, naps, meals, gym) into one Notion database. Next.js 15 App Router + React 19, TypeScript, CSS Modules, vitest. **Only other runtime deps: `@simplewebauthn/server` + `@simplewebauthn/browser` (passkey auth) — add nothing else without a strong reason.**
 
 All app code is in `app/`. Root holds `Dockerfile`, `compose.yml`, `preview.env`, this file.
 
@@ -58,6 +58,9 @@ Note: `trigger` is a floor event with no sheet and no capture entry — it's onl
 - **Theme:** all colors/spacing come from `styles/tokens.css`. New palette uses prototype names (`--accent`, `--t1`…`--t5`, `--ok/--warn/--bad`); legacy aliases (`--sleep`, `--intake`, `--state`, `--danger`, `--bg`, `--ink`, `--dim`) are what pre-redesign components read. Never hardcode hex in components.
 - Font is Inter via `next/font` (`--font-sans`). Numbers use tabular-nums.
 - **The user's PostToolUse hook blocks any file containing `.` + `exec` + `(`** (assumes child-process). Use `String.prototype.match` instead of regex `.exe` + `c()`, and avoid that letter sequence even in comments.
+- **Never let a `useEffect` depend on an array/object rebuilt every render** (e.g. `pages.flatMap(...)` from a hook). One such effect (`setGhosts([])` on `[events]`) created an infinite render loop that silently starved ALL router navigation app-wide (taps on nav did nothing, no errors) — hooks that return derived arrays must `useMemo` them (`useHistory`, `useCbtRecords`).
+- Nav links use `components/nav/NavLink.tsx` (`router.push` in a `setTimeout`, plain `<a>`), not `next/link` — Link-click transitions stalled on next 15.5 in this app even after the loop fix; NavLink is the mechanism verified working on prod. Test nav clicks in **real Chrome via claude-in-chrome against localhost:3199**, not the preview harness (SPA navigation is unreliable inside the harness).
+- **Auth:** PIN + WebAuthn passkeys (`lib/webauthn/`, `/api/webauthn/*`; login/options+verify+status are public in middleware). Session = rolling 7-min idle timeout — middleware re-signs the cookie on every authed request. Passkeys persist in `data/webauthn.json` (Docker volume `webauthn-data:/app/data`); RP id/origin derive from request headers, so localhost and prod both work unconfigured. Enrollment is offered on the login page right after a PIN unlock.
 - Deletes are always Notion archive (reversible), never hard delete; UI pattern is 5s pending-delete with undo.
 - Duplicate-sleep protection: logging wake/sleep that repeats current state must open `DuplicateCard`, never silently double-log (logic in both Home components' `log()`).
 - Optimistic "ghost" rows (`ghost-` id prefix) render until the next refresh; never editable/deletable.

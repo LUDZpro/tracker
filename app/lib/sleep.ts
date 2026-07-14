@@ -172,3 +172,57 @@ export function overlapsPairs(
     return s < pe && e > ps;
   });
 }
+
+const DAY_MINUTES = 24 * 60;
+
+export interface DaySpan {
+  from: number; // axis minutes, 0–1440
+  to: number;
+}
+
+/**
+ * Every sleep span clipped to one wall day — the timeline previously drew
+ * only `last_sleep`, so a second sleep in the same day never rendered.
+ * Handles spans crossing either midnight, a wake with its start outside the
+ * data window (painted from 00:00), and an open sleep (no wake yet), which
+ * ends at `endOfDayMin` (pass now-in-minutes for the current day, 1440 for
+ * past days).
+ */
+export function daySleepSpans(
+  events: readonly AppEvent[],
+  axisKey: string,
+  endOfDayMin: number = DAY_MINUTES,
+): DaySpan[] {
+  const markers = sortByTime(events).filter((e) => e.category === 'marker');
+
+  // Raw spans over the whole window; either edge may be missing.
+  const raw: Array<{ startIso: string | null; endIso: string | null }> = [];
+  let open: AppEvent | null = null;
+  for (const m of markers) {
+    if (m.type === 'sleep_start') {
+      open = m; // a later sleep_start supersedes an unclosed one
+    } else if (m.type === 'wake_up') {
+      raw.push({ startIso: open?.occurredAt ?? null, endIso: m.occurredAt });
+      open = null;
+    }
+  }
+  if (open) raw.push({ startIso: open.occurredAt, endIso: null });
+
+  const spans: DaySpan[] = [];
+  for (const { startIso, endIso } of raw) {
+    const startKey = startIso ? wallDateKey(startIso) : null;
+    const endKey = endIso ? wallDateKey(endIso) : null;
+    if (startKey !== null && startKey > axisKey) continue; // starts after this day
+    if (endKey !== null && endKey < axisKey) continue; // ended before this day
+    // A wake with no known start only makes sense on the day it ends.
+    if (startKey === null && endKey !== axisKey) continue;
+
+    const from = startKey === axisKey ? wallMinutes(startIso as string) : 0;
+    const to =
+      endKey === axisKey
+        ? wallMinutes(endIso as string)
+        : Math.min(endOfDayMin, DAY_MINUTES);
+    if (to > from) spans.push({ from, to });
+  }
+  return spans;
+}

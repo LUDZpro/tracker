@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Icon, toneFor } from '@/components/desktop/presentation';
+import { EventIcon, Icon, toneFor } from '@/components/desktop/presentation';
+import { daySleepSpans } from '@/lib/sleep';
 import { toLocalISO, wallDateKey, wallHHMM, wallMinutes } from '@/lib/time';
 import type { AppEvent, TodayResponse } from '@/lib/types';
 import styles from './home.module.css';
@@ -10,21 +11,6 @@ const DAY_MIN = 24 * 60;
 
 function pct(minutes: number): string {
   return `${Math.min(100, Math.max(0, (minutes / DAY_MIN) * 100))}%`;
-}
-
-function sleepBandRange(
-  lastSleep: TodayResponse['last_sleep'],
-  axisKey: string,
-): { from: number; to: number } | null {
-  const { start, end } = lastSleep;
-  if (!start && !end) return null;
-  const startsToday = start && wallDateKey(start.occurredAt) === axisKey;
-  const endsToday = end && wallDateKey(end.occurredAt) === axisKey;
-  if (!startsToday && !endsToday) return null;
-  return {
-    from: startsToday ? wallMinutes(start.occurredAt) : 0,
-    to: endsToday ? wallMinutes(end.occurredAt) : DAY_MIN,
-  };
 }
 
 function toneClass(ev: AppEvent): string {
@@ -58,7 +44,8 @@ export default function MobileTopbar({ today, events }: Props) {
   const axisKey = today.axis_date;
   const isCurrentDay = axisKey === wallDateKey(today.now);
   const axisEvents = events.filter((e) => wallDateKey(e.occurredAt) === axisKey);
-  const band = sleepBandRange(today.last_sleep, axisKey);
+  // Every sleep of the day, not just the latest pair — two sleeps both render.
+  const bands = daySleepSpans(events, axisKey, isCurrentDay ? wallMinutes(today.now) : DAY_MIN);
   const nowIso = toLocalISO(clock);
 
   return (
@@ -82,8 +69,9 @@ export default function MobileTopbar({ today, events }: Props) {
 
       <div className={styles.timeline} aria-label={`${axisKey}, midnight to midnight`}>
         <div className={styles.timelineBase} />
-        {band && (
+        {bands.map((band) => (
           <div
+            key={`${band.from}-${band.to}`}
             className={styles.sleepSpan}
             style={
               {
@@ -92,7 +80,7 @@ export default function MobileTopbar({ today, events }: Props) {
               } as React.CSSProperties
             }
           />
-        )}
+        ))}
         {axisEvents.map((ev) => (
           <button
             key={`${ev.id}-${ev.occurredAt}`}
@@ -100,7 +88,9 @@ export default function MobileTopbar({ today, events }: Props) {
             style={{ '--x': pct(wallMinutes(ev.occurredAt)) } as React.CSSProperties}
             aria-label={`${ev.type} at ${wallHHMM(ev.occurredAt)}`}
             type="button"
-          />
+          >
+            <EventIcon ev={ev} size={9} />
+          </button>
         ))}
         {isCurrentDay && (
           <div

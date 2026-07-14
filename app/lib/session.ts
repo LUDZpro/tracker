@@ -4,7 +4,9 @@
  */
 
 export const SESSION_COOKIE = 'fl_session';
-export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+// Idle timeout: middleware re-signs the cookie on every authenticated
+// request, so this is "7 minutes since last activity", not an absolute cap.
+export const SESSION_TTL_MS = 7 * 60 * 1000;
 
 const encoder = new TextEncoder();
 

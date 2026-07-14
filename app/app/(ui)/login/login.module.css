@@ -63,3 +63,59 @@
 .unlock:disabled {
   opacity: 0.4;
 }
+
+.bioBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: var(--tap-min);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--a700);
+  color: var(--sleep);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.bioBtn:active {
+  background: var(--surface-raised);
+}
+
+.bioBtn:disabled {
+  opacity: 0.4;
+}
+
+.enrollCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  text-align: center;
+}
+
+.enrollLead {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.enrollHint {
+  margin: 0 0 var(--space-1);
+  color: var(--dim);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.skipBtn {
+  min-height: 44px;
+  background: none;
+  border: none;
+  color: var(--dim);
+  font-size: var(--text-sm);
+}

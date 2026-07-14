@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { fetchHistory } from '@/lib/client/api';
 import { getCachedHistory, setCachedHistory, type CachedPage } from '@/lib/client/historyCache';
 import type { EventType } from '@/lib/types';
@@ -65,7 +65,11 @@ export function useHistory(type: EventType) {
     }
   }, [type, pages]);
 
-  const events = pages.flatMap((p) => p.events);
+  // Memoized so `events` keeps its identity between unrelated re-renders —
+  // pages watch it in effects (ghost clearing); a fresh array every render
+  // turns those effects into an infinite render loop that starves the
+  // router's navigation transitions (nav taps silently do nothing).
+  const events = useMemo(() => pages.flatMap((p) => p.events), [pages]);
   const hasMore = pages.length > 0 && pages[pages.length - 1].nextCursor !== null;
 
   return { events, hasMore, loading, error, loadMore, refresh };

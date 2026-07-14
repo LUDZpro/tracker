@@ -153,13 +153,17 @@
 
 .evdot {
   position: absolute;
-  top: 12px;
-  width: 10px;
-  height: 10px;
+  top: 8px;
+  width: 19px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
   border-radius: 50%;
-  transform: translateX(-5px);
+  transform: translateX(-10px);
   cursor: pointer;
-  background: currentColor;
+  background: var(--night);
   box-shadow: 0 0 0 2px var(--night);
   padding: 0;
 }

@@ -12,3 +12,9 @@ services:
     # Only reachable through nginx on the host
     ports:
       - "127.0.0.1:3000:3000"
+    # Enrolled passkeys (WebAuthn credentials) survive rebuilds
+    volumes:
+      - webauthn-data:/app/data
+
+volumes:
+  webauthn-data:

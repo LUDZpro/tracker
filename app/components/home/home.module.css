@@ -117,14 +117,18 @@
 .timelineEvent {
   position: absolute;
   left: var(--x);
-  top: 6px;
-  width: 8px;
-  height: 8px;
+  top: 2px;
+  width: 16px;
+  height: 16px;
   min-height: 0;
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
   border-radius: 50%;
-  transform: translateX(-4px);
-  background: currentColor;
+  transform: translateX(-8px);
+  background: var(--night);
   box-shadow: 0 0 0 2px var(--night);
 }
 
@@ -715,8 +719,11 @@
 }
 
 @media (min-width: 1024px) {
+  /* Tracker pages breathe on desktop: 42rem reading column right of the rail
+     (matches the CBT section) instead of the mobile 28rem strip. */
   .page {
-    margin-left: calc(var(--rail-w) + ((100% - var(--rail-w) - 28rem) / 2));
+    max-width: 42rem;
+    margin-left: calc(var(--rail-w) + ((100% - var(--rail-w) - 42rem) / 2));
     padding-bottom: var(--space-4);
   }
 }
