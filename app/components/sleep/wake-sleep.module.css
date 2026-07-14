@@ -112,21 +112,28 @@
 /* Desktop wide layout */
 @media (min-width: 1024px) {
   .toggle {
-    display: block;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
     margin-bottom: 7px;
   }
 
   .side {
     width: 100%;
-    min-height: auto;
-    margin-bottom: 7px;
+    min-height: 40px;
+    margin-bottom: 0;
     padding: 10px 12px;
     border-radius: 10px;
     flex-direction: row;
     justify-content: flex-start;
-    gap: 10px;
+    gap: 8px;
     font-size: 13px;
     text-align: left;
+  }
+
+  .side svg {
+    width: 16px;
+    height: 16px;
   }
 
   .side:not(.disabled):active {
