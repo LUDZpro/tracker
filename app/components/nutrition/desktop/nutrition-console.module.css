@@ -1,0 +1,659 @@
+/* Desktop Nutrition console — 3 columns: recipes | day ledger | numbers.
+   Colors/spacing come from styles/tokens.css only. Rendered exclusively at
+   ≥1024px via the page-level media-query switch; the display:none guard at
+   the very END of this file must stay last (source order beats equal
+   specificity). */
+
+.main {
+  height: 100vh;
+  padding-left: var(--rail-w);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--canvas);
+  font-size: 14px;
+}
+
+/* ── topbar ─────────────────────────────────────────────────────────── */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 16px 26px;
+  border-bottom: 1px solid var(--line);
+  background: var(--night);
+}
+
+.topTitle {
+  flex: none;
+  width: 200px;
+}
+
+.topKicker {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.topDate {
+  font-weight: 300;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--t1);
+}
+
+.topSpacer {
+  flex: 1;
+}
+
+.topMeter {
+  width: 280px;
+}
+
+.meterHead {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--t2);
+  margin-bottom: 6px;
+}
+
+.meterVal {
+  color: var(--t1);
+}
+
+.meterDim {
+  color: var(--t3);
+}
+
+.track {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rail);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width var(--duration-normal) var(--ease-out-expo);
+}
+
+.fillKcal {
+  background: var(--a600);
+}
+
+/* ── 3-column grid ──────────────────────────────────────────────────── */
+
+.grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr) 270px;
+  overflow: hidden;
+}
+
+.col {
+  padding: 20px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.colMid {
+  background: var(--app);
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 11px;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+.sectionHint {
+  font-size: 11px;
+  color: var(--t4);
+}
+
+/* ── recipes (left) ─────────────────────────────────────────────────── */
+
+.recipeCard {
+  background: var(--surface-raised);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  margin-bottom: 7px;
+  overflow: hidden;
+}
+
+.recipeCardOpen {
+  border-color: var(--a700);
+}
+
+.recipeHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.recipeInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.recipeName {
+  font-size: 13px;
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recipeMacros {
+  font-size: 10.5px;
+  color: var(--t3);
+  margin-top: 3px;
+}
+
+.logBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--edge);
+  background: none;
+  color: var(--a400);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  flex: none;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) ease,
+    background var(--duration-fast) ease;
+}
+
+.logBtn:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.ingredients {
+  padding: 0 12px 12px;
+}
+
+.ingredientsInner {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.ingRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11.5px;
+  color: var(--t2);
+  padding: 3px 0;
+}
+
+.ingQty {
+  color: var(--t4);
+  flex: none;
+}
+
+.emptyCol {
+  padding: 24px 4px;
+  font-size: 12.5px;
+  color: var(--t4);
+  line-height: 1.6;
+}
+
+/* ── day stats (middle top) ─────────────────────────────────────────── */
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.statCard {
+  position: relative;
+  background: var(--surface-raised);
+  border-radius: 12px;
+  padding: 14px 15px;
+}
+
+.statBadge {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--edge);
+  color: var(--t4);
+}
+
+.statBadgeDone {
+  background: var(--ok-d);
+  border-color: transparent;
+  color: var(--ok);
+}
+
+.statLabel {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 10px;
+}
+
+.statValue {
+  font-weight: 300;
+  font-size: 27px;
+  line-height: 1;
+  color: var(--t1);
+}
+
+.statUnit {
+  font-size: 11.5px;
+  color: var(--t3);
+  margin-left: 3px;
+  font-weight: 400;
+}
+
+.statSub {
+  font-size: 11px;
+  margin-top: 9px;
+  color: var(--t3);
+}
+
+.statTrack {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rail);
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.statFill {
+  display: block;
+  height: 100%;
+  background: var(--a600);
+  transition: width var(--duration-normal) var(--ease-out-expo);
+}
+
+/* ── quick add ──────────────────────────────────────────────────────── */
+
+.quickAdd {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.qaName,
+.qaNum {
+  background: var(--surface-raised);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--t1);
+  outline: none;
+}
+
+.qaName {
+  flex: 1;
+  min-width: 0;
+}
+
+.qaName::placeholder,
+.qaNum::placeholder {
+  color: var(--t4);
+}
+
+.qaNum {
+  width: 86px;
+  padding: 9px 10px;
+  font-size: 12.5px;
+  text-align: right;
+}
+
+.qaNumSmall {
+  width: 70px;
+}
+
+.qaName:focus,
+.qaNum:focus {
+  border-color: var(--a700);
+}
+
+.qaBtn {
+  flex: none;
+  padding: 9px 16px;
+  border: 1px solid var(--a700);
+  border-radius: var(--radius-sm);
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--a400);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) ease,
+    background var(--duration-fast) ease;
+}
+
+.qaBtn:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* ── log rows ───────────────────────────────────────────────────────── */
+
+.logRow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 8px;
+  font-size: 13.5px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  margin-bottom: 1px;
+  color: var(--t1);
+}
+
+.logRow:hover {
+  background: rgba(233, 233, 237, 0.03);
+}
+
+.logRowSelected {
+  border-color: var(--a700);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.logRowGhost {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.logRowPending {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.logTime {
+  width: 42px;
+  color: var(--t3);
+  font-size: 12px;
+  flex: none;
+}
+
+.logIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border: 1px solid var(--edge);
+  color: var(--t2);
+}
+
+.logName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logMeta {
+  font-size: 11px;
+  color: var(--t2);
+  flex: none;
+  width: 72px;
+  text-align: right;
+}
+
+.logMetaDim {
+  color: var(--t3);
+  width: 64px;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 11px;
+  color: var(--bad);
+  flex: none;
+  cursor: pointer;
+}
+
+.undoBtn {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 11px;
+  color: var(--accent);
+  flex: none;
+  cursor: pointer;
+}
+
+.emptyLog {
+  padding: 32px 8px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--t4);
+}
+
+.logTotals {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24px;
+  padding: 12px 8px;
+  margin-top: 6px;
+  border-top: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--t3);
+}
+
+.logTotals b {
+  font-weight: 500;
+  color: var(--a400);
+}
+
+.logTotals b.totKcal {
+  color: var(--t2);
+}
+
+/* ── numbers panel (right) ──────────────────────────────────────────── */
+
+.panelCard {
+  background: var(--surface-raised);
+  border-radius: 12px;
+  padding: 14px 15px;
+  margin-bottom: 10px;
+}
+
+.panelCardRows {
+  padding: 5px 15px;
+}
+
+.panelGap {
+  display: block;
+  margin: 20px 0 11px;
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 46px;
+}
+
+.bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  background: var(--a800);
+}
+
+.barHit {
+  background: var(--a500);
+}
+
+.barToday {
+  background: var(--accent);
+}
+
+.barLabels {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.barLabel {
+  flex: 1;
+  text-align: center;
+  font-size: 9.5px;
+  color: var(--t5);
+}
+
+.chartFoot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--t4);
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.chartFoot + .chartFootRow {
+  margin-top: 7px;
+}
+
+.chartFootRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--t4);
+}
+
+.chartFoot span:last-child,
+.chartFootRow span:last-child {
+  color: var(--t2);
+}
+
+.panelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--t2);
+}
+
+.panelRow:last-child {
+  border-bottom: none;
+}
+
+.panelVal {
+  color: var(--t1);
+  font-size: 13px;
+}
+
+.paceText {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.6;
+}
+
+/* ── footer ─────────────────────────────────────────────────────────── */
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 9px 26px;
+  border-top: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--t3);
+  background: var(--night);
+}
+
+.footDot {
+  color: var(--t4);
+}
+
+.footHint {
+  margin-left: auto;
+  color: var(--t4);
+  font-size: 10.5px;
+}
+
+/* ── toast ──────────────────────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 52px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface-raised);
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 12.5px;
+  color: var(--t1);
+  box-shadow: var(--sh-md);
+  z-index: 50;
+}
+
+.toastError {
+  color: var(--bad);
+}
+
+.toastBtn {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.errorInline {
+  font-size: 12px;
+  color: var(--bad);
+  margin: 0 0 10px;
+}
+
+/* Guard: the console is desktop-only. Keep this rule LAST in the file. */
+@media (max-width: 1023.98px) {
+  .main {
+    display: none;
+  }
+}

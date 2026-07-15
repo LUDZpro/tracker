@@ -43,6 +43,21 @@ export function invalidateToday(): void {
   weekSlot = null;
 }
 
+// Recipes: the pre-planned meal list, edited in Notion and read on every
+// nutrition surface. Changes rarely, so a longer TTL and no invalidation —
+// a stale recipe list self-heals within RECIPES_TTL_MS.
+const RECIPES_TTL_MS = 300_000;
+let recipesSlot: Slot<unknown> | null = null;
+
+export function getCachedRecipes<T>(now = Date.now()): T | null {
+  if (recipesSlot && now - recipesSlot.at < RECIPES_TTL_MS) return recipesSlot.data as T;
+  return null;
+}
+
+export function setCachedRecipes<T>(data: T, now = Date.now()): void {
+  recipesSlot = { data, at: now };
+}
+
 // History (Nutrition/Gym): only the first page (no `before` cursor) is
 // cached — scrolled-further pages are one-shot fetches the user explicitly
 // asked for, not worth caching.

@@ -1,0 +1,62 @@
+/* Mobile recipe quick-log chips — one tap logs the recipe as a meal now. */
+
+.wrap {
+  margin: 0 0 var(--space-2);
+}
+
+.label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t2);
+  margin-bottom: 8px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 9px 13px;
+  background: var(--surface-raised);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-md);
+  font: inherit;
+  color: var(--t1);
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) ease,
+    background var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
+}
+
+.chip:active {
+  transform: scale(0.96);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-raised));
+}
+
+.chipName {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chipMacros {
+  font-size: 10.5px;
+  color: var(--t3);
+  white-space: nowrap;
+}
