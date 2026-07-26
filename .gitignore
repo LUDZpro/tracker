@@ -9,3 +9,7 @@ preview.env
 
 # WebAuthn passkey store (local dev)
 app/data/
+
+# Per-machine Claude Code permissions (ignored in the repo, not just via a
+# personal global gitignore, so checkouts on other machines stay clean)
+.claude/settings.local.json
