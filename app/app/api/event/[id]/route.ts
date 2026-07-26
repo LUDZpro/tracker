@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { invalidateHistory, invalidateToday } from '@/lib/cache';
 import { errorResponse, jsonError, readJson } from '@/lib/http';
-import { buildNotesJson, eventTitle } from '@/lib/mapping';
-import { queryEventsSince, retrieveEvent, updateEventFields } from '@/lib/notion';
+import { queryEventsSince, retrieveEvent, updateEventFields } from '@/lib/store/events';
 import { buildSleepPairs, checkSleepSpan, overlapsPairs } from '@/lib/sleep';
 import { toLocalISO } from '@/lib/time';
 import { EDIT_WINDOW_MS, patchMismatch, validatePatchBody } from '@/lib/validation';
@@ -51,44 +50,20 @@ export async function PATCH(req: Request, ctx: Ctx) {
       if (problem) return jsonError(422, problem);
     }
 
-    // Value edits must keep the Notion title ("category:type — value") honest.
-    const valueEdited =
-      patch.kind !== undefined ||
-      patch.intensity !== undefined ||
-      patch.duration !== undefined ||
-      patch.mealName !== undefined ||
-      patch.description !== undefined ||
-      patch.proteinG !== undefined ||
-      patch.calories !== undefined ||
-      patch.sessionDuration !== undefined ||
-      patch.exercises !== undefined;
-    const merged: AppEvent = {
-      ...ev,
-      ...(patch.kind !== undefined ? { kind: patch.kind } : {}),
-      ...(patch.intensity !== undefined ? { intensity: patch.intensity } : {}),
-      ...(patch.duration !== undefined ? { duration: patch.duration } : {}),
-      ...(patch.mealName !== undefined ? { mealName: patch.mealName } : {}),
-      ...(patch.description !== undefined ? { description: patch.description } : {}),
-      ...(patch.proteinG !== undefined ? { proteinG: patch.proteinG } : {}),
-      ...(patch.calories !== undefined ? { calories: patch.calories } : {}),
-      ...(patch.sessionDuration !== undefined ? { sessionDuration: patch.sessionDuration } : {}),
-      ...(patch.exercises !== undefined ? { exercises: patch.exercises } : {}),
-    };
-    // gym-session's minutes share nap's Duration (min) column.
-    const durationForNotion = patch.sessionDuration ?? patch.duration;
-    const notesEdited =
-      patch.description !== undefined ||
-      patch.proteinG !== undefined ||
-      patch.calories !== undefined ||
-      patch.exercises !== undefined;
-
+    // Every field is its own column now — no derived title to keep honest and
+    // no Notes envelope to rebuild, so the patch maps across one-to-one.
     await updateEventFields(id, {
       occurredAt: patch.occurred_at,
       precision: patch.precision,
+      kind: patch.kind,
       intensity: patch.intensity,
-      duration: durationForNotion,
-      ...(valueEdited ? { title: eventTitle(merged) } : {}),
-      ...(notesEdited ? { notes: buildNotesJson(merged) ?? '' } : {}),
+      duration: patch.duration,
+      mealName: patch.mealName,
+      description: patch.description,
+      proteinG: patch.proteinG,
+      calories: patch.calories,
+      sessionDuration: patch.sessionDuration,
+      exercises: patch.exercises,
     });
     invalidateToday();
     invalidateHistory(ev.type);

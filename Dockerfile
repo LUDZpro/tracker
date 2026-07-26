@@ -21,6 +21,11 @@ ENV PORT=3000
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
+# Schema migrations run before the server accepts traffic (see CMD). Not part
+# of the standalone trace, so they are copied in explicitly; `pg` itself the
+# trace does include, since the store layer imports it.
+COPY --from=builder /app/db ./db
+COPY --from=builder /app/scripts/migrate.mjs ./scripts/migrate.mjs
 
 # Writable mountpoint for the webauthn-data volume; a fresh volume inherits
 # this ownership, so the non-root app user can persist passkeys.
@@ -28,4 +33,4 @@ RUN mkdir -p /app/data && chown node:node /app/data
 
 USER node
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "node scripts/migrate.mjs && exec node server.js"]

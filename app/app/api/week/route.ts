@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCachedWeek, setCachedWeek } from '@/lib/cache';
 import { errorResponse } from '@/lib/http';
-import { queryEventsSince } from '@/lib/notion';
+import { queryEventsSince } from '@/lib/store/events';
 import { shiftDateKey, toLocalISO, wallDateKey } from '@/lib/time';
 import { EDIT_WINDOW_MS } from '@/lib/validation';
 import type { WeekResponse } from '@/lib/types';

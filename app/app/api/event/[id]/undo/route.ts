@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { invalidateHistory, invalidateToday } from '@/lib/cache';
 import { errorResponse } from '@/lib/http';
-import { archiveEvent, retrieveEvent } from '@/lib/notion';
+import { archiveEvent, retrieveEvent } from '@/lib/store/events';
 
 type Ctx = { params: Promise<{ id: string }> };
 

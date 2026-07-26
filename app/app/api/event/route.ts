@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { invalidateHistory, invalidateToday } from '@/lib/cache';
 import { errorResponse, jsonError, readJson } from '@/lib/http';
-import { archiveEvent, createEvent } from '@/lib/notion';
+import { archiveEvent, createEvent } from '@/lib/store/events';
 import { addMinutes } from '@/lib/time';
 import { validateEventPayload } from '@/lib/validation';
 import type { EventPayload, Precision } from '@/lib/types';

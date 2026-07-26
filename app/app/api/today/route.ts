@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCachedToday, setCachedToday } from '@/lib/cache';
 import { errorResponse, jsonError } from '@/lib/http';
-import { queryEventsSince } from '@/lib/notion';
+import { queryEventsSince } from '@/lib/store/events';
 import { currentState, lastSleep, missingNights, wakeWindowAt } from '@/lib/sleep';
 import { toLocalISO, wallDateKey } from '@/lib/time';
 import { EDIT_WINDOW_MS } from '@/lib/validation';

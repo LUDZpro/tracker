@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { invalidateToday } from '@/lib/cache';
-import { queryCbtRecords, createCbtRecord } from '@/lib/cbt/notion';
+import { queryCbtRecords, createCbtRecord } from '@/lib/cbt/store';
 import { validateCbtPayload } from '@/lib/cbt/validation';
 import { errorResponse, readJson } from '@/lib/http';
-import { createEvent } from '@/lib/notion';
+import { createEvent } from '@/lib/store/events';
 import type { CbtHistoryResponse } from '@/lib/cbt/types';
 
 const DEFAULT_LIMIT = 20;

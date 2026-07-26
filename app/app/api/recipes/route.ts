@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCachedRecipes, setCachedRecipes } from '@/lib/cache';
 import { errorResponse } from '@/lib/http';
 import { calorieTarget, proteinTarget } from '@/lib/nutrition/targets';
-import { queryRecipes } from '@/lib/recipes/notion';
+import { queryRecipes } from '@/lib/recipes/store';
 import type { Recipe, RecipesResponse } from '@/lib/recipes/types';
 
 export async function GET() {

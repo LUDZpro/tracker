@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { invalidateToday } from '@/lib/cache';
 import { errorResponse, jsonError, readJson } from '@/lib/http';
-import { createEvent, queryEventsSince } from '@/lib/notion';
+import { createEvent, queryEventsSince } from '@/lib/store/events';
 import { buildSleepPairs, checkSleepSpan, overlapsPairs, sortByTime } from '@/lib/sleep';
 import { toLocalISO } from '@/lib/time';
 import { isPrecision } from '@/lib/validation';

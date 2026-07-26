@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { archiveCbtRecord } from '@/lib/cbt/notion';
+import { archiveCbtRecord } from '@/lib/cbt/store';
 import { errorResponse } from '@/lib/http';
 
 type Ctx = { params: Promise<{ id: string }> };

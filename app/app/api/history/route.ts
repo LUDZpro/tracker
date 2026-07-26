@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCachedHistory, setCachedHistory } from '@/lib/cache';
 import { errorResponse, jsonError } from '@/lib/http';
-import { queryEventsByType } from '@/lib/notion';
+import { queryEventsByType } from '@/lib/store/events';
 import type { EventType, HistoryResponse } from '@/lib/types';
 
 const HISTORY_TYPES = new Set<EventType>(['meal', 'gym-session']);
