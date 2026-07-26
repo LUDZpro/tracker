@@ -87,6 +87,16 @@ Note: `trigger` is a floor event with no sheet and no capture entry — it's onl
 
 ## Deploy
 
-VPS at `/opt/floor-logger` (Docker, bound 127.0.0.1:3000, host nginx + certbot, Cloudflare DNS). Redeploy = rsync repo to `/opt/floor-logger`, then `docker compose up -d --build`. Container TZ must stay Africa/Casablanca (sleep-day boundaries).
+VPS at `/opt/floor-logger` (Docker, bound 127.0.0.1:3000, host nginx + certbot, Cloudflare DNS).
+
+**Redeploy is now `git pull` on the VPS, not rsync** (converted 2026-07-26):
+
+```bash
+ssh tachafine.srv 'cd /opt/floor-logger && git pull --ff-only && docker compose up -d --build'
+```
+
+`/opt/floor-logger` is a real checkout of `git@github.com:LUDZpro/tracker.git` tracking `origin/main`. **GitHub's port 22 is blocked outbound from this VPS** — `~/.ssh/config` there maps `github.com` to `ssh.github.com:443`, so plain URLs work; don't "fix" that Host block. `.env` is gitignored and lives only on the server (backup at `~/floor-logger-env.bak`). Note `ludz.pro` (the other remote name seen locally) does not resolve from the VPS at all.
+
+Container TZ: CLAUDE.md long claimed Africa/Casablanca, but **prod actually runs `TZ=UTC`** — `.env` has no `TZ` and compose defaults to it. Unresolved; the Postgres schema is TZ-safe regardless (absolute `occurred_ts` + verbatim `occurred_at` text).
 
 **The VPS `.env` needs `POSTGRES_PASSWORD` before the first Postgres deploy** — compose builds `DATABASE_URL` from it, and the app won't start without it. The `db` service brings its own `pgdata` volume and the app waits on its healthcheck; migrations run automatically on container start. The VPS database starts **empty** — the first deploy must also run the Notion import (or a `pg_dump`/`pg_restore` of the local one) or the app comes up with no history.
