@@ -1,0 +1,2386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tracker — Component Catalog</title>
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/docs.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/handbook.css">
+<link rel="stylesheet" href="styles/datetime.css">
+</head>
+<body class="ds-catalog">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- event icons — ICON_BODY in desktop/presentation.tsx -->
+    <symbol id="i-wake" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    </symbol>
+    <symbol id="i-sleep" viewBox="0 0 24 24">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+    </symbol>
+    <symbol id="i-nap" viewBox="0 0 24 24">
+      <path d="M14 12.5A6.5 6.5 0 1 1 7 5.5a5 5 0 0 0 7 7Z" />
+      <path d="M16 4h4l-4 4h4" />
+    </symbol>
+    <symbol id="i-coffee" viewBox="0 0 24 24">
+      <path d="M17 8h1a3 3 0 0 1 0 6h-1" />
+      <path d="M3 8h14v5a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8Z" />
+    </symbol>
+    <symbol id="i-tea" viewBox="0 0 24 24">
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z" />
+    </symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24">
+      <path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z" />
+    </symbol>
+    <symbol id="i-meal" viewBox="0 0 24 24">
+      <path d="M7 3v7a2 2 0 0 0 4 0V3" />
+      <path d="M9 3v18" />
+      <path d="M17 3c-1.5 2-2 4-2 7h2v11" />
+    </symbol>
+    <symbol id="i-gym" viewBox="0 0 24 24">
+      <path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11" />
+    </symbol>
+    <symbol id="i-mood" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" />
+    </symbol>
+    <symbol id="i-energy" viewBox="0 0 24 24">
+      <path d="M3 12h4l3-7 4 14 3-7h4" />
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </symbol>
+    <symbol id="i-list" viewBox="0 0 24 24">
+      <path d="M4 6h16M4 12h16M4 18h10" />
+    </symbol>
+    <symbol id="i-trigger" viewBox="0 0 24 24">
+      <path d="M5 21V4" />
+      <path d="M5 4c3-1.6 6 1.6 9 0s5 0 5 0v9s-2-1.6-5 0-6-1.6-9 0" />
+    </symbol>
+    <symbol id="i-mind" viewBox="0 0 24 24">
+      <path d="M12 3a7 7 0 0 1 7 7c0 2.4-1.2 4-2.4 5.4L16 21h-6l-.4-3H8a2 2 0 0 1-2-2v-2H4.5l1.7-3.4A7 7 0 0 1 12 3Z" />
+      <path d="M10.5 9.5c.4-1 1.6-1.5 2.6-1" />
+    </symbol>
+
+    <!-- status glyphs — GoalCards StatusDot -->
+    <symbol id="s-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+    <symbol id="s-warn" viewBox="0 0 24 24"><path d="M12 6v7M12 17h.01" /></symbol>
+
+    <!-- distortions — DISTORTION_META in cbt/presentation.tsx -->
+    <symbol id="d-catastrophizing" viewBox="0 0 24 24">
+      <path d="M17.5 9a4.5 4.5 0 0 0-8.8-1.2A4 4 0 0 0 6 15.6h11a3.5 3.5 0 0 0 .5-6.6Z" />
+      <path d="M12 17l-1.5 3.5M11.5 18.5h2.5L12.5 21" />
+    </symbol>
+    <symbol id="d-allornothing" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 4v16" />
+      <path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor" stroke="none" opacity="0.5" />
+    </symbol>
+    <symbol id="d-mindreading" viewBox="0 0 24 24">
+      <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h9A2.5 2.5 0 0 1 18 6.5v5a2.5 2.5 0 0 1-2.5 2.5H10l-4 4v-4H6.5A2.5 2.5 0 0 1 4 11.5Z" />
+      <path d="M8 9h.01M11 9h.01M14 9h.01" />
+    </symbol>
+    <symbol id="d-fortunetelling" viewBox="0 0 24 24">
+      <circle cx="12" cy="10.5" r="6" />
+      <path d="M8 19.5h8M9.5 16.5l-.8 3M14.5 16.5l.8 3" />
+      <path d="M9.8 8.6c.5-.9 1.4-1.4 2.4-1.4" />
+    </symbol>
+    <symbol id="d-emotionalreasoning" viewBox="0 0 24 24">
+      <path d="M12 20s-7-4.3-7-9.2A4 4 0 0 1 12 8a4 4 0 0 1 7 2.8C19 15.7 12 20 12 20Z" />
+      <path d="M8.5 12h2l1-2 1.5 3.5 1-1.5h1.5" />
+    </symbol>
+    <symbol id="d-overgeneralization" viewBox="0 0 24 24">
+      <circle cx="6" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="18" cy="12" r="2" />
+      <path d="M8 12h2M14 12h2" />
+    </symbol>
+    <symbol id="d-mentalfilter" viewBox="0 0 24 24">
+      <path d="M4 5h16l-6 7v6l-4 2v-8L4 5Z" />
+    </symbol>
+    <symbol id="d-discounting" viewBox="0 0 24 24">
+      <path d="M12 3.5l2.4 5 5.6.7-4.1 3.8 1.1 5.5-5-2.8-5 2.8 1.1-5.5L4 9.2l5.6-.7Z" />
+      <path d="M4.5 20l15-16" />
+    </symbol>
+    <symbol id="d-should" viewBox="0 0 24 24">
+      <path d="M8 4h8a2 2 0 0 1 2 2v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V6a2 2 0 0 1 2-2Z" />
+      <path d="M9 8.5h6M9 12h6M9 15.5h3" />
+      <path d="M15.5 15.2v2.4M15.5 19.4h.01" />
+    </symbol>
+    <symbol id="d-labeling" viewBox="0 0 24 24">
+      <path d="M11.6 3.5H5a1.5 1.5 0 0 0-1.5 1.5v6.6a2 2 0 0 0 .6 1.4l7.4 7.4a2 2 0 0 0 2.8 0l5.2-5.2a2 2 0 0 0 0-2.8L12.9 4a2 2 0 0 0-1.3-.5Z" />
+      <circle cx="8" cy="8" r="1.2" />
+    </symbol>
+    <symbol id="d-personalization" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="10" r="2.2" />
+      <path d="M7.5 17.5c.8-2.2 2.5-3.3 4.5-3.3s3.7 1.1 4.5 3.3" />
+      <path d="M12 2v1.8M12 20.2V22M2 12h1.8M20.2 12H22" />
+    </symbol>
+
+    <!-- emotion faces — EMOTION_META in cbt/presentation.tsx -->
+    <symbol id="e-anxious" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8.2 8.6l2-1M15.8 8.6l-2-1" />
+      <path d="M8.5 15.5c1-.9 1.6.9 2.6 0s1.4.9 2.4 0 1.6.9 2 .2" />
+      <path d="M9.5 11h.01M14.5 11h.01" />
+    </symbol>
+    <symbol id="e-sad" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8.5 16s1.3-1.8 3.5-1.8 3.5 1.8 3.5 1.8" />
+      <path d="M9.5 10.5h.01M14.5 10.5h.01" />
+    </symbol>
+    <symbol id="e-angry" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M7.8 8.8l2.4 1.2M16.2 8.8l-2.4 1.2" />
+      <path d="M9 15.5h6" />
+      <path d="M9.5 11.5h.01M14.5 11.5h.01" />
+    </symbol>
+    <symbol id="e-ashamed" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 12.5h.01M14.5 12.5h.01" />
+      <path d="M10 16h4" />
+      <path d="M8 9.5c.8-.5 1.7-.5 2.5-.2M16 9.5c-.8-.5-1.7-.5-2.5-.2" />
+    </symbol>
+    <symbol id="e-guilty" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 11.5h.01M14.5 11.5h.01" />
+      <path d="M9.5 15.8c1.2-.9 2.3-.9 3.2-.4" />
+    </symbol>
+    <symbol id="e-overwhelmed" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8.6 10.4l1.8 1.8M10.4 10.4l-1.8 1.8M13.6 10.4l1.8 1.8M15.4 10.4l-1.8 1.8" />
+      <circle cx="12" cy="15.7" r="1.3" />
+    </symbol>
+    <symbol id="e-hopeless" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8.8 11.6c.4.3 1 .3 1.4 0M13.8 11.6c.4.3 1 .3 1.4 0" />
+      <path d="M9 15.8h6" />
+    </symbol>
+  </defs>
+</svg>
+
+<nav class="ds-nav" aria-label="Design system sections">
+  <div class="ds-brand">
+    <span class="ds-brandMark">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-list"/></svg>
+    </span>
+    <span class="ds-brandText">
+      <b>floor <span>.</span> logger</b>
+      <small>Component catalog</small>
+    </span>
+  </div>
+
+  <div class="ds-pageNav" aria-label="Design system pages">
+    <a href="index.html">UX contract</a>
+    <a href="components.html" aria-current="page">Components</a>
+    <a href="charts-lab.html">Charts</a>
+  </div>
+
+  <div class="ds-navGroup">
+    <h4>Foundations</h4>
+    <a class="ds-navLink" href="#principles">Principles <em>01</em></a>
+    <a class="ds-navLink" href="#color">Color <em>02</em></a>
+    <a class="ds-navLink" href="#materials">Materials &amp; depth <em>03</em></a>
+    <a class="ds-navLink" href="#type">Typography <em>04</em></a>
+    <a class="ds-navLink" href="#space">Space &amp; radius <em>05</em></a>
+    <a class="ds-navLink" href="#motion">Motion <em>06</em></a>
+    <a class="ds-navLink" href="#icons">Iconography <em>07</em></a>
+  </div>
+
+  <div class="ds-navGroup">
+    <h4>Components</h4>
+    <a class="ds-navLink" href="#navigation">Navigation <em>08</em></a>
+    <a class="ds-navLink" href="#buttons">Buttons <em>09</em></a>
+    <a class="ds-navLink" href="#capture">Capture <em>10</em></a>
+    <a class="ds-navLink" href="#inputs">Inputs &amp; fields <em>11</em></a>
+    <a class="ds-navLink" href="#cards">Cards <em>12</em></a>
+    <a class="ds-navLink" href="#lists">Lists &amp; ledger <em>13</em></a>
+    <a class="ds-navLink" href="#overlays">Overlays <em>14</em></a>
+    <a class="ds-navLink" href="#feedback">Feedback <em>15</em></a>
+  </div>
+
+  <div class="ds-navGroup">
+    <h4>Data</h4>
+    <a class="ds-navLink" href="#charts">Charts <em>16</em></a>
+    <a class="ds-navLink" href="#timelines">Timelines <em>17</em></a>
+    <a class="ds-navLink" href="#gauges">Gauges <em>18</em></a>
+  </div>
+
+  <div class="ds-navGroup">
+    <h4>Systems</h4>
+    <a class="ds-navLink" href="#cbt">CBT module <em>19</em></a>
+    <a class="ds-navLink" href="#layout">Layout <em>20</em></a>
+    <a class="ds-navLink" href="#events">Event types <em>21</em></a>
+    <a class="ds-navLink" href="#rules">Rules <em>22</em></a>
+  </div>
+
+  <p class="ds-navFoot">
+    Values transcribed from <code>app/styles/tokens.css</code> and the CSS modules.
+    Edit the app first, then mirror here.
+  </p>
+</nav>
+
+<main class="ds-main">
+
+<header class="ds-hero">
+  <h1>Quiet night <b>console</b></h1>
+  <p>
+    The visual catalog for a personal logger that runs at 2am with a thumb, and at a desk with a keyboard.
+    Everything here is dark, low-noise, and instrument-like: light numerals, tabular figures,
+    hairline rules, and one purple accent that only appears where something is actionable.
+    Behavior and release requirements live in the <a href="index.html" style="color:var(--a300)">UI/UX engineering manual</a>.
+  </p>
+  <div class="ds-heroMeta">
+    <span class="ds-pill">Surfaces <b>2</b></span>
+    <span class="ds-pill">Breakpoint <b>1024px</b></span>
+    <span class="ds-pill">Accent <b>#9184d9</b></span>
+    <span class="ds-pill">Type <b>Inter</b></span>
+    <span class="ds-pill">Tap target <b>64px</b></span>
+  </div>
+</header>
+
+<!-- ══ 01 PRINCIPLES ══════════════════════════════════════════════════ -->
+<section class="ds-section" id="principles">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">01</span><h2>Principles</h2></div>
+  <p class="ds-lede">
+    Six rules that decide every visual argument in this app. When a component looks wrong,
+    it is almost always breaking one of these.
+  </p>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-do">
+      <h4><span class="ds-ruleTag">Rule</span> Fast when the data is certain</h4>
+      <p>An instant event with safe defaults logs at <em>now</em>. A composed record opens its shortest trustworthy form. Detail is never fabricated to save a tap.</p>
+    </div>
+    <div class="ds-rule ds-do">
+      <h4><span class="ds-ruleTag">Rule</span> Accent means actionable</h4>
+      <p><code>--accent</code> marks the current nav item, the primary button, the live "now" marker, and nothing else. Decorative purple dilutes the signal.</p>
+    </div>
+    <div class="ds-rule ds-do">
+      <h4><span class="ds-ruleTag">Rule</span> Numbers are instruments</h4>
+      <p>Readouts use weight 300 at large sizes with <code>tabular-nums</code>, so digits never shift as values tick. Labels stay 10px uppercase with wide tracking.</p>
+    </div>
+    <div class="ds-rule ds-do">
+      <h4><span class="ds-ruleTag">Rule</span> Hairlines, not boxes</h4>
+      <p>Separation comes from <code>--line</code> at 8% and a change of surface. Heavy borders and drop shadows are reserved for things that float.</p>
+    </div>
+    <div class="ds-rule ds-do">
+      <h4><span class="ds-ruleTag">Rule</span> Two surfaces, one system</h4>
+      <p>Below 1024px the app is a one-thumb logger; above it is a three-column console. Sheets, tones, and tokens are shared — only layout and density change.</p>
+    </div>
+    <div class="ds-rule ds-do">
+      <h4><span class="ds-ruleTag">Rule</span> Every destructive act is reversible</h4>
+      <p>Deletes use a soft <code>archived_at</code> stamp behind a 5s Undo. The target also requires a user-visible Restore path after that window; current production only has operator/database recovery.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 COLOR ═══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="color">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">02</span><h2>Color</h2></div>
+  <p class="ds-lede">
+    Four groups: surfaces stack from <code>--canvas</code> up to <code>--surface-raised</code>;
+    the accent ramp carries interaction; the text ramp carries hierarchy; semantic colors carry
+    state. Click any swatch to copy its hex.
+  </p>
+
+  <span class="ds-eyebrow">Surfaces — darkest to lightest</span>
+  <div class="ds-swatches">
+    <button class="ds-swatch" data-hex="#0d0e15"><span class="ds-swatchChip" style="background:#0d0e15"></span><span class="ds-swatchMeta"><b>--canvas</b><span>#0d0e15</span><em>App background, desktop shell</em></span></button>
+    <button class="ds-swatch" data-hex="#12131e"><span class="ds-swatchChip" style="background:#12131e"></span><span class="ds-swatchMeta"><b>--night</b><span>#12131e</span><em>Chrome: rail, topbar, tab bar, footer</em></span></button>
+    <button class="ds-swatch" data-hex="#161826"><span class="ds-swatchChip" style="background:#161826"></span><span class="ds-swatchMeta"><b>--app</b><span>#161826</span><em>Content column, mobile page</em></span></button>
+    <button class="ds-swatch" data-hex="#1b1d2c"><span class="ds-swatchChip" style="background:#1b1d2c"></span><span class="ds-swatchMeta"><b>--surface</b><span>#1b1d2c</span><em>Sheets, chips (= --sheet)</em></span></button>
+    <button class="ds-swatch" data-hex="#232532"><span class="ds-swatchChip" style="background:#232532"></span><span class="ds-swatchMeta"><b>--surface-raised</b><span>#232532</span><em>Cards, inputs, capture buttons</em></span></button>
+    <button class="ds-swatch" data-hex="#292b31"><span class="ds-swatchChip" style="background:#292b31"></span><span class="ds-swatchMeta"><b>--rail</b><span>#292b31</span><em>Empty track behind bars</em></span></button>
+  </div>
+
+  <span class="ds-eyebrow">Accent ramp — a200 lightest to a900 darkest</span>
+  <div class="ds-swatches">
+    <button class="ds-swatch" data-hex="#e7e5fe"><span class="ds-swatchChip" style="background:#e7e5fe"></span><span class="ds-swatchMeta"><b>--a200</b><span>#e7e5fe</span><em>Hover label, night-row text</em></span></button>
+    <button class="ds-swatch" data-hex="#d2cefd"><span class="ds-swatchChip" style="background:#d2cefd"></span><span class="ds-swatchMeta"><b>--a300</b><span>#d2cefd</span><em>Meta that scored a hit</em></span></button>
+    <button class="ds-swatch" data-hex="#b5abfc"><span class="ds-swatchChip" style="background:#b5abfc"></span><span class="ds-swatchMeta"><b>--a400</b><span>#b5abfc</span><em>Secondary links, totals</em></span></button>
+    <button class="ds-swatch" data-hex="#9184d9"><span class="ds-swatchChip" style="background:#9184d9"></span><span class="ds-swatchMeta"><b>--accent</b><span>#9184d9</span><em>The one interactive color</em></span></button>
+    <button class="ds-swatch" data-hex="#968ae0"><span class="ds-swatchChip" style="background:#968ae0"></span><span class="ds-swatchMeta"><b>--a500</b><span>#968ae0</span><em>Bar "hit" fill, CBT icons</em></span></button>
+    <button class="ds-swatch" data-hex="#796cbf"><span class="ds-swatchChip" style="background:#796cbf"></span><span class="ds-swatchMeta"><b>--a600</b><span>#796cbf</span><em>Progress fill, sleep span edge</em></span></button>
+    <button class="ds-swatch" data-hex="#5d5294"><span class="ds-swatchChip" style="background:#5d5294"></span><span class="ds-swatchMeta"><b>--a700</b><span>#5d5294</span><em>Hover border, selected row</em></span></button>
+    <button class="ds-swatch" data-hex="#423a6a"><span class="ds-swatchChip" style="background:#423a6a"></span><span class="ds-swatchMeta"><b>--a800</b><span>#423a6a</span><em>Bar base, sleep span fill</em></span></button>
+    <button class="ds-swatch" data-hex="#2b2741"><span class="ds-swatchChip" style="background:#2b2741"></span><span class="ds-swatchMeta"><b>--a900</b><span>#2b2741</span><em>Night row, CTA gradient</em></span></button>
+  </div>
+
+  <span class="ds-eyebrow">Text ramp — t1 primary to t5 faintest</span>
+  <div class="ds-swatches">
+    <button class="ds-swatch" data-hex="#e9e9ed"><span class="ds-swatchChip" style="background:#e9e9ed"></span><span class="ds-swatchMeta"><b>--t1</b><span>#e9e9ed</span><em>Primary copy, readouts</em></span></button>
+    <button class="ds-swatch" data-hex="#9397ab"><span class="ds-swatchChip" style="background:#9397ab"></span><span class="ds-swatchMeta"><b>--t2</b><span>#9397ab</span><em>Secondary, row meta, eyebrows</em></span></button>
+    <button class="ds-swatch" data-hex="#75798c"><span class="ds-swatchChip" style="background:#75798c"></span><span class="ds-swatchMeta"><b>--t3</b><span>#75798c</span><em>Captions, timestamps, labels</em></span></button>
+    <button class="ds-swatch" data-hex="#595d6c"><span class="ds-swatchChip" style="background:#595d6c"></span><span class="ds-swatchMeta"><b>--t4</b><span>#595d6c</span><em>Idle nav icons, hints</em></span></button>
+    <button class="ds-swatch" data-hex="#41445a"><span class="ds-swatchChip" style="background:#41445a"></span><span class="ds-swatchMeta"><b>--t5</b><span>#41445a</span><em>Axis ticks, disabled meta</em></span></button>
+  </div>
+
+  <span class="ds-eyebrow">Text contrast — range across canvas, night, app, sheet, and raised surfaces</span>
+  <table class="ds-table">
+    <thead><tr><th>Token</th><th>Contrast range</th><th>Normal text</th><th>Permitted role</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey"><code>--t1</code></td><td>12.55–15.90:1</td><td>AA pass</td><td>Primary text</td></tr>
+      <tr><td class="ds-tdKey"><code>--t2</code></td><td>5.25–6.65:1</td><td>AA pass</td><td>Meaningful secondary text</td></tr>
+      <tr><td class="ds-tdKey"><code>--t3</code></td><td>3.52–4.46:1</td><td>Fail</td><td>Large text or nonessential decoration only until replaced</td></tr>
+      <tr><td class="ds-tdKey"><code>--t4</code></td><td>2.32–2.94:1</td><td>Fail</td><td>Disabled/decorative only</td></tr>
+      <tr><td class="ds-tdKey"><code>--t5</code></td><td>1.59–2.02:1</td><td>Fail</td><td>Decorative only</td></tr>
+    </tbody>
+  </table>
+  <div class="ds-debt">
+    <span>WCAG 2.2 AA</span>
+    <p>Current components use t3–t5 for some timestamps, hints, labels, and axes. Required small text must migrate to a contrast-safe token; disabled appearance must not hide information needed to understand the screen.</p>
+  </div>
+
+  <span class="ds-eyebrow">Current semantic tokens — feedback and event roles still overlap</span>
+  <div class="ds-swatches">
+    <button class="ds-swatch" data-hex="#6fbf9a"><span class="ds-swatchChip" style="background:#6fbf9a"></span><span class="ds-swatchMeta"><b>--ok</b><span>#6fbf9a</span><em>Success feedback + meal tone (debt)</em></span></button>
+    <button class="ds-swatch" data-hex="#20342c"><span class="ds-swatchChip" style="background:#20342c"></span><span class="ds-swatchMeta"><b>--ok-d</b><span>#20342c</span><em>Backing for --ok</em></span></button>
+    <button class="ds-swatch" data-hex="#d8a657"><span class="ds-swatchChip" style="background:#d8a657"></span><span class="ds-swatchMeta"><b>--warn</b><span>#d8a657</span><em>Warning/queued + caffeine tone (debt)</em></span></button>
+    <button class="ds-swatch" data-hex="#33291a"><span class="ds-swatchChip" style="background:#33291a"></span><span class="ds-swatchMeta"><b>--warn-d</b><span>#33291a</span><em>Backing for --warn</em></span></button>
+    <button class="ds-swatch" data-hex="#d2706b"><span class="ds-swatchChip" style="background:#d2706b"></span><span class="ds-swatchMeta"><b>--bad</b><span>#d2706b</span><em>Error/delete + gym tone (debt)</em></span></button>
+    <button class="ds-swatch" data-hex="#331f1e"><span class="ds-swatchChip" style="background:#331f1e"></span><span class="ds-swatchMeta"><b>--bad-d</b><span>#331f1e</span><em>Backing for --bad</em></span></button>
+    <button class="ds-swatch" data-hex="#5bbfc0"><span class="ds-swatchChip" style="background:#5bbfc0"></span><span class="ds-swatchMeta"><b>--cyan</b><span>#5bbfc0</span><em>Mood / energy state tone</em></span></button>
+  </div>
+
+  <span class="ds-eyebrow">Event tones — the only color-coding users must learn</span>
+  <table class="ds-table">
+    <thead><tr><th>Tone</th><th>Token</th><th>Applies to</th><th>Rendered as</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey"><span class="ds-tone"><i style="background:var(--accent)"></i>sleep</span></td><td><code>--accent</code></td><td>wake_up, sleep_start, nap</td><td>Glyph stroke + timeline dot</td></tr>
+      <tr><td class="ds-tdKey"><span class="ds-tone"><i style="background:var(--warn)"></i>intake</span></td><td><code>--warn</code></td><td>caffeine</td><td>Glyph stroke + timeline dot</td></tr>
+      <tr><td class="ds-tdKey"><span class="ds-tone"><i style="background:var(--ok)"></i>meal</span></td><td><code>--ok</code></td><td>meal</td><td>Glyph stroke + timeline dot</td></tr>
+      <tr><td class="ds-tdKey"><span class="ds-tone"><i style="background:var(--bad)"></i>gym</span></td><td><code>--bad</code></td><td>gym-session</td><td>Glyph stroke + timeline dot</td></tr>
+      <tr><td class="ds-tdKey"><span class="ds-tone"><i style="background:var(--cyan)"></i>state</span></td><td><code>--cyan</code></td><td>mood, energy, trigger</td><td>Glyph stroke + timeline dot</td></tr>
+    </tbody>
+  </table>
+  <div class="ds-debt">
+    <span>Token migration</span>
+    <p>Event categories and feedback outcomes need separate namespaces. Until that migration lands, color never carries category or status alone, and a gym-red record must not be read as an error.</p>
+  </div>
+</section>
+
+<!-- ══ 03 MATERIALS ═══════════════════════════════════════════════════ -->
+<section class="ds-section" id="materials">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">03</span><h2>Materials &amp; depth</h2></div>
+  <p class="ds-lede">
+    There is no elevation scale — depth is a change of surface plus a hairline. Shadow is used
+    twice only: on things that float over content (toast, dialog).
+  </p>
+
+  <span class="ds-eyebrow">Surface stack</span>
+  <div class="ds-preview">
+    <div style="background:var(--canvas);padding:18px;border-radius:14px">
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);margin-bottom:10px">canvas</div>
+      <div style="background:var(--app);padding:18px;border-radius:12px;border:1px solid var(--line)">
+        <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);margin-bottom:10px">app + 1px line</div>
+        <div style="background:var(--surface-raised);padding:16px;border-radius:12px">
+          <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t2)">surface-raised — cards, inputs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Borders &amp; shadows</span>
+  <table class="ds-table">
+    <thead><tr><th>Token</th><th>Value</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey"><code>--line</code></td><td><code>rgba(233,233,237,.08)</code></td><td>Default hairline: section rules, card borders, row underline</td></tr>
+      <tr><td class="ds-tdKey"><code>--edge</code></td><td><code>rgba(233,233,237,.12)</code></td><td>Slightly stronger: input outlines, ledger glyph frame, rating buttons</td></tr>
+      <tr><td class="ds-tdKey"><code>--sleep-dim</code></td><td><code>rgba(145,132,217,.28)</code></td><td>Pressed chip border</td></tr>
+      <tr><td class="ds-tdKey"><code>--sh-md</code></td><td><code>0 8px 24px rgba(0,0,0,.45)</code></td><td>Toast, timeline tooltip</td></tr>
+      <tr><td class="ds-tdKey"><code>--sh-lg</code></td><td><code>0 20px 60px rgba(0,0,0,.55)</code></td><td>Desktop dialog only</td></tr>
+      <tr><td class="ds-tdKey">backdrop</td><td><code>rgba(8,10,14,.7)</code> / <code>rgba(13,14,21,.72)</code></td><td>Sheet scrim (mobile / desktop)</td></tr>
+    </tbody>
+  </table>
+
+  <span class="ds-eyebrow">Tint overlays — how state is painted without new colors</span>
+  <table class="ds-table">
+    <thead><tr><th>Effect</th><th>Value</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey">Nav active</td><td><code>rgba(145,132,217,.10)</code></td><td>Rail button background</td></tr>
+      <tr><td class="ds-tdKey">Row hover</td><td><code>rgba(233,233,237,.03)</code></td><td>Ledger rows, log rows</td></tr>
+      <tr><td class="ds-tdKey">Row selected</td><td><code>rgba(145,132,217,.08)</code> + <code>--a700</code> border</td><td>Ledger selection</td></tr>
+      <tr><td class="ds-tdKey">Hold fill</td><td><code>rgba(145,132,217,.16)</code></td><td>Capture button long-press wipe</td></tr>
+      <tr><td class="ds-tdKey">Rating on</td><td><code>rgba(145,132,217,.07)</code></td><td>Mood / energy pressed</td></tr>
+      <tr><td class="ds-tdKey">Toggle tone</td><td><code>color-mix(in srgb, var(--tone) 10%, var(--surface-raised))</code></td><td>Wake / sleep toggle</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 04 TYPOGRAPHY ══════════════════════════════════════════════════ -->
+<section class="ds-section" id="type">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">04</span><h2>Typography</h2></div>
+  <p class="ds-lede">
+    Inter, loaded through <code>next/font</code> as <code>--font-sans</code>. One family, four jobs:
+    readouts (light + large), body (regular), labels (uppercase micro), and code-ish meta (mono, keys only).
+  </p>
+
+  <span class="ds-eyebrow">Token scale</span>
+  <div>
+    <div class="ds-ruler"><span class="ds-rulerKey">--text-xs</span><span class="ds-rulerVal">12px</span><span class="ds-typeSample" style="font-size:12px">Log at 2:45p — the quick brown fox</span></div>
+    <div class="ds-ruler"><span class="ds-rulerKey">--text-sm</span><span class="ds-rulerVal">14px</span><span class="ds-typeSample" style="font-size:14px">Log at 2:45p — the quick brown fox</span></div>
+    <div class="ds-ruler"><span class="ds-rulerKey">--text-base</span><span class="ds-rulerVal">16px</span><span class="ds-typeSample" style="font-size:16px">Log at 2:45p — the quick brown</span></div>
+    <div class="ds-ruler"><span class="ds-rulerKey">--text-lg</span><span class="ds-rulerVal">20px</span><span class="ds-typeSample" style="font-size:20px">Log at 2:45p — the quick</span></div>
+    <div class="ds-ruler"><span class="ds-rulerKey">--text-xl</span><span class="ds-rulerVal">24–32px</span><span class="ds-typeSample" style="font-size:var(--text-xl)">Log at 2:45p</span></div>
+  </div>
+
+  <span class="ds-eyebrow">Roles</span>
+  <div class="ds-preview">
+    <div class="ds-cols">
+      <div>
+        <div style="font-size:38px;font-weight:300;line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums">2:45p</div>
+        <div style="font-size:11.5px;color:var(--t2);margin-top:5px">Desktop clock — 38px / 300 / tabular</div>
+      </div>
+      <div>
+        <div style="font-size:27px;font-weight:300;line-height:1;font-variant-numeric:tabular-nums">7h 24m<small style="font-size:11.5px;color:var(--t2);margin-left:3px;font-weight:400">avg</small></div>
+        <div style="font-size:11.5px;color:var(--t2);margin-top:9px">Card readout — 27px / 300 + 11.5px suffix</div>
+      </div>
+      <div>
+        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--t2)">Sleep last night</div>
+        <div style="font-size:11.5px;color:var(--t2);margin-top:9px">Card label — 10px / .12em / uppercase</div>
+      </div>
+      <div>
+        <div style="font-size:13.5px;color:var(--t1)">Coffee <em style="font-style:normal;color:var(--t2)">· medium</em></div>
+        <div style="font-size:11.5px;color:var(--t2);margin-top:9px">Ledger row — 13.5px, meta uses --t2</div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Non-negotiables</span>
+  <div class="ds-rules">
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Tabular figures everywhere</h4><p><code>time</code> and <code>.num</code> get <code>font-variant-numeric: tabular-nums</code> globally, so clocks and totals never jitter.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don't</span> Bold a large number</h4><p>Big readouts are weight 300. Emphasis comes from size and <code>--t1</code>, never from weight above 600 at 20px+.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> Line height 1.45</h4><p>Body sits at 1.45 (global.css). Readouts and labels override to 1 so they align to their own box.</p></div>
+  </div>
+</section>
+
+<!-- ══ 05 SPACE & RADIUS ══════════════════════════════════════════════ -->
+<section class="ds-section" id="space">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">05</span><h2>Space &amp; radius</h2></div>
+  <p class="ds-lede">
+    Token spacing governs mobile and sheets. The desktop console predates the tokens and uses
+    a tighter literal rhythm (7 / 10 / 20 / 26px) — both are documented so you match the surface you're in.
+  </p>
+
+  <span class="ds-eyebrow">Space scale</span>
+  <div>
+    <div class="ds-ruler"><span class="ds-rulerKey">--space-1</span><span class="ds-rulerVal">6px</span><span class="ds-rulerBar" style="width:6px"></span></div>
+    <div class="ds-ruler"><span class="ds-rulerKey">--space-2</span><span class="ds-rulerVal">12px</span><span class="ds-rulerBar" style="width:12px"></span></div>
+    <div class="ds-ruler"><span class="ds-rulerKey">--space-3</span><span class="ds-rulerVal">20px</span><span class="ds-rulerBar" style="width:20px"></span></div>
+    <div class="ds-ruler"><span class="ds-rulerKey">--space-4</span><span class="ds-rulerVal">32px</span><span class="ds-rulerBar" style="width:32px"></span></div>
+  </div>
+
+  <span class="ds-eyebrow">Radius</span>
+  <div class="ds-preview">
+    <div class="ds-row is-center">
+      <div style="text-align:center"><div class="ds-radiusChip" style="border-radius:6px"></div><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:7px">6px · glyph</div></div>
+      <div style="text-align:center"><div class="ds-radiusChip" style="border-radius:8px"></div><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:7px">8px · row</div></div>
+      <div style="text-align:center"><div class="ds-radiusChip" style="border-radius:10px"></div><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:7px">--radius-sm</div></div>
+      <div style="text-align:center"><div class="ds-radiusChip" style="border-radius:12px"></div><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:7px">12px · card</div></div>
+      <div style="text-align:center"><div class="ds-radiusChip" style="border-radius:14px"></div><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:7px">14px · capture</div></div>
+      <div style="text-align:center"><div class="ds-radiusChip" style="border-radius:16px"></div><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:7px">--radius-md</div></div>
+      <div style="text-align:center"><div class="ds-radiusChip" style="border-radius:22px"></div><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:7px">--radius-lg</div></div>
+      <div style="text-align:center"><div class="ds-radiusChip" style="border-radius:999px"></div><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:7px">999px · chip</div></div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Fixed dimensions</span>
+  <table class="ds-table">
+    <thead><tr><th>Token</th><th>Value</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey"><code>--tap-min</code></td><td>64px</td><td>Minimum touch target in sheets and mobile actions</td></tr>
+      <tr><td class="ds-tdKey"><code>--rail-w</code></td><td>56px</td><td>Desktop rail width; content is padded by this</td></tr>
+      <tr><td class="ds-tdKey"><code>--tabbar-h</code></td><td>60px</td><td>Mobile tab bar, plus <code>env(safe-area-inset-bottom)</code></td></tr>
+      <tr><td class="ds-tdKey">page max</td><td>28rem default</td><td>Mobile-first route column; desktop route widths vary by task and density</td></tr>
+      <tr><td class="ds-tdKey">console grid</td><td>250px / 1fr / 296px</td><td>Capture · ledger · stats</td></tr>
+      <tr><td class="ds-tdKey">dialog</td><td>540px, max 86vh</td><td>Desktop sheet</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 06 MOTION ══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="motion">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">06</span><h2>Motion</h2></div>
+  <p class="ds-lede">
+    Two durations and one curve. Motion confirms an action landed; it never introduces delay.
+    Everything collapses to 0.01ms under <code>prefers-reduced-motion</code>.
+  </p>
+
+  <span class="ds-eyebrow">Tokens</span>
+  <table class="ds-table">
+    <thead><tr><th>Token</th><th>Value</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey"><code>--duration-fast</code></td><td>150ms</td><td>Hover, press, color and border changes</td></tr>
+      <tr><td class="ds-tdKey"><code>--duration-normal</code></td><td>300ms</td><td>Sheet slide-up, balance beam tilt</td></tr>
+      <tr><td class="ds-tdKey"><code>--ease-out-expo</code></td><td><code>cubic-bezier(.16,1,.3,1)</code></td><td>Anything that travels — decisive arrival, no bounce</td></tr>
+      <tr><td class="ds-tdKey">hold</td><td>500ms linear</td><td>Long-press wipe on capture buttons</td></tr>
+      <tr><td class="ds-tdKey">undo window</td><td>12s (log) / 5s (delete)</td><td>Not animation — the reversal budget</td></tr>
+    </tbody>
+  </table>
+
+  <span class="ds-eyebrow">Named animations</span>
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Press scale</h3><code>:active — scale(.97)</code></div>
+      <p class="ds-specNote">Capture buttons and chips shrink slightly. Chips use .95.</p>
+      <div class="ds-preview"><button class="t-btn t-cap t-capSleep" style="width:110px"><span class="t-capFill"></span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-nap"/></svg><span class="t-capLabel">Press me</span><span class="t-capMeta">holds too</span></button></div>
+    </div>
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Flash</h3><code>.btn-flash:active</code></div>
+      <p class="ds-specNote">Brightness 1.6 → 1 over 150ms. Confirms a write fired without moving anything.</p>
+      <div class="ds-preview"><button class="t-btn t-capRow" id="ds-flashDemo"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg><span class="t-capLbl">Coffee</span><kbd>C</kbd></button></div>
+    </div>
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Hold wipe</h3><code>width 0 → 100%, 500ms linear</code></div>
+      <p class="ds-specNote">Legacy mobile behavior: a tint sweeps during long press and opens the sheet. A visible ordinary-control equivalent is required by the target contract.</p>
+      <div class="ds-preview"><button class="t-btn t-capRow" id="ds-holdDemo" style="width:100%"><span class="t-capFill" id="ds-holdFill"></span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-nap"/></svg><span class="t-capLbl">Hold 500ms</span><kbd>N</kbd></button></div>
+    </div>
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Slide up / dialog in</h3><code>@keyframes slide-up · dialog-in</code></div>
+      <p class="ds-specNote">Mobile sheets translate 100% → 0 over 300ms. Desktop dialogs fade with an 8px rise over 150ms.</p>
+      <div class="ds-preview"><button class="t-btn t-wideCap" id="ds-sheetDemo" style="width:100%">Play sheet entrance</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 07 ICONOGRAPHY ═════════════════════════════════════════════════ -->
+<section class="ds-section" id="icons">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">07</span><h2>Iconography</h2></div>
+  <p class="ds-lede">
+    Target set: one SVG family drawn on a 24×24 grid, stroke only: <code>stroke-width 1.5</code>,
+    round caps and joins, <code>fill: none</code>, and <code>currentColor</code>. Legacy mobile
+    history and presentation modules still contain emoji; that is tracked migration debt, not a pattern to copy.
+  </p>
+
+  <span class="ds-eyebrow">Event icons — <code>ICON_BODY</code>, desktop/presentation.tsx</span>
+  <div class="ds-icons">
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg><b>wake</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><b>sleep</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-nap"/></svg><b>nap</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg><b>coffee</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-tea"/></svg><b>tea</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bolt"/></svg><b>bolt</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg><b>meal</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg><b>gym</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mood"/></svg><b>mood</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-energy"/></svg><b>energy</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-clock"/></svg><b>clock</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-list"/></svg><b>list</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-trigger"/></svg><b>trigger</b></div>
+    <div class="ds-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mind"/></svg><b>mind</b></div>
+  </div>
+
+  <span class="ds-eyebrow">Sizes in use</span>
+  <div class="ds-preview">
+    <div class="ds-row is-center" style="gap:28px">
+      <div style="text-align:center;color:var(--accent)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:8px">12 · ledger glyph, card label</div></div>
+      <div style="text-align:center;color:var(--accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:8px">16 · desktop toggle</div></div>
+      <div style="text-align:center;color:var(--accent)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:8px">17 · Icon default</div></div>
+      <div style="text-align:center;color:var(--accent)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:8px">19 · capture, tab bar</div></div>
+      <div style="text-align:center;color:var(--accent)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><div style="font-family:var(--ds-mono);font-size:10px;color:var(--t2);margin-top:8px">22 · CbtIcon default</div></div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Tone applied</span>
+  <div class="ds-preview">
+    <div class="ds-row is-center" style="gap:20px">
+      <span class="t-rowG t-cSleep"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg></span>
+      <span class="t-rowG t-cIntake"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg></span>
+      <span class="t-rowG t-cMeal"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg></span>
+      <span class="t-rowG t-cGym"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg></span>
+      <span class="t-rowG t-cState"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mood"/></svg></span>
+      <span style="font-size:11.5px;color:var(--t2)">20×20 glyph frame, radius 6, 1px <code style="font-family:var(--ds-mono);font-size:10.5px;color:var(--a300)">--edge</code></span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 08 NAVIGATION ══════════════════════════════════════════════════ -->
+<section class="ds-section" id="navigation">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">08</span><h2>Navigation</h2></div>
+  <p class="ds-lede">
+    The same five canonical destinations — Today, Sleep, Nutrition, Gym, Mind — in the same order.
+    Desktop gets a 56px rail on the left; mobile gets
+    a 60px tab bar at the bottom. Each hides itself at the other breakpoint — and those
+    <code>display:none</code> queries must stay last in their file, since equal specificity means source order wins.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Rail — desktop</h3><code>nav/Rail.tsx</code></div>
+      <p class="ds-specNote">Fixed, full height, <code>--night</code>. 36px buttons at radius 10; active is accent on a 10% accent wash. The mark on top is decorative, 30px at radius 9.</p>
+      <div class="ds-preview is-flush">
+        <div class="t-rail" style="height:300px">
+          <span class="t-railMark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mind"/></svg></span>
+          <a class="t-railBtn t-railOn" href="#navigation" aria-label="Today"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-list"/></svg></a>
+          <a class="t-railBtn" href="#navigation" aria-label="Sleep"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg></a>
+          <a class="t-railBtn" href="#navigation" aria-label="Nutrition"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg></a>
+          <a class="t-railBtn" href="#navigation" aria-label="Gym"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg></a>
+          <a class="t-railBtn" href="#navigation" aria-label="Mind"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mind"/></svg></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Tab bar — mobile</h3><code>nav/TabBar.tsx</code></div>
+      <p class="ds-specNote">Fixed bottom, centered at 28rem, <code>--night</code> with a top hairline. Icon 19px over a 9.5px label; current tab uses <code>aria-current="page"</code> → accent.</p>
+      <div class="ds-preview is-flush">
+        <div style="height:300px;display:flex;flex-direction:column;justify-content:flex-end;background:var(--app)">
+          <nav class="t-tabBar">
+            <a class="t-tab" href="#navigation" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-list"/></svg>Today</a>
+            <a class="t-tab" href="#navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg>Sleep</a>
+            <a class="t-tab" href="#navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg>Nutrition</a>
+            <a class="t-tab" href="#navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg>Gym</a>
+            <a class="t-tab" href="#navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mind"/></svg>Mind</a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-debt">
+    <span>Production order</span>
+    <p>The current desktop rail orders Nutrition and Gym before Sleep. The specimen above shows the target canonical order; migrate both surfaces to one shared navigation registry.</p>
+  </div>
+
+  <span class="ds-eyebrow">Pager — history paging</span>
+  <div class="ds-spec">
+    <p class="ds-specNote">Used by meal and gym history. Disabled state drops to <code>--t4</code> at 55% opacity rather than disappearing, so the control keeps its position.</p>
+    <div class="ds-preview">
+      <div class="ds-previewInner">
+        <div class="t-pager">
+          <button class="t-btn t-pagerBtn" disabled>← Newer</button>
+          <span class="t-pagerLabel">21–40 of 138</span>
+          <button class="t-btn t-pagerBtn">Older →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don't</span> Use next/link</h4><p>Link-click transitions stall on Next 15.5 in this app. Nav uses <code>NavLink.tsx</code> — a plain <code>&lt;a&gt;</code> that calls <code>router.push</code> inside a <code>setTimeout</code>.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> Test nav in real Chrome</h4><p>SPA navigation is unreliable inside the preview harness. Verify against <code>localhost:3199</code> in an actual browser.</p></div>
+  </div>
+</section>
+
+<!-- ══ 09 BUTTONS ═════════════════════════════════════════════════════ -->
+<section class="ds-section" id="buttons">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">09</span><h2>Buttons</h2></div>
+  <p class="ds-lede">
+    <code>button</code> is reset globally to inherit font and color with no border or background, so every
+    button here is additive. Focus is always a 2px accent outline at 2px offset — never removed.
+  </p>
+
+  <span class="ds-eyebrow">Primary actions</span>
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Log button</h3><code>.logBtn</code></div>
+      <p class="ds-specNote">The commit action inside every sheet. Full width, 64px, radius 22, solid accent on <code>--bg</code> text. Disabled drops to 40% opacity.</p>
+      <div class="ds-preview">
+        <div class="ds-stack">
+          <button class="t-btn t-logBtn">Log</button>
+          <button class="t-btn t-logBtn" disabled>Log</button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Delete + footer</h3><code>.deleteBtn · .editFooter</code></div>
+      <p class="ds-specNote">Destructive is outlined, never filled, and always narrower than the confirm action (1fr / 2fr grid).</p>
+      <div class="ds-preview">
+        <div class="t-editFooter">
+          <button class="t-btn t-deleteBtn">Delete</button>
+          <button class="t-btn t-logBtn">Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Wide capture</h3><code>.wideCap</code></div>
+      <p class="ds-specNote">Outlined accent, 48px. For actions that always open a sheet because they need input (meal name, gym exercises).</p>
+      <div class="ds-preview">
+        <div class="t-wideGrid">
+          <button class="t-btn t-wideCap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg>Meal</button>
+          <button class="t-btn t-wideCap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg>Gym</button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Chip</h3><code>.chip — global.css</code></div>
+      <p class="ds-specNote">Pill, 44px, tabular. Pressed swaps to <code>--surface-raised</code> with a <code>--sleep-dim</code> border. Press scales to .95.</p>
+      <div class="ds-preview">
+        <div class="ds-row">
+          <button class="t-btn t-chip">30m</button>
+          <button class="t-btn t-chip" aria-pressed="true">45m</button>
+          <button class="t-btn t-chip">60m</button>
+          <button class="t-btn t-chip">90m</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Text-level actions</span>
+  <div class="ds-preview">
+    <div class="ds-row is-center" style="gap:22px">
+      <button class="t-btn t-rowActE">Edit</button>
+      <button class="t-btn t-rowActD">Delete</button>
+      <button class="t-btn t-undoBtn">Undo</button>
+      <button class="t-btn t-nightEdit">edit night</button>
+      <button class="t-btn t-timeFieldReset">back to now</button>
+      <button class="t-btn t-pagerBtn">Older →</button>
+    </div>
+  </div>
+  <p class="ds-specNote" style="margin-top:10px">
+    Accent = constructive (edit, undo a delete). <code>--t2</code> = neutral. <code>--bad</code> = the destructive one, and it only appears
+    once per row.
+  </p>
+</section>
+
+<!-- ══ 10 CAPTURE ═════════════════════════════════════════════════════ -->
+<section class="ds-section" id="capture">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">10</span><h2>Capture</h2></div>
+  <p class="ds-lede">
+    Safe instant events use a visible primary action to log now; composed records open a short form.
+    Every event has a visible path to choose time or edit details. Long press may accelerate that path,
+    but is never its only access. Current desktop specimens retain a legacy gesture inversion noted below.
+  </p>
+
+  <span class="ds-eyebrow">Mobile — 84px cards</span>
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Wake / sleep toggle + quick grid</h3><code>ActionGrid.tsx · WakeSleepToggle.tsx</code></div>
+    <p class="ds-specNote">
+      Toggle sides tint themselves from <code>--tone</code> via <code>color-mix</code>. The unavailable side is not hidden —
+      it goes flat and non-interactive so the pair never reflows. Below it, a three-up grid at 9px gutters.
+    </p>
+    <div class="ds-preview">
+      <div class="ds-previewInner">
+        <div class="ds-stack">
+          <div class="t-toggle">
+            <button class="t-btn t-side"><span class="t-fill"></span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg><span class="t-sideLabel">Wake</span><span class="t-sideMeta t-capMetaHit">7:15</span></button>
+            <button class="t-btn t-side t-sideOff"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><span class="t-sideLabel">Sleep</span><span class="t-sideMeta">23:30</span></button>
+          </div>
+          <div class="t-qgrid">
+            <button class="t-btn t-cap t-capSleep"><span class="t-capFill"></span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-nap"/></svg><span class="t-capLabel">Nap</span><span class="t-capMeta t-capMetaHit">45m · 14:15</span></button>
+            <button class="t-btn t-cap t-capIntake"><span class="t-capFill"></span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg><span class="t-capLabel">Coffee</span><span class="t-capMeta t-capMetaHit">x3 · 10:45</span></button>
+            <button class="t-btn t-cap t-capIntake"><span class="t-capFill"></span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-tea"/></svg><span class="t-capLabel">Tea</span><span class="t-capMeta">-</span></button>
+          </div>
+          <div class="t-wideGrid">
+            <button class="t-btn t-wideCap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg>Meal</button>
+            <button class="t-btn t-wideCap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg>Gym</button>
+          </div>
+          <p class="t-hint">tap logs safe defaults · edit time is visible</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Desktop — rows and a compact three-up</span>
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Capture column</h3><code>desktop/CaptureColumn.tsx</code></div>
+    <p class="ds-specNote">
+      In the 250px column the toggle collapses to 40px rows and captures become left-aligned rows with a
+      keyboard hint. Substances stay as a three-up so the eye can compare their meta at a glance.
+      Hover raises the border to <code>--a700</code> and the label to <code>--a200</code>.
+    </p>
+    <div class="ds-preview">
+      <div class="ds-previewInner is-narrow">
+        <span class="t-eyebrow">Capture</span>
+        <div class="t-toggle t-toggleWide" style="margin-bottom:7px">
+          <button class="t-btn t-side"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg><span class="t-sideLabel">Wake</span><span class="t-sideMeta">7:15</span></button>
+          <button class="t-btn t-side t-sideOff"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><span class="t-sideLabel">Sleep</span><span class="t-sideMeta">23:30</span></button>
+        </div>
+        <button class="t-btn t-capRow" style="margin-bottom:7px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-nap"/></svg><span class="t-capLbl">Nap</span><span class="t-capMeta t-capMetaHit">45m</span><kbd>N</kbd></button>
+        <div class="t-subRow" style="margin-bottom:7px">
+          <button class="t-btn t-capRow t-capCompact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg><span class="t-capLbl">Coffee</span><span class="t-capMeta t-capMetaHit">x3</span></button>
+          <button class="t-btn t-capRow t-capCompact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-tea"/></svg><span class="t-capLbl">Tea</span><span class="t-capMeta">-</span></button>
+          <button class="t-btn t-capRow t-capCompact t-flash"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bolt"/></svg><span class="t-capLbl">Energy</span><span class="t-capMeta t-capMetaHit">18:30</span></button>
+        </div>
+        <button class="t-btn t-capRow" style="margin-bottom:7px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg><span class="t-capLbl">Meal</span><kbd>M</kbd></button>
+        <button class="t-btn t-capRow"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg><span class="t-capLbl">Gym</span><kbd>G</kbd></button>
+        <p class="t-hint" style="text-align:left;margin-top:8px">legacy: click opens · hold logs now</p>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Rating rows — mood &amp; energy</span>
+  <div class="ds-spec">
+    <p class="ds-specNote">Five outlined buttons, equal flex. Pressed uses accent border + 7% accent wash + accent text. The right label is the current value, in <code>--t4</code>.</p>
+    <div class="ds-preview">
+      <div class="ds-previewInner">
+        <div class="t-rateLabel"><span>Mood</span><span>3 / 5</span></div>
+        <div class="t-rate" style="margin-bottom:14px">
+          <button class="t-btn">1</button><button class="t-btn">2</button>
+          <button class="t-btn" aria-pressed="true">3</button>
+          <button class="t-btn">4</button><button class="t-btn">5</button>
+        </div>
+        <div class="t-rateLabel"><span>Energy</span><span>not set</span></div>
+        <div class="t-rate">
+          <button class="t-btn">1</button><button class="t-btn">2</button>
+          <button class="t-btn">3</button><button class="t-btn">4</button><button class="t-btn">5</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Show the last occurrence</h4><p>Meta text (<code>x3 · 10:45</code>) is what makes a capture grid legible at a glance. Present values use <code>--a300</code>; empty uses a literal <code>-</code> so the row keeps its height.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don't</span> Double-log sleep</h4><p>Logging wake/sleep that repeats the current state must open <code>DuplicateCard</code>. Never silently write a second one.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Debt</span> Desktop gesture inversion</h4><p>The current desktop generic captures use click to open and hold to log. Wake/sleep and complex captures do not follow that hint consistently. Do not copy this behavior; migrate to the technical capture contract.</p></div>
+  </div>
+</section>
+
+<!-- ══ 11 INPUTS ══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="inputs">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">11</span><h2>Inputs &amp; fields</h2></div>
+  <p class="ds-lede">
+    Every field sits on <code>--surface-raised</code> with a <code>--hairline</code> border, and every focus
+    state is the same: border switches to <code>--sleep</code> and thickens to 2px. Numeric fields are tabular.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Text &amp; textarea</h3><code>.textInput · .textarea</code></div>
+      <p class="ds-specNote">64px min height for text, free height for textarea with vertical resize only.</p>
+      <div class="ds-preview">
+        <div class="ds-stack">
+          <label class="ds-fieldLabel">
+            <span>Meal name</span>
+            <input class="t-textInput" name="meal-name" autocomplete="off" placeholder="e.g. Chicken and rice">
+          </label>
+          <label class="ds-fieldLabel">
+            <span>Notes <small>(optional)</small></span>
+            <textarea class="t-textarea" name="meal-notes" rows="3" placeholder="Add preparation or context"></textarea>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Macro pair</h3><code>.macroRow · .macroField</code></div>
+      <p class="ds-specNote">Two equal columns with a 12px label above each. Used for protein and calories.</p>
+      <div class="ds-preview">
+        <div class="t-macroRow">
+          <label class="t-macroField"><span>Protein (g)</span><input type="number" value="32"></label>
+          <label class="t-macroField"><span>Calories</span><input type="number" value="420"></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Scale — 1 to 5</h3><code>.scaleRow · .scaleBtn</code></div>
+      <p class="ds-specNote">The sheet variant of a rating: 64px tall, and pressed fills solid <code>--state</code> with <code>--bg</code> text.</p>
+      <div class="ds-preview">
+        <div class="t-scaleRow">
+          <button class="t-btn t-scaleBtn">1</button><button class="t-btn t-scaleBtn">2</button>
+          <button class="t-btn t-scaleBtn" aria-pressed="true">3</button>
+          <button class="t-btn t-scaleBtn">4</button><button class="t-btn t-scaleBtn">5</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Stepper</h3><code>.stepper · .stepperValue</code></div>
+      <p class="ds-specNote">Two 64px squares around a 6rem tabular readout at <code>--text-xl</code>.</p>
+      <div class="ds-preview">
+        <div class="t-stepper">
+          <button class="t-btn">−</button>
+          <span class="t-stepperValue num">45<small style="font-size:.55em;color:var(--t2)"> min</small></span>
+          <button class="t-btn">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Exercise row</h3><code>sheets/ExerciseRow.tsx</code></div>
+      <p class="ds-specNote">Array editor for gym sessions. Every field keeps a visible label and a 48px target; focus uses <code>--state</code>, not accent, to separate it from the sheet's primary action.</p>
+      <div class="ds-preview">
+        <div class="ds-stack">
+          <div class="t-exerciseRow">
+            <label class="ds-fieldLabel">
+              <span>Exercise</span>
+              <input class="t-textInput" name="exercise-name" value="Bench press">
+            </label>
+            <div class="t-exerciseFields">
+              <label class="ds-compactField"><span>Sets</span><input class="t-exerciseNum" name="exercise-sets" type="number" value="5"></label>
+              <span class="t-exerciseX" aria-hidden="true">×</span>
+              <label class="ds-compactField"><span>Reps</span><input class="t-exerciseNum" name="exercise-reps" type="number" value="8"></label>
+              <span class="t-exerciseX" aria-hidden="true">@</span>
+              <label class="ds-compactField"><span>kg</span><input class="t-exerciseNum" name="exercise-weight" type="number" value="60"></label>
+              <button class="t-btn t-exerciseRemove" type="button" aria-label="Remove Bench press">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <span class="ds-eyebrow">Date &amp; time — target system</span>
+  <div class="ds-dtDecision">
+    <span>DT</span>
+    <div>
+      <strong>Typable field first · platform picker second · looping wheel retired</strong>
+      <small>React Aria defines the target behavior. These live specimens use semantic native controls and no runtime dependency.</small>
+    </div>
+    <a href="DATETIME_INPUTS.md">Read the full technical contract →</a>
+  </div>
+
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>One field, two responsive surfaces</h3><code>DateTimeField · instant</code></div>
+    <p class="ds-specNote">
+      Try the presets, type directly into Date and Time, or choose an approximate period. Mobile and
+      desktop keep the same values and validation; only the overlay layout changes. The mobile form body
+      owns vertical scrolling, while sheet dismissal is restricted to the header handle.
+    </p>
+
+    <div class="ds-dtSurfaceGrid">
+      <article class="ds-dtSurface" data-dt-overlay-root>
+        <header class="ds-dtSurfaceHead">
+          <div><span>Mobile</span><strong>Bottom sheet</strong></div>
+          <small>Native picker · scroll body cannot dismiss sheet</small>
+        </header>
+        <button
+          class="ds-dtMobileAnchor"
+          type="button"
+          aria-expanded="true"
+          aria-controls="dt-mobile-editor"
+          data-dt-invoker
+        >
+          <span><span>When</span><strong data-dt-anchor-summary>Now</strong></span>
+          <small>Open sheet</small>
+        </button>
+        <div class="ds-dtMobileStage" id="dt-mobile-editor" data-dt-overlay>
+          <section class="ds-dtPhoneSheet" role="dialog" aria-modal="false" aria-labelledby="dt-mobile-title">
+            <header class="ds-dtSheetHead" data-dt-drag-region>
+              <span class="ds-dtGrabber" aria-hidden="true"></span>
+              <div class="ds-dtSheetTitle">
+                <strong id="dt-mobile-title">When did you have this?</strong>
+                <small>Caffeine occurrence</small>
+              </div>
+              <button class="ds-dtClose" type="button" aria-label="Close date and time example" data-dt-close>×</button>
+            </header>
+
+            <div class="ds-dtSheetBody">
+              <form
+                id="dt-mobile-form"
+                class="ds-dtForm"
+                data-dt-demo
+                data-time-zone="Africa/Casablanca"
+                data-precision="exact"
+                data-summary-target="dt-mobile-summary"
+                novalidate
+              >
+                <fieldset class="ds-dtPresetGroup">
+                  <legend>Quick choices</legend>
+                  <div class="ds-dtPresets">
+                    <button class="ds-dtPreset" type="button" data-dt-preset="now" aria-pressed="true">Now</button>
+                    <button class="ds-dtPreset" type="button" data-dt-preset="15-minutes-ago" aria-pressed="false">15 min ago</button>
+                    <button class="ds-dtPreset" type="button" data-dt-preset="yesterday" aria-pressed="false">Yesterday</button>
+                  </div>
+                </fieldset>
+
+                <div class="ds-dtFields">
+                  <label class="ds-dtField" for="dt-mobile-date">
+                    <span>Date</span>
+                    <input
+                      class="ds-dtInput"
+                      id="dt-mobile-date"
+                      name="mobile-date"
+                      type="date"
+                      value="2026-07-29"
+                      required
+                      data-dt-date
+                      aria-describedby="dt-mobile-zone dt-mobile-error"
+                    >
+                  </label>
+                  <label class="ds-dtField ds-dtClockField" for="dt-mobile-time">
+                    <span>Time · stored as HH:MM</span>
+                    <input
+                      class="ds-dtInput"
+                      id="dt-mobile-time"
+                      name="mobile-time"
+                      type="time"
+                      value="14:45"
+                      step="60"
+                      inputmode="numeric"
+                      required
+                      data-dt-time
+                      aria-describedby="dt-mobile-zone dt-mobile-error"
+                    >
+                  </label>
+                  <label class="ds-dtField ds-dtPartField" for="dt-mobile-part">
+                    <span>Part of day</span>
+                    <select class="ds-dtSelect" id="dt-mobile-part" name="mobile-part" data-dt-part aria-describedby="dt-mobile-zone dt-mobile-error">
+                      <option value="morning">Morning</option>
+                      <option value="afternoon" selected>Afternoon</option>
+                      <option value="evening">Evening</option>
+                      <option value="night-end">Last night</option>
+                      <option value="night-start">Tonight</option>
+                    </select>
+                  </label>
+                </div>
+
+                <fieldset class="ds-dtOffsetGroup" data-dt-offset-group hidden aria-describedby="dt-mobile-error">
+                  <legend>This local time occurs twice</legend>
+                  <div>
+                    <label class="ds-dtOffsetChoice">
+                      <input type="radio" name="mobile-disambiguation" value="earlier" data-dt-disambiguation>
+                      <span><strong data-dt-offset-label="earlier">Earlier occurrence</strong><small>First time the clock shows this value</small></span>
+                    </label>
+                    <label class="ds-dtOffsetChoice">
+                      <input type="radio" name="mobile-disambiguation" value="later" data-dt-disambiguation>
+                      <span><strong data-dt-offset-label="later">Later occurrence</strong><small>Second time the clock shows this value</small></span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="ds-dtPrecisionGroup">
+                  <legend>How precise is this?</legend>
+                  <div class="ds-dtPrecisionRow">
+                    <label class="ds-dtPrecision">
+                      <input type="radio" name="mobile-precision" value="exact" checked data-dt-precision>
+                      Exact
+                    </label>
+                    <label class="ds-dtPrecision">
+                      <input type="radio" name="mobile-precision" value="about" data-dt-precision>
+                      About
+                    </label>
+                    <label class="ds-dtPrecision">
+                      <input type="radio" name="mobile-precision" value="part-of-day" data-dt-precision>
+                      Part of day
+                    </label>
+                  </div>
+                </fieldset>
+
+                <output class="ds-dtSummary" id="dt-mobile-summary" aria-live="polite">
+                  <span aria-hidden="true"></span>
+                  <span>
+                    <span>Will save</span>
+                    <strong data-dt-summary>Now · resolved when Use this time is pressed</strong>
+                    <small data-dt-summary-detail>Exact occurrence time</small>
+                  </span>
+                </output>
+                <p class="ds-dtZone" id="dt-mobile-zone">Stores HH:MM · picker display follows device locale · Africa/Casablanca</p>
+                <p class="ds-dtError" id="dt-mobile-error" role="alert" data-dt-error>
+                  Choose a complete time that is not in the future.
+                </p>
+                <div class="ds-dtDiscardPrompt" role="alertdialog" aria-modal="false" aria-labelledby="dt-mobile-discard-title" aria-describedby="dt-mobile-discard-description" data-dt-discard-prompt hidden>
+                  <strong id="dt-mobile-discard-title">Discard your changes?</strong>
+                  <span id="dt-mobile-discard-description">A swipe or Escape never throws away a draft without this choice.</span>
+                  <div>
+                    <button class="ds-dtSecondary" type="button" data-dt-keep>Keep editing</button>
+                    <button class="ds-dtDanger" type="button" data-dt-discard>Discard</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <footer class="ds-dtSheetFoot">
+              <button class="ds-dtSecondary" type="button" data-dt-cancel>Cancel</button>
+              <button class="ds-dtPrimary" type="submit" form="dt-mobile-form">Use this time</button>
+            </footer>
+          </section>
+        </div>
+      </article>
+
+      <article class="ds-dtSurface" data-dt-overlay-root>
+        <header class="ds-dtSurfaceHead">
+          <div><span>Desktop</span><strong>Anchored popover</strong></div>
+          <small>Keyboard entry is always visible · calendar is optional</small>
+        </header>
+        <div class="ds-dtDesktopStage">
+          <div class="ds-dtDesktopStack">
+            <button
+              class="ds-dtDesktopAnchor"
+              type="button"
+              aria-expanded="true"
+              aria-controls="dt-desktop-editor"
+              data-dt-invoker
+            >
+              <span>
+                <span>When</span>
+                <strong data-dt-anchor-summary>Today at 14:45</strong>
+              </span>
+              <small>Change</small>
+            </button>
+            <section class="ds-dtPopover" id="dt-desktop-editor" role="dialog" aria-modal="false" aria-labelledby="dt-desktop-title" data-dt-overlay>
+              <form
+                id="dt-desktop-form"
+                class="ds-dtForm"
+                data-dt-demo
+                data-time-zone="Africa/Casablanca"
+                data-precision="exact"
+                data-summary-target="dt-desktop-summary"
+                novalidate
+              >
+                <div class="ds-dtPopoverHead">
+                  <p class="ds-dtQuestion" id="dt-desktop-title">When did you have this?</p>
+                  <button class="ds-dtClose" type="button" aria-label="Close date and time example" data-dt-close>×</button>
+                </div>
+                <p class="ds-dtHelp">Type the date and time directly. The calendar control is an optional pointer path.</p>
+
+                <fieldset class="ds-dtPresetGroup">
+                  <legend>Quick choices</legend>
+                  <div class="ds-dtPresets">
+                    <button class="ds-dtPreset" type="button" data-dt-preset="now" aria-pressed="false">Now</button>
+                    <button class="ds-dtPreset" type="button" data-dt-preset="15-minutes-ago" aria-pressed="false">15 min ago</button>
+                    <button class="ds-dtPreset" type="button" data-dt-preset="yesterday" aria-pressed="false">Yesterday</button>
+                  </div>
+                </fieldset>
+
+                <div class="ds-dtFields">
+                  <label class="ds-dtField" for="dt-desktop-date">
+                    <span>Date</span>
+                    <input
+                      class="ds-dtInput"
+                      id="dt-desktop-date"
+                      name="desktop-date"
+                      type="date"
+                      value="2026-07-29"
+                      required
+                      data-dt-date
+                      aria-describedby="dt-desktop-zone dt-desktop-error"
+                    >
+                  </label>
+                  <label class="ds-dtField ds-dtClockField" for="dt-desktop-time">
+                    <span>Time · type HH:MM</span>
+                    <input
+                      class="ds-dtInput"
+                      id="dt-desktop-time"
+                      name="desktop-time"
+                      type="time"
+                      value="14:45"
+                      step="60"
+                      inputmode="numeric"
+                      required
+                      data-dt-time
+                      aria-describedby="dt-desktop-zone dt-desktop-error"
+                    >
+                  </label>
+                  <label class="ds-dtField ds-dtPartField" for="dt-desktop-part">
+                    <span>Part of day</span>
+                    <select class="ds-dtSelect" id="dt-desktop-part" name="desktop-part" data-dt-part aria-describedby="dt-desktop-zone dt-desktop-error">
+                      <option value="morning">Morning</option>
+                      <option value="afternoon" selected>Afternoon</option>
+                      <option value="evening">Evening</option>
+                      <option value="night-end">Last night</option>
+                      <option value="night-start">Tonight</option>
+                    </select>
+                  </label>
+                </div>
+
+                <fieldset class="ds-dtOffsetGroup" data-dt-offset-group hidden aria-describedby="dt-desktop-error">
+                  <legend>This local time occurs twice</legend>
+                  <div>
+                    <label class="ds-dtOffsetChoice">
+                      <input type="radio" name="desktop-disambiguation" value="earlier" data-dt-disambiguation>
+                      <span><strong data-dt-offset-label="earlier">Earlier occurrence</strong><small>First time the clock shows this value</small></span>
+                    </label>
+                    <label class="ds-dtOffsetChoice">
+                      <input type="radio" name="desktop-disambiguation" value="later" data-dt-disambiguation>
+                      <span><strong data-dt-offset-label="later">Later occurrence</strong><small>Second time the clock shows this value</small></span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="ds-dtPrecisionGroup">
+                  <legend>How precise is this?</legend>
+                  <div class="ds-dtPrecisionRow">
+                    <label class="ds-dtPrecision">
+                      <input type="radio" name="desktop-precision" value="exact" checked data-dt-precision>
+                      Exact
+                    </label>
+                    <label class="ds-dtPrecision">
+                      <input type="radio" name="desktop-precision" value="about" data-dt-precision>
+                      About
+                    </label>
+                    <label class="ds-dtPrecision">
+                      <input type="radio" name="desktop-precision" value="part-of-day" data-dt-precision>
+                      Part of day
+                    </label>
+                  </div>
+                </fieldset>
+
+                <output class="ds-dtSummary" id="dt-desktop-summary" aria-live="polite">
+                  <span aria-hidden="true"></span>
+                  <span>
+                    <span>Will save</span>
+                    <strong data-dt-summary>Today at 14:45</strong>
+                    <small data-dt-summary-detail>Exact occurrence time</small>
+                  </span>
+                </output>
+                <p class="ds-dtZone" id="dt-desktop-zone">Stores HH:MM · React Aria target enforces 24-hour entry · Africa/Casablanca</p>
+                <p class="ds-dtError" id="dt-desktop-error" role="alert" data-dt-error>
+                  Choose a complete time that is not in the future.
+                </p>
+                <div class="ds-dtDiscardPrompt" role="alertdialog" aria-modal="false" aria-labelledby="dt-desktop-discard-title" aria-describedby="dt-desktop-discard-description" data-dt-discard-prompt hidden>
+                  <strong id="dt-desktop-discard-title">Discard your changes?</strong>
+                  <span id="dt-desktop-discard-description">Keep the typed draft or restore the value from when this editor opened.</span>
+                  <div>
+                    <button class="ds-dtSecondary" type="button" data-dt-keep>Keep editing</button>
+                    <button class="ds-dtDanger" type="button" data-dt-discard>Discard</button>
+                  </div>
+                </div>
+
+                <div class="ds-dtActions">
+                  <button class="ds-dtSecondary" type="button" data-dt-cancel>Cancel</button>
+                  <button class="ds-dtPrimary" type="submit">Apply time</button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Temporal shapes</span>
+  <div class="ds-dtUseCaseGrid">
+    <article class="ds-dtUseCase" data-dt-interval data-time-zone="Africa/Casablanca">
+      <header class="ds-dtUseCaseHead">
+        <div><span>Interval</span><strong>Sleep backfill</strong></div>
+        <small>start + end</small>
+      </header>
+      <div class="ds-dtBoundary">
+        <div class="ds-dtBoundaryHead"><strong>Fell asleep</strong><span>Start</span></div>
+        <div class="ds-dtFields is-even">
+          <label class="ds-dtField" for="dt-sleep-start-date">
+            <span>Date</span>
+            <input class="ds-dtInput" id="dt-sleep-start-date" type="date" value="2026-07-27" data-dt-start-date aria-describedby="dt-sleep-error">
+          </label>
+          <label class="ds-dtField" for="dt-sleep-start-time">
+            <span>Time</span>
+            <input class="ds-dtInput" id="dt-sleep-start-time" type="time" value="23:40" step="60" data-dt-start-time aria-describedby="dt-sleep-error">
+          </label>
+        </div>
+        <label class="ds-dtBoundaryPrecision" for="dt-sleep-start-precision">
+          <span>Start precision</span>
+          <select id="dt-sleep-start-precision" data-dt-start-precision data-tolerance-minutes="15"><option value="exact">Exact</option><option value="about" selected>About · ±15 min</option></select>
+        </label>
+        <label class="ds-dtBoundaryPrecision" for="dt-sleep-start-offset" data-dt-start-offset-group hidden>
+          <span>Repeated-time offset</span>
+          <select id="dt-sleep-start-offset" data-dt-start-disambiguation data-dt-disambiguation aria-describedby="dt-sleep-error">
+            <option value="">Choose occurrence</option>
+            <option value="earlier">Earlier occurrence</option>
+            <option value="later">Later occurrence</option>
+          </select>
+        </label>
+      </div>
+      <div class="ds-dtBoundary">
+        <div class="ds-dtBoundaryHead"><strong>Woke up</strong><span>End</span></div>
+        <div class="ds-dtFields is-even">
+          <label class="ds-dtField" for="dt-sleep-end-date">
+            <span>Date</span>
+            <input class="ds-dtInput" id="dt-sleep-end-date" type="date" value="2026-07-28" data-dt-end-date aria-describedby="dt-sleep-error">
+          </label>
+          <label class="ds-dtField" for="dt-sleep-end-time">
+            <span>Time</span>
+            <input class="ds-dtInput" id="dt-sleep-end-time" type="time" value="07:18" step="60" data-dt-end-time aria-describedby="dt-sleep-error">
+          </label>
+        </div>
+        <label class="ds-dtBoundaryPrecision" for="dt-sleep-end-precision">
+          <span>End precision</span>
+          <select id="dt-sleep-end-precision" data-dt-end-precision data-tolerance-minutes="15"><option value="exact" selected>Exact</option><option value="about">About · ±15 min</option></select>
+        </label>
+        <label class="ds-dtBoundaryPrecision" for="dt-sleep-end-offset" data-dt-end-offset-group hidden>
+          <span>Repeated-time offset</span>
+          <select id="dt-sleep-end-offset" data-dt-end-disambiguation data-dt-disambiguation aria-describedby="dt-sleep-error">
+            <option value="">Choose occurrence</option>
+            <option value="earlier">Earlier occurrence</option>
+            <option value="later">Later occurrence</option>
+          </select>
+        </label>
+      </div>
+      <div class="ds-dtDurationLine">
+        <span data-dt-interval-precision-summary>Start about · end exact</span>
+        <strong data-dt-interval-summary>about 7 h 38 min · possible 7 h 23 min–7 h 53 min</strong>
+      </div>
+      <p class="ds-dtError" id="dt-sleep-error" role="alert" data-dt-interval-error>End must be after start.</p>
+    </article>
+
+    <article class="ds-dtUseCase" data-dt-duration data-dt-anchor="end" data-dt-duration-label="Nap" data-time-zone="Africa/Casablanca">
+      <header class="ds-dtUseCaseHead">
+        <div><span>Duration · end anchored</span><strong>Nap</strong></div>
+        <small>end − duration</small>
+      </header>
+      <div class="ds-dtFields is-even">
+        <label class="ds-dtField" for="dt-nap-date">
+          <span>Nap ended · date</span>
+          <input class="ds-dtInput" id="dt-nap-date" type="date" value="2026-07-28" data-dt-anchor-date aria-describedby="dt-nap-error">
+        </label>
+        <label class="ds-dtField" for="dt-nap-time">
+          <span>Nap ended · time</span>
+          <input class="ds-dtInput" id="dt-nap-time" type="time" value="14:50" step="60" data-dt-anchor-time aria-describedby="dt-nap-error">
+        </label>
+      </div>
+      <label class="ds-dtBoundaryPrecision" for="dt-nap-offset" data-dt-anchor-offset-group hidden>
+        <span>Repeated-time offset</span>
+        <select id="dt-nap-offset" data-dt-anchor-disambiguation data-dt-disambiguation aria-describedby="dt-nap-error">
+          <option value="">Choose occurrence</option>
+          <option value="earlier">Earlier occurrence</option>
+          <option value="later">Later occurrence</option>
+        </select>
+      </label>
+      <label class="ds-dtField" for="dt-nap-duration">
+        <span>Duration · minutes</span>
+        <input class="ds-dtInput" id="dt-nap-duration" type="number" min="1" max="600" step="1" value="45" inputmode="numeric" data-dt-duration-minutes aria-describedby="dt-nap-error">
+      </label>
+      <output class="ds-dtSummary" aria-live="polite">
+        <span aria-hidden="true"></span>
+        <span>
+          <span>Will save as a nap</span>
+          <strong data-dt-duration-summary>14:05 → 14:50 · 45 min</strong>
+          <small>One interval record; never synthetic sleep markers</small>
+        </span>
+      </output>
+      <p class="ds-dtError" id="dt-nap-error" role="alert" data-dt-duration-error>Nap must be between 1 minute and 10 hours.</p>
+    </article>
+
+    <article class="ds-dtUseCase" data-dt-duration data-dt-anchor="start" data-dt-duration-label="Gym" data-time-zone="Africa/Casablanca">
+      <header class="ds-dtUseCaseHead">
+        <div><span>Duration · start anchored</span><strong>Gym session</strong></div>
+        <small>start + duration</small>
+      </header>
+      <div class="ds-dtFields is-even">
+        <label class="ds-dtField" for="dt-gym-date">
+          <span>Workout started · date</span>
+          <input class="ds-dtInput" id="dt-gym-date" type="date" value="2026-07-28" data-dt-anchor-date aria-describedby="dt-gym-error">
+        </label>
+        <label class="ds-dtField" for="dt-gym-time">
+          <span>Workout started · time</span>
+          <input class="ds-dtInput" id="dt-gym-time" type="time" value="18:10" step="60" data-dt-anchor-time aria-describedby="dt-gym-error">
+        </label>
+      </div>
+      <label class="ds-dtBoundaryPrecision" for="dt-gym-offset" data-dt-anchor-offset-group hidden>
+        <span>Repeated-time offset</span>
+        <select id="dt-gym-offset" data-dt-anchor-disambiguation data-dt-disambiguation aria-describedby="dt-gym-error">
+          <option value="">Choose occurrence</option>
+          <option value="earlier">Earlier occurrence</option>
+          <option value="later">Later occurrence</option>
+        </select>
+      </label>
+      <label class="ds-dtField" for="dt-gym-duration">
+        <span>Duration · minutes</span>
+        <input class="ds-dtInput" id="dt-gym-duration" type="number" min="5" max="600" step="1" value="65" inputmode="numeric" data-dt-duration-minutes aria-describedby="dt-gym-error">
+      </label>
+      <output class="ds-dtSummary" aria-live="polite">
+        <span aria-hidden="true"></span>
+        <span>
+          <span>Will save as a session</span>
+          <strong data-dt-duration-summary>18:10 → 19:15 · 65 min</strong>
+          <small>The label makes the timestamp anchor explicit</small>
+        </span>
+      </output>
+      <p class="ds-dtError" id="dt-gym-error" role="alert" data-dt-duration-error>Gym must be between 5 minutes and 10 hours.</p>
+    </article>
+  </div>
+
+  <span class="ds-eyebrow">Tracker-specific questions</span>
+  <table class="ds-table">
+    <thead>
+      <tr><th>Use case</th><th>Field label</th><th>Default</th><th>Shape / precision</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="ds-tdKey">Caffeine</td><td>When did you have this?</td><td>Live Now</td><td>Instant · exact/about</td></tr>
+      <tr><td class="ds-tdKey">Meal</td><td>When did you finish eating?</td><td>Live Now on Save</td><td>Instant · exact/about</td></tr>
+      <tr><td class="ds-tdKey">Mood / energy</td><td>When did you notice this?</td><td>Live Now</td><td>Instant · exact/about/part of day</td></tr>
+      <tr><td class="ds-tdKey">CBT trigger</td><td>When did this situation start?</td><td>Flow-open time</td><td>Instant · exact/about/part of day</td></tr>
+      <tr><td class="ds-tdKey">History filter</td><td>From / To</td><td>Last 7 days</td><td>Wall-date range · no clock</td></tr>
+    </tbody>
+  </table>
+
+  <span class="ds-eyebrow">Required states</span>
+  <div class="ds-dtStateGrid">
+    <article class="ds-dtState">
+      <span>Approximate</span>
+      <strong>Uncertainty stays visible</strong>
+      <small>No exact minute is invented for a named period.</small>
+      <div class="ds-dtReadOnly">
+        <time datetime="2026-07-29">Wednesday evening</time>
+        <small>A named local period · Casablanca</small>
+      </div>
+    </article>
+    <article class="ds-dtState">
+      <span>Invalid</span>
+      <strong>Future occurrence</strong>
+      <small>The UI blocks the same range as the API.</small>
+      <label class="ds-dtField" for="dt-future-static-date">
+        <span>Date</span>
+        <input class="ds-dtInput" id="dt-future-static-date" type="date" value="2099-01-01" aria-invalid="true" aria-describedby="dt-future-static-error">
+      </label>
+      <p class="ds-dtError is-visible" id="dt-future-static-error" role="alert">Date can’t be in the future.</p>
+    </article>
+    <article class="ds-dtState">
+      <span>Read only</span>
+      <strong>Correction window ended</strong>
+      <small>The reason appears before an unavailable edit attempt.</small>
+      <div class="ds-dtReadOnly">
+        <time datetime="2026-07-21T15:30:00+01:00">21 July · about 15:30</time>
+        <small>Recorded time can no longer be corrected</small>
+      </div>
+    </article>
+    <article class="ds-dtState">
+      <span>Wall date</span>
+      <strong>No truthful clock time</strong>
+      <small>Use for calendar facts and history filters.</small>
+      <label class="ds-dtField" for="dt-date-only">
+        <span>Date</span>
+        <input class="ds-dtInput" id="dt-date-only" type="date" value="2026-07-29">
+      </label>
+    </article>
+  </div>
+
+  <div class="ds-dtLegacy">
+    <span>!</span>
+    <div>
+      <strong>Current legacy debt — do not copy the looping wheel</strong>
+      <p>
+        <code>WheelTimePicker.tsx</code> duplicates option values, cannot be typed into directly by default,
+        conflicts with mobile sheet scrolling, and only exposes Today/Yesterday. Keep it visible in the
+        conformance register until production migrates to the target field above.
+      </p>
+    </div>
+  </div>
+
+  <div class="ds-rules ds-dtRules">
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Let people type</h4><p>Date and time are visible inputs on desktop. React Aria enforces 24-hour segments; native fallback display follows the device locale. The picker is an additional path.</p></div>
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Offer any allowed date</h4><p>Now, Today, and Yesterday are shortcuts. The explicit date field covers the complete permitted range.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don't</span> Dismiss from content</h4><p>Swipe-to-dismiss begins only on the handle/header. Input, calendar, and form-body scrolling never move the sheet.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don't</span> Guess precision</h4><p>Approximate values remain ranges or named periods through history and analysis; changing a value does not silently make it exact.</p></div>
+  </div>
+
+  <span class="ds-eyebrow">Implementation boundary</span>
+  <table class="ds-table">
+    <thead>
+      <tr><th>Layer</th><th>Owns</th><th>Must not own</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="ds-tdKey"><code>DateTimeField</code></td><td>Inputs, presets, precision, local messages, summaries</td><td>Timezone arithmetic or database rows</td></tr>
+      <tr><td class="ds-tdKey">Temporal domain</td><td>IANA-zone resolution, bounds, DST, interval maths, formatting</td><td>Responsive overlay layout</td></tr>
+      <tr><td class="ds-tdKey">Sheet / popover</td><td>Focus, close, scroll ownership, draft protection, responsive layout</td><td>Timestamp meaning</td></tr>
+      <tr><td class="ds-tdKey">Tracker spec</td><td>Shape, label, timestamp anchor, range, precision options</td><td>A one-off picker implementation</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 12 CARDS ═══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="cards">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">12</span><h2>Cards</h2></div>
+  <p class="ds-lede">
+    Three card shapes carry almost everything: the goal card (a number against a target), the stat card
+    (a number with a chart), and the panel row list. All sit on <code>--surface-raised</code> at radius 12
+    with no border — the surface change is the edge.
+  </p>
+
+  <span class="ds-eyebrow">Goal card</span>
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Anatomy</h3><code>desktop/GoalCards.tsx · MobileGoalCards.tsx</code></div>
+    <p class="ds-specNote">
+      Label (10px uppercase, tracked .12em, reserving 26px on the right for the status dot) → readout
+      (27px weight 300, optional 11.5px suffix) → optional 3px progress bar → summary (11px, <code>--t3</code>).
+      The status dot is absolutely positioned at 11px/11px and is the only thing that changes color.
+    </p>
+    <div class="ds-preview">
+      <div class="t-goals">
+        <div class="t-goalCard">
+          <span class="t-statusDot t-statusDone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#s-check"/></svg></span>
+          <div class="t-goalTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg>Sleep</div>
+          <div class="t-goalValue num">7h 45<small>m</small></div>
+          <div class="t-goalBar"><i style="width:97%"></i></div>
+          <div class="t-goalSummary">goal 8h · 23:30 → 07:15</div>
+        </div>
+        <div class="t-goalCard">
+          <span class="t-statusDot t-statusWarn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#s-warn"/></svg></span>
+          <div class="t-goalTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg>Protein</div>
+          <div class="t-goalValue num">128<small>g / 160</small></div>
+          <div class="t-goalBar"><i style="width:64%"></i></div>
+          <div class="t-goalSummary">3 meals logged</div>
+        </div>
+        <div class="t-goalCard">
+          <span class="t-statusDot t-statusOpen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#s-check"/></svg></span>
+          <div class="t-goalTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg>Last caffeine</div>
+          <div class="t-goalValue num">10:45</div>
+          <div class="t-goalSummary">cutoff 14:00 · clear</div>
+        </div>
+        <div class="t-goalCard">
+          <span class="t-statusDot t-statusOpen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#s-check"/></svg></span>
+          <div class="t-goalTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg>Gym</div>
+          <div class="t-goalValue num">—</div>
+          <div class="t-goalSummary">nothing yet today</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Status dot — three states only</span>
+  <div class="ds-preview">
+    <div class="ds-row is-center" style="gap:26px">
+      <span class="ds-row is-center" style="gap:9px"><span class="t-statusDot t-statusDone" style="position:static"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#s-check"/></svg></span><code style="font-family:var(--ds-mono);font-size:11px;color:var(--t2)">done — target met</code></span>
+      <span class="ds-row is-center" style="gap:9px"><span class="t-statusDot t-statusWarn" style="position:static"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#s-warn"/></svg></span><code style="font-family:var(--ds-mono);font-size:11px;color:var(--t2)">warn — behind pace</code></span>
+      <span class="ds-row is-center" style="gap:9px"><span class="t-statusDot t-statusOpen" style="position:static"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#s-check"/></svg></span><code style="font-family:var(--ds-mono);font-size:11px;color:var(--t2)">open — not started</code></span>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Stat card &amp; panel rows</span>
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Stat card</h3><code>.stat · .statK</code></div>
+      <p class="ds-specNote">Label row is a flex with the metric on the left and its aggregate on the right in <code>--t4</code>. The body is a chart (see §16).</p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="t-stat">
+            <div class="t-statK"><span>Sleep · 7d</span><b>avg 7h 28m</b></div>
+            <div class="t-spark">
+              <i style="height:62%"></i><i style="height:78%"></i><i class="t-sparkOn" style="height:91%"></i>
+              <i style="height:70%"></i><i class="t-sparkLow" style="height:38%"></i>
+              <i class="t-sparkOn" style="height:88%"></i><i class="t-sparkToday" style="height:97%"></i>
+            </div>
+            <div class="t-sparkx"><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span>M</span><span>T</span></div>
+            <div class="t-chartFoot"><span>Best</span><span class="num">8h 12m</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Panel rows</h3><code>.panelRow · .panelVal</code></div>
+      <p class="ds-specNote">A key/value list inside a card. Hairline between rows, none after the last. Values are <code>--t1</code> at 13px, tabular.</p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="t-stat" style="padding:5px 15px">
+            <div class="t-panelRow"><span>Protein today</span><span class="t-panelVal num">128 g</span></div>
+            <div class="t-panelRow"><span>7-day average</span><span class="t-panelVal num">141 g</span></div>
+            <div class="t-panelRow"><span>Days on target</span><span class="t-panelVal num">4 / 7</span></div>
+            <div class="t-panelRow"><span>Pace to goal</span><span class="t-panelVal num">−32 g</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">CTA card — the entry point into a flow</span>
+  <div class="ds-spec">
+    <p class="ds-specNote">Used once, on the Mind tab, to start a thought record. A 135° gradient from <code>--a900</code> to <code>--night</code> with an <code>--a800</code> border; hover lifts the border to <code>--a600</code>, press scales to .985.</p>
+    <div class="ds-preview">
+      <div class="ds-previewInner">
+        <button class="t-btn t-ctaCard">
+          <svg class="t-ctaTriangle" viewBox="0 0 52 46" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M26 5 48 41H4Z"/><path d="M26 18v11M26 34h.01"/></svg>
+          <span class="t-ctaText"><b>Start a thought record</b><span>Seven steps · about four minutes</span></span>
+          <span class="t-ctaArrow">›</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 13 LISTS ═══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="lists">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">13</span><h2>Lists &amp; ledger</h2></div>
+  <p class="ds-lede">
+    The ledger is the app's spine. A row is <em>time · glyph · text · value</em>, separated not by a border
+    but by a gradient underline that fades out at both ends — so a list reads as one object rather than
+    a stack of boxes.
+  </p>
+
+  <span class="ds-eyebrow">Row anatomy &amp; states</span>
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Ledger</h3><code>desktop/Ledger.tsx</code></div>
+    <p class="ds-specNote">
+      Click selects, double-click (or Enter) opens the edit sheet. Selecting swaps the right-hand value for
+      the edit/delete actions, so the row never grows. Read-only rows carry a literal <code>read-only</code> tag.
+    </p>
+    <div class="ds-preview on-app">
+      <div class="ds-previewInner">
+        <div class="t-dayhd"><span class="t-dayhdL">Today · Tue 29 Jul</span><span class="t-dayhdR">8 entries · 128 g</span></div>
+        <div class="t-row"><time class="t-rowT">07:15</time><span class="t-rowG t-cSleep"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg></span><span class="t-rowTxt">Wake</span><span class="t-rowV">›</span></div>
+        <div class="t-row"><time class="t-rowT">10:45</time><span class="t-rowG t-cIntake"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg></span><span class="t-rowTxt">Coffee</span><span class="t-rowV">›</span></div>
+        <div class="t-row t-rowSel"><time class="t-rowT">13:20</time><span class="t-rowG t-cMeal"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg></span><span class="t-rowTxt">Chicken &amp; rice <em>· big bowl</em></span><span class="t-rowAct"><button class="t-btn t-rowActE">Edit</button><button class="t-btn t-rowActD">Delete</button></span></div>
+        <div class="t-row"><time class="t-rowT">14:15</time><span class="t-rowG t-cSleep"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-nap"/></svg></span><span class="t-rowTxt">Nap</span><span class="t-rowV num">45 min</span></div>
+        <div class="t-row"><time class="t-rowT">16:00</time><span class="t-rowG t-cState"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mood"/></svg></span><span class="t-rowTxt">Mood · 3/5</span><span class="t-rowV">›</span></div>
+        <div class="t-row"><time class="t-rowT">18:30</time><span class="t-rowG t-cGym"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg></span><span class="t-rowTxt">Gym · 75 min <em>· 6 exercises</em></span><span class="t-rowV">›</span></div>
+        <div class="t-row t-rowGhost"><time class="t-rowT">18:52</time><span class="t-rowG t-cIntake"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-tea"/></svg></span><span class="t-rowTxt">Tea</span><span class="t-rowV">saving…</span></div>
+        <div class="t-row"><time class="t-rowT">19:10</time><span class="t-rowG t-cState"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-trigger"/></svg></span><span class="t-rowTxt">Trigger <em>· thought record</em></span><span class="t-rowLock">read-only</span><span class="t-rowV">›</span></div>
+        <div class="t-nightrow" style="margin:8px 0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><span class="num">23:30 → 07:15 · 7h 45m</span><button class="t-btn t-nightEdit">edit night</button></div>
+        <div class="t-logTotals"><span>Protein <b class="num">128 g</b></span><span>Calories <b class="num">2 140</b></span></div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Row state reference</span>
+  <table class="ds-table">
+    <thead><tr><th>State</th><th>Class</th><th>Treatment</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey">Default</td><td><code>.row</code></td><td>Transparent, gradient underline, 13.5px</td></tr>
+      <tr><td class="ds-tdKey">Hover</td><td><code>:hover</code></td><td><code>rgba(233,233,237,.03)</code> background</td></tr>
+      <tr><td class="ds-tdKey">Selected</td><td><code>.rowSel</code></td><td>8% accent wash, <code>--a700</code> border, underline removed, actions revealed</td></tr>
+      <tr><td class="ds-tdKey">Optimistic</td><td><code>ghost-</code> id prefix</td><td>55% opacity, not clickable, cleared per-row when the real event lands</td></tr>
+      <tr><td class="ds-tdKey">Pending delete</td><td><code>.logRowPending</code></td><td>60% opacity for 5s with an undo action</td></tr>
+      <tr><td class="ds-tdKey">Read-only</td><td><code>editable === false</code></td><td>10px <code>read-only</code> tag before the value</td></tr>
+    </tbody>
+  </table>
+
+  <span class="ds-eyebrow">Empty state</span>
+  <div class="ds-preview on-app">
+    <div class="ds-previewInner"><div class="t-emptyLog">Nothing logged yet today.</div></div>
+  </div>
+</section>
+
+<!-- ══ 14 OVERLAYS ════════════════════════════════════════════════════ -->
+<section class="ds-section" id="overlays">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">14</span><h2>Overlays</h2></div>
+  <p class="ds-lede">
+    One component, two shapes. <code>Sheet.tsx</code> renders a bottom sheet on mobile and a centered
+    540px dialog on desktop — the switch is a single media query at the end of
+    <code>sheets.module.css</code>. There is one sheet per event type, plus <code>EditEventSheet</code>
+    which can edit all of them.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Bottom sheet — mobile</h3><code>&lt; 1024px</code></div>
+      <p class="ds-specNote">
+        Anchored to the bottom edge, 28rem max, radius 22 on the top corners only, no bottom border.
+        Slides up over 300ms. A 44×4 grabber sits above the title; drag past 90px or tap the backdrop to dismiss.
+        Bottom padding respects <code>env(safe-area-inset-bottom)</code>.
+      </p>
+      <div class="ds-preview is-flush">
+        <div class="t-backdrop" style="height:340px">
+          <div class="t-sheet">
+            <span class="t-grabber"></span>
+            <h2 class="t-sheetTitle">Log coffee</h2>
+            <div class="ds-row"><button class="t-btn t-chip" aria-pressed="true">Coffee</button><button class="t-btn t-chip">Tea</button><button class="t-btn t-chip">Energy</button></div>
+            <button class="t-btn t-timeField" style="text-align:left">at <span class="num">now · 14:45</span><small> — change</small></button>
+            <button class="t-btn t-logBtn">Log</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Dialog — desktop</h3><code>≥ 1024px</code></div>
+      <p class="ds-specNote">
+        Same markup, centered. 540px fixed, max 86vh with internal scroll, radius 16 on all corners,
+        <code>--sh-lg</code>, and the grabber is hidden. Enters with an 8px rise over 150ms.
+        The scrim also darkens slightly, from <code>rgba(8,10,14,.7)</code> to <code>rgba(13,14,21,.72)</code>.
+      </p>
+      <div class="ds-preview is-flush">
+        <div class="t-backdrop t-backdropDesktop" style="height:340px">
+          <div class="t-sheet t-sheetDialog" style="width:88%;max-width:420px">
+            <h2 class="t-sheetTitle">Edit nap</h2>
+            <div class="t-stepper"><button class="t-btn">−</button><span class="t-stepperValue num">45</span><button class="t-btn">+</button></div>
+            <div class="t-editFooter"><button class="t-btn t-deleteBtn">Delete</button><button class="t-btn t-logBtn">Save</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Read-only notice</span>
+  <div class="ds-preview">
+    <div class="ds-previewInner">
+      <p class="t-readOnlyNotice">This entry was created by a thought record — its time can be changed, but not its content.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 15 FEEDBACK ════════════════════════════════════════════════════ -->
+<section class="ds-section" id="feedback">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">15</span><h2>Feedback</h2></div>
+  <p class="ds-lede">
+    Every write says so, and every write can be taken back. The toast is the confirmation surface;
+    the banner is for conditions that persist; inline error sits next to the control that failed.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Toast</h3><code>fixed, bottom 52px, centered</code></div>
+      <p class="ds-specNote">Floats on <code>--surface-raised</code> with <code>--sh-md</code>. Carries a dot, the message, and the undo affordance. The undo window is 12s for a log.</p>
+      <div class="ds-preview">
+        <div class="ds-stack" style="align-items:flex-start">
+          <div class="t-toast"><span class="t-toastDot">●</span><span>Coffee logged · 14:45</span><button class="t-btn t-toastA">Undo</button><span class="t-toastU">12s</span></div>
+          <div class="t-toast"><span class="t-toastErr">●</span><span class="t-toastErr">Couldn't save — queued offline</span><button class="t-btn t-toastA">Retry</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Queue banner &amp; inline error</h3><code>.queueNote · .error-inline</code></div>
+      <p class="ds-specNote">The queue note is the warn pair (<code>--warn</code> on <code>--warn-d</code>) and stays until the service worker drains. Inline errors are <code>--bad</code> next to their control.</p>
+      <div class="ds-preview">
+        <div class="ds-stack">
+          <p class="t-queueNote">2 events waiting to sync</p>
+          <div class="t-errorInline"><span>Duration must be between 1 and 180 minutes.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Pending delete</h3><code>.undoRow — 5s window</code></div>
+      <p class="ds-specNote">The row does not vanish. It is replaced in place by an undo row for 5 seconds, so the list length never jumps under the pointer.</p>
+      <div class="ds-preview on-app">
+        <div class="ds-previewInner">
+          <div class="t-undoRow"><span>Deleted “Chicken &amp; rice”</span><button class="t-btn t-undoBtn">Undo</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Guard cards</h3><code>DuplicateCard · NapGuardCard · MissingNightCard</code></div>
+      <p class="ds-specNote">When an action would create bad data, the app interrupts with a card offering the sane alternatives rather than blocking with an alert.</p>
+      <div class="ds-preview">
+        <div class="ds-previewInner">
+          <div class="t-nightrow" style="flex-direction:column;align-items:flex-start;gap:9px;padding:14px">
+            <b style="font-size:12.5px">You're already awake</b>
+            <span style="font-size:11.5px;color:var(--a400)">Last wake was logged at 07:15 today.</span>
+            <div class="ds-row" style="margin-top:2px"><button class="t-btn t-chip" style="min-height:36px">Edit that one</button><button class="t-btn t-chip" style="min-height:36px">Log anyway</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 16 CHARTS ══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="charts">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">16</span><h2>Charts</h2></div>
+  <p class="ds-lede">
+    No chart library — every graph is divs or hand-written SVG. There are exactly five chart types and each
+    answers one question. They share a language: <code>--rail</code> is the empty track,
+    <code>--a800</code> is a normal bar, <code>--a500</code> means the day hit its target, and
+    <code>--accent</code> is always today.
+  </p>
+
+  <span class="ds-eyebrow">Chart type reference</span>
+  <table class="ds-table">
+    <thead><tr><th>Type</th><th>Class</th><th>Answers</th><th>Height</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey">Sparkline bars</td><td><code>.spark</code> / <code>.bars</code></td><td>How did the last 7 days trend?</td><td>46px</td></tr>
+      <tr><td class="ds-tdKey">Stacked count grid</td><td><code>.mgrid</code></td><td>How many discrete things per day?</td><td>8px per block</td></tr>
+      <tr><td class="ds-tdKey">Dot row</td><td><code>.crow</code> + <code>.dots</code></td><td>When in the day did they happen?</td><td>7px dots</td></tr>
+      <tr><td class="ds-tdKey">Progress bar</td><td><code>.bar</code> / <code>.goalBar</code></td><td>How far to the target?</td><td>3px</td></tr>
+      <tr><td class="ds-tdKey">Insight bar row</td><td><code>.insightBarRow</code></td><td>Which categories dominate?</td><td>5px</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Sparkline bars</h3><code>.spark i · .sparkOn · .sparkToday · .sparkLow</code></div>
+      <p class="ds-specNote">
+        Flex row, <code>align-items:flex-end</code>, 5px gutters, height set per bar as a percentage.
+        Top corners rounded 2px only — the baseline stays flat so the row reads as a chart, not as pills.
+        Labels below are 9.5px in <code>--t5</code>.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="t-stat">
+            <div class="t-statK"><span>Protein · 7d</span><b>avg 141 g</b></div>
+            <div class="t-spark">
+              <i class="t-sparkOn" style="height:88%"></i><i style="height:64%"></i>
+              <i class="t-sparkLow" style="height:31%"></i><i class="t-sparkOn" style="height:92%"></i>
+              <i style="height:70%"></i><i class="t-sparkOn" style="height:100%"></i>
+              <i class="t-sparkToday" style="height:74%"></i>
+            </div>
+            <div class="t-sparkx"><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span>M</span><span>T</span></div>
+            <div class="t-chartFoot"><span>On target</span><span class="num">4 / 7</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Stacked count grid</h3><code>.mgrid · .mgridF</code></div>
+      <p class="ds-specNote">
+        One column per day, stacked bottom-up with <code>column-reverse</code>. Each 8px block is one
+        logged item, filled (<code>--a600</code>) or empty (<code>--rail</code>). Counts stay countable
+        in a way a bar height never is.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="t-stat">
+            <div class="t-statK"><span>Meals · 7d</span><b>21 total</b></div>
+            <div class="t-mgrid">
+              <div><i class="t-mgridF"></i><i class="t-mgridF"></i><i class="t-mgridF"></i><i></i></div>
+              <div><i class="t-mgridF"></i><i class="t-mgridF"></i><i></i><i></i></div>
+              <div><i class="t-mgridF"></i><i class="t-mgridF"></i><i class="t-mgridF"></i><i class="t-mgridF"></i></div>
+              <div><i class="t-mgridF"></i><i class="t-mgridF"></i><i class="t-mgridF"></i><i></i></div>
+              <div><i class="t-mgridF"></i><i></i><i></i><i></i></div>
+              <div><i class="t-mgridF"></i><i class="t-mgridF"></i><i class="t-mgridF"></i><i></i></div>
+              <div><i class="t-mgridF"></i><i class="t-mgridF"></i><i></i><i></i></div>
+            </div>
+            <div class="t-sparkx"><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span>M</span><span>T</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Dot row</h3><code>.crow · .dots i · .dotLate</code></div>
+      <p class="ds-specNote">
+        One row per day: label, a run of 7px dots (one per intake), then the last time on the right.
+        Dots past the caffeine cutoff switch to <code>--accent</code> — the chart's only alarm.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="t-stat">
+            <div class="t-statK"><span>Caffeine timing</span><b>cutoff 14:00</b></div>
+            <div class="t-crow"><span class="t-crowD">Tue</span><span class="t-dots"><i></i><i></i><i></i></span><span class="t-lastt">10:45</span></div>
+            <div class="t-crow"><span class="t-crowD">Mon</span><span class="t-dots"><i></i><i></i><i class="t-dotLate"></i></span><span class="t-lastt">16:20</span></div>
+            <div class="t-crow"><span class="t-crowD">Sun</span><span class="t-dots"><i></i></span><span class="t-lastt">09:10</span></div>
+            <div class="t-crow"><span class="t-crowD">Sat</span><span class="t-dots"><i></i><i></i><i class="t-dotLate"></i><i class="t-dotLate"></i></span><span class="t-lastt">18:05</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Progress &amp; insight bars</h3><code>.goalBar · .insightBarRow</code></div>
+      <p class="ds-specNote">
+        3px inside a goal card, 5px in the CBT insight list. Track is <code>--rail</code>, fill is
+        <code>--a600</code>. Width is clamped 0–100 in JS, never allowed to overflow its track.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="t-stat">
+            <div class="t-statK"><span>Thinking traps · 30d</span><b>18 records</b></div>
+            <div class="t-insightBarRow"><span class="t-insightBarIcon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-catastrophizing"/></svg></span><span>Catastrophizing</span><span class="t-insightBarTrack"><i style="width:82%"></i></span><b>11</b></div>
+            <div class="t-insightBarRow"><span class="t-insightBarIcon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-mindreading"/></svg></span><span>Mind reading</span><span class="t-insightBarTrack"><i style="width:55%"></i></span><b>7</b></div>
+            <div class="t-insightBarRow"><span class="t-insightBarIcon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-allornothing"/></svg></span><span>All-or-nothing</span><span class="t-insightBarTrack"><i style="width:36%"></i></span><b>5</b></div>
+            <div class="t-insightBarRow"><span class="t-insightBarIcon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-should"/></svg></span><span>Should statements</span><span class="t-insightBarTrack"><i style="width:22%"></i></span><b>3</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Keep today accent</h4><p>Across every chart the current day is <code>--accent</code>. It is the anchor that makes a 7-bar row readable without axis labels.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don't</span> Add a chart library</h4><p>Runtime deps are capped at <code>pg</code> and the two SimpleWebAuthn packages. Divs and inline SVG have covered every chart so far.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> Aggregation lives in lib</h4><p>Chart components receive numbers. The maths is in <code>lib/weekStats.ts</code> and <code>lib/nutrition/stats.ts</code>, both unit-tested.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Open</span> None of these draw their goal</h4><p>Every specimen above encodes "on target" as a fill color on one hue, treats an unlogged day as a low day, and clips overshoot. A proposed replacement vocabulary — reference rule, target band, missing mark, breach scale, pace marker, cutoff track — is worked through in <a href="charts-lab.html" style="color:var(--a300)">Charts: goals, thresholds, warnings</a>.</p></div>
+  </div>
+</section>
+
+<!-- ══ 17 TIMELINES ═══════════════════════════════════════════════════ -->
+<section class="ds-section" id="timelines">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">17</span><h2>Timelines</h2></div>
+  <p class="ds-lede">
+    Two time axes with different jobs. The 24-hour timeline in the top bar shows <em>the day so far</em>;
+    the sleep band shows <em>last night</em> on an 18-hour axis and is directly editable by dragging its ends.
+  </p>
+
+  <span class="ds-eyebrow">24-hour timeline — Topbar</span>
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Day strip</h3><code>desktop/Topbar.tsx · home/MobileTopbar.tsx</code></div>
+    <p class="ds-specNote">
+      A 2px <code>--rail</code> baseline carries three things: the sleep span (12px pill, <code>--a800</code>
+      filled with an <code>--a600</code> edge), event dots (19px circles in the event tone, ringed by the
+      <code>--night</code> background so they punch out of the line), and the now marker — a 1px accent line
+      with an 8px glow. Dots reveal a tooltip on hover and focus.
+    </p>
+    <div class="ds-preview is-flush">
+      <div style="background:var(--night);padding:16px 20px">
+        <div class="t-tlwrap">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:9px">
+            <span class="t-eyebrow" style="margin:0">Today</span>
+            <span style="font-size:11px;color:var(--t2)">8 events · 7h 45m slept</span>
+          </div>
+          <div class="t-tl">
+            <div class="t-tlBase"></div>
+            <div class="t-sleepspan" style="left:0;width:25%"></div>
+            <button class="t-btn t-evdot t-cSleep" style="left:25%" aria-label="Wake at 07:15"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg><span class="t-tip" aria-hidden="true">Wake · 07:15</span></button>
+            <button class="t-btn t-evdot t-cIntake" style="left:45%" aria-label="Coffee, medium, at 10:48"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg><span class="t-tip" aria-hidden="true">Coffee · medium · 10:48</span></button>
+            <button class="t-btn t-evdot t-cMeal" style="left:65%" aria-label="Two events: meal, chicken and rice, at 13:20; nap, 25 minutes, at 14:10"><span class="t-clusterCount">2</span><span class="t-tip" aria-hidden="true">2 events · Meal 13:20 · Nap 14:10</span></button>
+            <button class="t-btn t-evdot t-cState" style="left:85%" aria-label="Two events: mood, 4 out of 5, at 16:05; gym session at 18:32"><span class="t-clusterCount">2</span><span class="t-tip" aria-hidden="true">2 events · Mood 16:05 · Gym 18:32</span></button>
+            <div class="t-nowline" style="left:73%"></div>
+          </div>
+          <div class="t-axis"><span>00</span><span>04</span><span>08</span><span>12</span><span>16</span><span>20</span><span>24</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="ds-specNote">The strip is supplemental: every event also appears in a 48px-target ledger. If markers collide, group them into one labeled cluster that opens an accessible list; never stack overlapping event buttons.</p>
+  </div>
+
+  <span class="ds-eyebrow">Sleep band — editable</span>
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Last night</h3><code>sleep/SleepBand.tsx</code></div>
+    <p class="ds-specNote">
+      SVG on a 1000×130 viewBox. The axis runs 20:00 → 14:00 the next day (18 hours), because that is the
+      only window a night can occupy. Both ends drag with a 5-minute snap; tapping an end without dragging
+      opens the wheel picker instead, so the control works with a thumb as well as a mouse.
+    </p>
+    <div class="ds-preview is-flush">
+      <div style="background:var(--app);padding:18px 20px">
+        <svg viewBox="0 0 1000 130" style="width:100%;height:130px" aria-hidden>
+          <rect x="0" y="40" width="1000" height="44" rx="8" fill="var(--surface-raised)"/>
+          <rect x="195" y="40" width="475" height="44" rx="8" fill="var(--a800)" stroke="var(--a600)" stroke-width="2"/>
+          <g fill="var(--accent)">
+            <rect x="187" y="32" width="16" height="60" rx="6"/>
+            <rect x="662" y="32" width="16" height="60" rx="6"/>
+          </g>
+          <text x="195" y="24" fill="var(--t2)" font-size="20" font-family="Inter">23:30</text>
+          <text x="600" y="24" fill="var(--t2)" font-size="20" font-family="Inter">07:15</text>
+          <text x="420" y="70" fill="var(--a200)" font-size="22" font-family="Inter">7h 45m</text>
+          <g fill="var(--t5)" font-size="17" font-family="Inter">
+            <text x="0" y="112">20:00</text><text x="215" y="112">00:00</text>
+            <text x="440" y="112">04:00</text><text x="665" y="112">08:00</text>
+            <text x="900" y="112">14:00</text>
+          </g>
+          <g stroke="var(--rail)" stroke-width="2">
+            <path d="M0 92v6M222 92v6M444 92v6M667 92v6M998 92v6"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 18 GAUGES ══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="gauges">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">18</span><h2>Gauges</h2></div>
+  <p class="ds-lede">
+    Two custom SVG instruments, both in the CBT flow, both driven by a native input underneath so touch and
+    keyboard keep working. They exist because a number field cannot convey <em>how much</em> at a glance.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>SUDS dial</h3><code>cbt/IntensityDial.tsx</code></div>
+      <p class="ds-specNote">
+        A 78px-radius semicircle on a 200×112 viewBox, 10px stroke with round caps. The fill is a
+        <code>stroke-dasharray</code> of <code>(value / 100) × πr</code>. Color ramps by band —
+        below 34 <code>--ok</code>, below 67 <code>--warn</code>, otherwise <code>--bad</code> — and the
+        numeral takes the same color. A range input at step 5 sits below the arc.
+      </p>
+      <div class="ds-preview">
+        <div class="t-dial" id="ds-dialWrap">
+          <svg class="t-dialArc" viewBox="0 0 200 112" aria-hidden>
+            <path d="M22 100 A 78 78 0 0 1 178 100" fill="none" stroke="var(--line)" stroke-width="10" stroke-linecap="round"/>
+            <path id="ds-dialFill" d="M22 100 A 78 78 0 0 1 178 100" fill="none" stroke="var(--warn)" stroke-width="10" stroke-linecap="round" stroke-dasharray="159 245"/>
+            <text id="ds-dialNum" x="100" y="86" text-anchor="middle" class="t-dialNumber" fill="var(--warn)">65</text>
+            <text x="100" y="104" text-anchor="middle" class="t-dialUnit" fill="var(--t3)">/ 100</text>
+          </svg>
+          <div class="t-dialEnds"><span>calm</span><span>unbearable</span></div>
+          <input class="t-dialRange" id="ds-dialRange" type="range" min="0" max="100" step="5" value="65" aria-label="Intensity">
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Evidence balance</h3><code>cbt/EvidenceScale.tsx</code></div>
+      <p class="ds-specNote">
+        A beam on a 240×96 viewBox that physically tips toward the heavier pan: 3.5° per fact, clamped to
+        ±11°, transitioning over <code>--duration-normal</code>. The left pan (evidence <em>for</em> the
+        thought) is the bad pair; the right pan (<em>against</em>) is the ok pair. Watching "against"
+        outweigh "for" is the entire point of the exercise.
+      </p>
+      <div class="ds-preview">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+          <svg viewBox="0 0 240 96" style="width:240px" aria-hidden>
+            <path d="M120 48 L110 84 H130 Z" fill="none" stroke="var(--t4)" stroke-width="1.5"/>
+            <path d="M92 84h56" stroke="var(--t4)" stroke-width="1.5" stroke-linecap="round"/>
+            <g id="ds-beam" style="transform:rotate(7deg);transform-origin:120px 48px;transition:transform var(--duration-normal) var(--ease-out-expo)">
+              <path d="M30 48 H210" stroke="var(--t2)" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="120" cy="48" r="3" fill="var(--t2)"/>
+              <path d="M30 48 L20 64 M30 48 L40 64" stroke="var(--t3)" stroke-width="1.5"/>
+              <path d="M14 64 A 16 16 0 0 0 46 64 Z" fill="var(--bad-d)" stroke="var(--bad)" stroke-width="1.5"/>
+              <text x="30" y="60" text-anchor="middle" font-size="11" font-family="Inter" fill="var(--bad)">2</text>
+              <path d="M210 48 L200 64 M210 48 L220 64" stroke="var(--t3)" stroke-width="1.5"/>
+              <path d="M194 64 A 16 16 0 0 0 226 64 Z" fill="var(--ok-d)" stroke="var(--ok)" stroke-width="1.5"/>
+              <text x="210" y="60" text-anchor="middle" font-size="11" font-family="Inter" fill="var(--ok)">5</text>
+            </g>
+          </svg>
+          <div class="ds-row is-center" style="justify-content:center">
+            <button class="t-btn t-chip" style="min-height:34px" data-beam="-1">− for</button>
+            <button class="t-btn t-chip" style="min-height:34px" data-beam="1">+ against</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 19 CBT ═════════════════════════════════════════════════════════ -->
+<section class="ds-section" id="cbt">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">19</span><h2>CBT module</h2></div>
+  <p class="ds-lede">
+    The Mind tab is its own domain — not an event type. A guided seven-step thought record writes to its own
+    <code>cbt_records</code> table. It borrows the tokens but speaks more slowly: more space, longer line
+    lengths, softer contrast, and a 42rem column instead of 28rem.
+  </p>
+
+  <span class="ds-eyebrow">The seven steps</span>
+  <table class="ds-table">
+    <thead><tr><th>#</th><th>Step</th><th>Control</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey">1</td><td>Trigger — what happened</td><td>Textarea</td></tr>
+      <tr><td class="ds-tdKey">2</td><td>Thought — what you told yourself</td><td>Textarea</td></tr>
+      <tr><td class="ds-tdKey">3</td><td>Emotion + intensity</td><td>Face picker · SUDS dial 0–100</td></tr>
+      <tr><td class="ds-tdKey">4</td><td>Thinking traps</td><td>Distortion grid, multi-select</td></tr>
+      <tr><td class="ds-tdKey">5</td><td>Evidence for and against</td><td>Balance scale, two lists</td></tr>
+      <tr><td class="ds-tdKey">6</td><td>Reframe</td><td>Textarea</td></tr>
+      <tr><td class="ds-tdKey">7</td><td>Re-rate</td><td>SUDS dial — relief is the delta</td></tr>
+    </tbody>
+  </table>
+
+  <span class="ds-eyebrow">Emotion faces — <code>EMOTION_META</code></span>
+  <div class="ds-icons">
+    <div class="ds-icon" style="color:var(--accent)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#e-anxious"/></svg><b>anxious</b></div>
+    <div class="ds-icon" style="color:var(--cyan)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#e-sad"/></svg><b>sad</b></div>
+    <div class="ds-icon" style="color:var(--bad)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#e-angry"/></svg><b>angry</b></div>
+    <div class="ds-icon" style="color:var(--warn)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#e-ashamed"/></svg><b>ashamed</b></div>
+    <div class="ds-icon" style="color:var(--a600)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#e-guilty"/></svg><b>guilty</b></div>
+    <div class="ds-icon" style="color:var(--a400)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#e-overwhelmed"/></svg><b>overwhelmed</b></div>
+    <div class="ds-icon" style="color:var(--t2)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#e-hopeless"/></svg><b>hopeless</b></div>
+  </div>
+  <p class="ds-specNote" style="margin-top:10px">Each emotion owns a token color, so the same feeling reads the same way in the flow, the record card, and the insights.</p>
+
+  <span class="ds-eyebrow">Distortion grid — 11 cards, multi-select</span>
+  <div class="ds-preview">
+    <div class="t-distortionGrid">
+      <button class="t-btn t-distortionCard" aria-pressed="true"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-catastrophizing"/></svg></span><span class="t-distortionLabel">Catastrophizing</span><span class="t-distortionBlurb">Jumping to the worst possible outcome</span></button>
+      <button class="t-btn t-distortionCard"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-allornothing"/></svg></span><span class="t-distortionLabel">All-or-nothing</span><span class="t-distortionBlurb">Only total success or total failure, no middle</span></button>
+      <button class="t-btn t-distortionCard"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-mindreading"/></svg></span><span class="t-distortionLabel">Mind reading</span><span class="t-distortionBlurb">Assuming you know what others think</span></button>
+      <button class="t-btn t-distortionCard"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-fortunetelling"/></svg></span><span class="t-distortionLabel">Fortune telling</span><span class="t-distortionBlurb">Predicting the future as if it were fact</span></button>
+      <button class="t-btn t-distortionCard"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-emotionalreasoning"/></svg></span><span class="t-distortionLabel">Emotional reasoning</span><span class="t-distortionBlurb">“I feel it, therefore it must be true”</span></button>
+      <button class="t-btn t-distortionCard" aria-pressed="true"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-overgeneralization"/></svg></span><span class="t-distortionLabel">Overgeneralization</span><span class="t-distortionBlurb">One bad moment becomes “always” or “never”</span></button>
+      <button class="t-btn t-distortionCard"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-mentalfilter"/></svg></span><span class="t-distortionLabel">Mental filter</span><span class="t-distortionBlurb">Seeing only the negatives, filtering the rest out</span></button>
+      <button class="t-btn t-distortionCard"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-discounting"/></svg></span><span class="t-distortionLabel">Discounting positives</span><span class="t-distortionBlurb">“That good thing doesn’t count”</span></button>
+      <button class="t-btn t-distortionCard"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-should"/></svg></span><span class="t-distortionLabel">Should statements</span><span class="t-distortionBlurb">Rigid rules about how you “must” be</span></button>
+      <button class="t-btn t-distortionCard"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-labeling"/></svg></span><span class="t-distortionLabel">Labeling</span><span class="t-distortionBlurb">Turning one event into an identity</span></button>
+      <button class="t-btn t-distortionCard"><span class="t-distortionIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#d-personalization"/></svg></span><span class="t-distortionLabel">Personalization</span><span class="t-distortionBlurb">Making yourself the cause of everything bad</span></button>
+    </div>
+  </div>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> The record never enters the event log</h4><p><code>POST /api/cbt</code> also writes a bare <code>trigger</code> event so the floor feed shows <em>when</em> it happened. The content stays in <code>cbt_records</code>.</p></div>
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Give this section room</h4><p>42rem column, 18px gaps, blurbs on every option. The rest of the app optimises for speed; this one optimises for thinking.</p></div>
+  </div>
+</section>
+
+<!-- ══ 20 LAYOUT ══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="layout">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">20</span><h2>Layout</h2></div>
+  <p class="ds-lede">
+    One route, two surfaces. <code>page.tsx</code> is only a <code>useMediaQuery('(min-width: 1024px)')</code>
+    switch between <code>DesktopHome</code> and <code>MobileHome</code>. They share every sheet and every token —
+    what changes is density and how much is visible at once.
+  </p>
+
+  <span class="ds-eyebrow">Desktop console — ≥ 1024px</span>
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Rail + topbar + three columns</h3><code>250px / 1fr / 296px</code></div>
+    <p class="ds-specNote">
+      Full viewport height with no page scroll — each column scrolls independently. Left is capture,
+      middle is the ledger on <code>--app</code> with hairlines on both sides, right is 7-day stats.
+      Base font drops to 14px because the console is denser than the phone.
+    </p>
+    <div class="ds-preview is-flush">
+      <div class="t-console">
+        <div class="t-rail">
+          <span class="t-railMark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mind"/></svg></span>
+          <span class="t-railBtn t-railOn" aria-label="Today"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-list"/></svg></span>
+          <span class="t-railBtn" aria-label="Sleep"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg></span>
+          <span class="t-railBtn" aria-label="Nutrition"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg></span>
+          <span class="t-railBtn" aria-label="Gym"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg></span>
+          <span class="t-railBtn" aria-label="Mind"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mind"/></svg></span>
+        </div>
+        <div class="t-consoleMain">
+          <div class="t-topbar">
+            <div class="t-clockbox">
+              <div class="t-wordmark">floor <span>.</span> logger</div>
+              <div class="t-clock">14:45</div>
+              <div class="t-clockDate">Tuesday 29 July</div>
+            </div>
+            <div class="t-tlwrap">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:9px"><span class="t-eyebrow" style="margin:0">Today</span><span style="font-size:11px;color:var(--t2)">8 events</span></div>
+              <div class="t-tl">
+                <div class="t-tlBase"></div>
+                <div class="t-sleepspan" style="left:0;width:30%"></div>
+                <span class="t-evdot t-cSleep" style="left:30%"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg></span>
+                <span class="t-evdot t-cIntake" style="left:45%"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg></span>
+                <span class="t-evdot t-cMeal" style="left:56%"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg></span>
+                <div class="t-nowline" style="left:62%"></div>
+              </div>
+              <div class="t-axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+            </div>
+          </div>
+          <div class="t-colGrid">
+            <div class="t-col">
+              <span class="t-eyebrow">Capture</span>
+              <div class="t-toggle t-toggleWide" style="margin-bottom:7px">
+                <span class="t-side"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg><span class="t-sideLabel">Wake</span></span>
+                <span class="t-side t-sideOff"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><span class="t-sideLabel">Sleep</span></span>
+              </div>
+              <span class="t-capRow" style="margin-bottom:7px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-nap"/></svg><span class="t-capLbl">Nap</span><kbd>N</kbd></span>
+              <div class="t-subRow">
+                <span class="t-capRow t-capCompact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg><span class="t-capLbl">Coffee</span></span>
+                <span class="t-capRow t-capCompact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-tea"/></svg><span class="t-capLbl">Tea</span></span>
+                <span class="t-capRow t-capCompact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bolt"/></svg><span class="t-capLbl">Energy</span></span>
+              </div>
+            </div>
+            <div class="t-col t-colMid">
+              <div class="t-goals" style="margin-bottom:18px">
+                <div class="t-goalCard"><span class="t-statusDot t-statusDone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#s-check"/></svg></span><div class="t-goalTitle">Sleep</div><div class="t-goalValue num">7h 45<small>m</small></div><div class="t-goalBar"><i style="width:97%"></i></div></div>
+                <div class="t-goalCard"><span class="t-statusDot t-statusWarn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#s-warn"/></svg></span><div class="t-goalTitle">Protein</div><div class="t-goalValue num">128<small>g</small></div><div class="t-goalBar"><i style="width:64%"></i></div></div>
+              </div>
+              <div class="t-dayhd"><span class="t-dayhdL">Today</span><span class="t-dayhdR">8 entries</span></div>
+              <div class="t-row"><time class="t-rowT">07:15</time><span class="t-rowG t-cSleep"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg></span><span class="t-rowTxt">Wake</span><span class="t-rowV">›</span></div>
+              <div class="t-row"><time class="t-rowT">10:45</time><span class="t-rowG t-cIntake"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg></span><span class="t-rowTxt">Coffee</span><span class="t-rowV">›</span></div>
+              <div class="t-row"><time class="t-rowT">13:20</time><span class="t-rowG t-cMeal"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg></span><span class="t-rowTxt">Chicken &amp; rice</span><span class="t-rowV num">42 g</span></div>
+            </div>
+            <div class="t-col">
+              <span class="t-eyebrow">7 days</span>
+              <div class="t-stat">
+                <div class="t-statK"><span>Sleep</span><b>7h 28m</b></div>
+                <div class="t-spark"><i style="height:62%"></i><i style="height:78%"></i><i class="t-sparkOn" style="height:91%"></i><i style="height:70%"></i><i class="t-sparkLow" style="height:38%"></i><i class="t-sparkOn" style="height:88%"></i><i class="t-sparkToday" style="height:97%"></i></div>
+                <div class="t-sparkx"><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span>M</span><span>T</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="t-foot"><span>Postgres · live</span><span class="t-footH">N nap · C coffee · T tea · E energy · M meal · G gym</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Mobile logger — &lt; 1024px</span>
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Single 28rem column</h3><code>home/MobileHome.tsx</code></div>
+    <p class="ds-specNote">
+      One scrolling column on <code>--app</code>, centred with a 1px ring so it reads as a device on wide
+      phones. A sticky topbar carries the clock and day strip; the bottom padding reserves
+      <code>--tabbar-h</code> plus the safe-area inset so the last row is never under the tab bar.
+    </p>
+    <div class="ds-preview is-flush">
+      <div style="display:flex;justify-content:center;background:var(--canvas)">
+        <div class="t-phone">
+          <div class="t-phoneTop">
+            <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+              <span style="font-size:14px;font-weight:500">floor <span style="color:var(--accent)">.</span> logger</span>
+              <span style="margin-left:auto;text-align:right"><span style="display:block;font-size:22px;font-weight:300;line-height:1" class="num">14:45</span><span style="display:block;font-size:11px;color:var(--t2)">Tue 29 Jul</span></span>
+            </div>
+            <div class="t-tl" style="height:20px">
+              <div class="t-tlBase" style="top:9px"></div>
+              <div class="t-sleepspan" style="left:0;width:30%;top:5px;height:10px"></div>
+              <div class="t-nowline" style="left:62%;top:1px;height:18px"></div>
+            </div>
+          </div>
+          <div class="t-phoneBody">
+            <div class="t-toggle">
+              <span class="t-side"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg><span class="t-sideLabel">Wake</span><span class="t-sideMeta">7:15</span></span>
+              <span class="t-side t-sideOff"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg><span class="t-sideLabel">Sleep</span><span class="t-sideMeta">23:30</span></span>
+            </div>
+            <div class="t-qgrid">
+              <span class="t-cap t-capSleep"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-nap"/></svg><span class="t-capLabel">Nap</span><span class="t-capMeta">45m</span></span>
+              <span class="t-cap t-capIntake"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg><span class="t-capLabel">Coffee</span><span class="t-capMeta t-capMetaHit">x3</span></span>
+              <span class="t-cap t-capIntake"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-tea"/></svg><span class="t-capLabel">Tea</span><span class="t-capMeta">-</span></span>
+            </div>
+            <div>
+              <span class="t-eyebrow">Today</span>
+              <div class="t-row"><time class="t-rowT">10:45</time><span class="t-rowG t-cIntake"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg></span><span class="t-rowTxt">Coffee</span><span class="t-rowV">›</span></div>
+              <div class="t-row"><time class="t-rowT">13:20</time><span class="t-rowG t-cMeal"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg></span><span class="t-rowTxt">Chicken &amp; rice</span><span class="t-rowV num">42 g</span></div>
+            </div>
+          </div>
+          <nav class="t-tabBar" style="max-width:none">
+            <span class="t-tab" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-list"/></svg>Today</span>
+            <span class="t-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg>Sleep</span>
+            <span class="t-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg>Nutrition</span>
+            <span class="t-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg>Gym</span>
+            <span class="t-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mind"/></svg>Mind</span>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="ds-eyebrow">Breakpoint contract</span>
+  <table class="ds-table">
+    <thead><tr><th>Route</th><th>&lt; 1024px</th><th>≥ 1024px</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey">/ (home)</td><td>MobileHome — one-thumb logger</td><td>DesktopHome — three-column console</td></tr>
+      <tr><td class="ds-tdKey">/nutrition</td><td>MobileNutrition — list + quick-log chips</td><td>NutritionConsole — recipes · ledger · week</td></tr>
+      <tr><td class="ds-tdKey">/cbt</td><td>28rem column, flow inline</td><td>42rem column, flow becomes a dialog</td></tr>
+      <tr><td class="ds-tdKey">/gym · /sleep</td><td>28rem mobile column</td><td>42rem column, offset right of the rail</td></tr>
+      <tr><td class="ds-tdKey">/login</td><td colspan="2">24rem locked surface; navigation is suppressed</td></tr>
+      <tr><td class="ds-tdKey">Sheets</td><td>Bottom sheet</td><td>540px centered dialog</td></tr>
+      <tr><td class="ds-tdKey">Nav</td><td>TabBar</td><td>Rail</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 21 EVENT TYPES ═════════════════════════════════════════════════ -->
+<section class="ds-section" id="events">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">21</span><h2>Event types</h2></div>
+  <p class="ds-lede">
+    Nine current production types. Each one owns an icon, a tone, a row copy rule, and a read path —
+    Today-feed events appear in <code>/api/today</code>, trackers are filtered out and paged through
+    <code>/api/history</code> instead. Proposed composed trackers are specified separately until their
+    storage and service boundary is approved.
+  </p>
+
+  <table class="ds-table">
+    <thead><tr><th>Icon</th><th>Type</th><th>Tone</th><th>Row copy</th><th>Read path</th></tr></thead>
+    <tbody>
+      <tr><td class="t-cSleep"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wake"/></svg></td><td class="ds-tdKey"><code>wake_up</code></td><td><span class="ds-tone"><i style="background:var(--accent)"></i>sleep</span></td><td>Wake</td><td>Today feed</td></tr>
+      <tr><td class="t-cSleep"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sleep"/></svg></td><td class="ds-tdKey"><code>sleep_start</code></td><td><span class="ds-tone"><i style="background:var(--accent)"></i>sleep</span></td><td>Sleep</td><td>Today feed</td></tr>
+      <tr><td class="t-cSleep"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-nap"/></svg></td><td class="ds-tdKey"><code>nap</code></td><td><span class="ds-tone"><i style="background:var(--accent)"></i>sleep</span></td><td>Nap · <em>N min</em></td><td>Today feed</td></tr>
+      <tr><td class="t-cIntake"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-coffee"/></svg></td><td class="ds-tdKey"><code>caffeine</code></td><td><span class="ds-tone"><i style="background:var(--warn)"></i>intake</span></td><td>Coffee / Tea / Energy drink</td><td>Today feed</td></tr>
+      <tr><td class="t-cMeal"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-meal"/></svg></td><td class="ds-tdKey"><code>meal</code></td><td><span class="ds-tone"><i style="background:var(--ok)"></i>meal</span></td><td>Name · <em>description</em> · g / kcal</td><td>History</td></tr>
+      <tr><td class="t-cGym"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-gym"/></svg></td><td class="ds-tdKey"><code>gym-session</code></td><td><span class="ds-tone"><i style="background:var(--bad)"></i>gym</span></td><td>Gym · N min · <em>N exercises</em></td><td>History</td></tr>
+      <tr><td class="t-cState"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mood"/></svg></td><td class="ds-tdKey"><code>mood</code></td><td><span class="ds-tone"><i style="background:var(--cyan)"></i>state</span></td><td>Mood · n/5</td><td>Today feed</td></tr>
+      <tr><td class="t-cState"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-energy"/></svg></td><td class="ds-tdKey"><code>energy</code></td><td><span class="ds-tone"><i style="background:var(--cyan)"></i>state</span></td><td>Energy · n/5</td><td>Today feed</td></tr>
+      <tr><td class="t-cState"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-trigger"/></svg></td><td class="ds-tdKey"><code>trigger</code></td><td><span class="ds-tone"><i style="background:var(--cyan)"></i>state</span></td><td>Trigger · <em>thought record</em></td><td>Today feed · server-written only</td></tr>
+    </tbody>
+  </table>
+
+  <span class="ds-eyebrow">Proposed composed tracker — Snooker training</span>
+  <div class="x-snookerDecision">
+    <span>SNK</span>
+    <div>
+      <strong>Session → exercise run → shot/rep result → derived record</strong>
+      <small>One table-mode capture language; exercise-specific metrics; no opaque overall score.</small>
+    </div>
+    <a href="SNOOKER_TRAINING.md">Read the technical contract →</a>
+  </div>
+
+  <div class="x-snookerGrid">
+    <article class="x-snookerLive" aria-label="Mobile snooker table-mode specimen">
+      <header class="x-snookerHead">
+        <div><span>Live session</span><strong>Snooker training</strong></div>
+        <time datetime="PT34M18S">34:18</time>
+      </header>
+      <div class="x-snookerRun">
+        <span>Long pots · block 2</span>
+        <strong>12 <small>/ 20 potted</small></strong>
+      </div>
+      <dl class="x-snookerStats">
+        <div><dt>Streak</dt><dd>4</dd></div>
+        <div><dt>Best today</dt><dd>7</dd></div>
+        <div><dt>Queued</dt><dd>0</dd></div>
+      </dl>
+      <div class="x-snookerPrimaryActions">
+        <button type="button">Record miss</button>
+        <button type="button">Record pot</button>
+      </div>
+      <div class="x-snookerSecondaryActions">
+        <button type="button">Foul</button>
+        <button type="button">Undo last</button>
+        <button type="button">Finish run</button>
+      </div>
+      <p role="status"><i aria-hidden="true"></i> Result saved locally and synced</p>
+    </article>
+
+    <article class="x-snookerReview" aria-label="Desktop snooker session review specimen">
+      <header class="x-snookerHead">
+        <div><span>Session review</span><strong>29 Jul · 18:10–19:32</strong></div>
+        <b>1 h 22 min</b>
+      </header>
+      <div class="x-snookerSummary">
+        <span><b>3</b> exercises</span>
+        <span><b>72</b> results</span>
+        <span><b>38 / 62</b> pot attempts</span>
+      </div>
+      <ol class="x-snookerRuns">
+        <li>
+          <span><b>Line-up</b><small>15-red · standard table</small></span>
+          <strong>43 pts</strong>
+        </li>
+        <li>
+          <span><b>Long pots</b><small>20 shots · same setup</small></span>
+          <strong>14 / 20</strong>
+        </li>
+        <li>
+          <span><b>Safety outcomes</b><small>10 shots · distribution only</small></span>
+          <strong>6 good</strong>
+        </li>
+      </ol>
+      <div class="x-snookerRecord">
+        <span>New comparable best</span>
+        <strong>Line-up · 43 points</strong>
+        <small>Previous 38 · same drill version and setup</small>
+      </div>
+      <button class="x-snookerFinish" type="button">Finish session</button>
+    </article>
+  </div>
+
+  <table class="ds-table">
+    <thead><tr><th>Exercise metric</th><th>Table-mode control</th><th>Comparable record</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey">Points / break</td><td>Score or ball-value pad</td><td>Highest eligible run</td></tr>
+      <tr><td class="ds-tdKey">Fixed success block</td><td>Potted / Missed / Foul</td><td>Best count/rate with the same denominator</td></tr>
+      <tr><td class="ds-tdKey">Streak</td><td>Outcome buttons; streak derived</td><td>Longest completed streak</td></tr>
+      <tr><td class="ds-tdKey">Timed clearance</td><td>Start / Finish / Abandon</td><td>Fastest valid completion</td></tr>
+      <tr><td class="ds-tdKey">Qualitative result</td><td>Named choices or note</td><td>No personal record by default</td></tr>
+    </tbody>
+  </table>
+
+  <span class="ds-eyebrow">Adding a tenth type — the checklist</span>
+  <table class="ds-table">
+    <thead><tr><th>#</th><th>File</th><th>What to add</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey">1</td><td><code>lib/types.ts</code></td><td><code>EventType</code>, <code>CATEGORY_BY_TYPE</code>, payload and patch fields</td></tr>
+      <tr><td class="ds-tdKey">2</td><td><code>lib/validation.ts</code> + test</td><td>Field ranges</td></tr>
+      <tr><td class="ds-tdKey">3</td><td><code>db/migrations/NNN_*.sql</code></td><td>New Postgres columns/tables plus mapping in <code>lib/db/rows.ts</code> and tests</td></tr>
+      <tr><td class="ds-tdKey">4</td><td><code>components/sheets/</code></td><td>A sheet, wired into <code>EditEventSheet</code></td></tr>
+      <tr><td class="ds-tdKey">5</td><td>both presentations</td><td><code>desktop/presentation.tsx</code> (icon, tone, rowText) and <code>home/eventPresentation.ts</code></td></tr>
+      <tr><td class="ds-tdKey">6</td><td>capture entries</td><td><code>CAPTURES</code> in <code>CaptureColumn.tsx</code> and/or mobile <code>ActionGrid</code></td></tr>
+      <tr><td class="ds-tdKey">7</td><td>read path</td><td>Decide floor (<code>/api/today</code>) or tracker (<code>/api/history</code>)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 22 RULES ═══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="rules">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">22</span><h2>Rules &amp; traps</h2></div>
+  <p class="ds-lede">
+    Conventions that are not obvious from reading a component, and the specific mistakes that have already
+    cost time in this codebase.
+  </p>
+
+  <span class="ds-eyebrow">Styling</span>
+  <div class="ds-rules">
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don't</span> Hardcode a hex</h4><p>Every color comes from <code>styles/tokens.css</code>. If a value is missing, add a token — don't inline it.</p></div>
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Keep hide queries last</h4><p>The <code>display:none</code> breakpoints in <code>nav.module.css</code> and the nutrition console have equal specificity to the rules they override — source order is what makes them win.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> Legacy aliases still live</h4><p>Pre-redesign components read <code>--sleep</code>, <code>--intake</code>, <code>--state</code>, <code>--bg</code>, <code>--ink</code>, <code>--dim</code>. They alias the new names; both are valid.</p></div>
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Respect reduced motion</h4><p><code>global.css</code> collapses all animation and transition to 0.01ms under <code>prefers-reduced-motion</code>. Don't reintroduce motion through inline styles.</p></div>
+  </div>
+
+  <span class="ds-eyebrow">Behaviour</span>
+  <div class="ds-rules">
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Soft-delete and restore</h4><p>Deletes stamp <code>archived_at</code>; every normal read filters <code>archived_at IS NULL</code>. Provide immediate Undo and a user-visible archived-records Restore path. Never issue a hard <code>DELETE</code>.</p></div>
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Invalidate both caches</h4><p><code>/api/today</code> and <code>/api/week</code> are cached 60s. <code>invalidateToday()</code> clears the week slot too, by design — never add a write path that skips it.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don't</span> Edit a ghost row</h4><p>Optimistic rows carry a <code>ghost-</code> id prefix and are never editable or deletable. They clear per-row when the real event lands.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> Time is wall-clock</h4><p><code>occurred_at</code> is text holding the exact ISO string with its original offset; <code>occurred_ts</code> exists only for ordering. Any write must set both. Use <code>lib/time.ts</code> — never hand-roll date maths.</p></div>
+  </div>
+
+  <span class="ds-eyebrow">Traps that have already bitten</span>
+  <div class="ds-rules">
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Trap</span> useEffect on a rebuilt array</h4><p>An effect depending on <code>pages.flatMap(...)</code> created an infinite render loop that silently starved all router navigation app-wide — taps did nothing, no errors. Hooks returning derived arrays must <code>useMemo</code> them.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Trap</span> next/link for nav</h4><p>Link-click transitions stall on Next 15.5 here. Use <code>NavLink.tsx</code>, and verify nav in real Chrome against <code>localhost:3199</code> — not the preview harness.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Trap</span> Stale is usually the cache</h4><p>During manual testing, "wrong" data from <code>/api/today</code> or <code>/api/week</code> is almost always the 60s server cache, not a bug. Any write invalidates it.</p></div>
+  </div>
+
+  <span class="ds-eyebrow">Keeping this page honest</span>
+  <p class="ds-specNote" style="max-width:74ch">
+    This page is a mirror, not a source. When a token changes, edit
+    <code>app/styles/tokens.css</code> first and copy it into <code>design-system/styles/tokens.css</code>.
+    When a component changes, update its CSS module first and mirror the block in
+    <code>design-system/styles/components.css</code> — the header of that file maps every class back to
+    the module it came from.
+  </p>
+</section>
+
+
+
+</main>
+
+<div class="ds-toast" id="ds-toast" role="status" aria-live="polite"><span id="ds-toastMsg">Copied</span> <b id="ds-toastVal"></b></div>
+<script src="app.js"></script>
+<script type="module" src="datetime-demo.js"></script>
+</body>
+</html>

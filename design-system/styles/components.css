@@ -1,0 +1,2049 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   COMPONENTS — transcribed from the app's CSS modules.
+   Class names are prefixed `t-` and the responsive hide/show media queries
+   are replaced with explicit modifiers so both surfaces can be shown side
+   by side. Everything else (values, states, tones) matches the app 1:1.
+
+   Source map:
+     .t-rail .t-tab .t-pager      → nav/nav.module.css, home.module.css
+     .t-cap  .t-side .t-wideCap   → home.module.css, sleep/wake-sleep.module.css
+     .t-capRow .t-row .t-goalCard → desktop/desktop.module.css
+     .t-sheet .t-textInput …      → sheets/sheets.module.css
+     .t-spark .t-mgrid .t-bars    → desktop.module.css, nutrition-console.module.css
+     .t-dial .t-distortion…       → cbt/cbt.module.css
+   ───────────────────────────────────────────────────────────────────────── */
+
+.t-btn {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.t-btn:focus-visible {
+  outline: 2px solid var(--sleep);
+  outline-offset: 2px;
+}
+
+/* event tones — glyphs and dots read currentColor */
+.t-cSleep { color: var(--accent); }
+.t-cIntake { color: var(--warn); }
+.t-cMeal { color: var(--ok); }
+.t-cGym { color: var(--bad); }
+.t-cState { color: var(--cyan); }
+
+/* ── navigation ──────────────────────────────────────────────────────── */
+
+.t-rail {
+  width: var(--rail-w);
+  background: var(--night);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 6px;
+}
+
+.t-railMark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  margin-bottom: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: rgba(145, 132, 217, 0.08);
+}
+
+.t-railBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--t4);
+  text-decoration: none;
+}
+
+.t-railBtn:hover {
+  color: var(--t2);
+  background: rgba(233, 233, 237, 0.04);
+}
+
+.t-railOn,
+.t-railOn:hover {
+  color: var(--accent);
+  background: rgba(145, 132, 217, 0.1);
+}
+
+.t-tabBar {
+  width: 100%;
+  max-width: 28rem;
+  height: var(--tabbar-h);
+  display: flex;
+  padding: 8px 10px 10px;
+  background: var(--night);
+  border-top: 1px solid var(--line);
+}
+
+.t-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--t4);
+  font-size: 9.5px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.t-tab[aria-current='page'] {
+  color: var(--accent);
+}
+
+.t-tab svg {
+  width: 19px;
+  height: 19px;
+}
+
+.t-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.t-pagerBtn {
+  min-height: 36px;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.t-pagerBtn:disabled {
+  color: var(--t4);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.t-pagerLabel {
+  color: var(--t3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+/* ── chip (shared primitive, global.css) ─────────────────────────────── */
+
+.t-chip {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  color: var(--dim);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  transition:
+    transform var(--duration-fast) var(--ease-out-expo),
+    background var(--duration-fast),
+    color var(--duration-fast);
+}
+
+.t-chip:active {
+  transform: scale(0.95);
+}
+
+.t-chip[aria-pressed='true'] {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border-color: var(--sleep-dim);
+}
+
+/* ── capture: mobile card (84px) ─────────────────────────────────────── */
+
+.t-qgrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.t-cap {
+  position: relative;
+  overflow: hidden;
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 0 10px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: var(--surface-raised);
+  color: var(--t1);
+  transition:
+    border-color var(--duration-fast),
+    box-shadow var(--duration-fast),
+    transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.t-cap:active {
+  transform: scale(0.97);
+}
+
+.t-capFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: rgba(145, 132, 217, 0.16);
+  pointer-events: none;
+}
+
+.t-cap:active .t-capFill {
+  width: 100%;
+  transition: width 500ms linear;
+}
+
+.t-capSleep svg { color: var(--accent); }
+.t-capIntake svg { color: var(--warn); }
+
+.t-capLabel {
+  color: var(--t1);
+  font-size: 12px;
+  z-index: 1;
+}
+
+.t-capMeta {
+  min-height: 12px;
+  color: var(--t3);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  z-index: 1;
+}
+
+.t-capMetaHit {
+  color: var(--a300);
+}
+
+.t-wideGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.t-wideCap {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  color: var(--accent);
+  font-size: 13.5px;
+  font-weight: 500;
+  background: none;
+}
+
+.t-hint {
+  margin: 0;
+  color: var(--t4);
+  font-size: 10.5px;
+  text-align: center;
+}
+
+/* ── capture: desktop row + compact three-up ─────────────────────────── */
+
+.t-capRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--surface-raised);
+  border-radius: 10px;
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+  font-size: 13px;
+  text-align: left;
+  color: var(--t1);
+}
+
+.t-capRow:hover {
+  border-color: var(--a700);
+}
+
+.t-capRow:hover .t-capLbl {
+  color: var(--a200);
+}
+
+.t-capRow svg {
+  stroke: var(--t1);
+  flex: none;
+}
+
+.t-capLbl {
+  flex: 1;
+  text-align: left;
+}
+
+.t-capRow kbd {
+  font-family: var(--ds-mono);
+  font-size: 10.5px;
+  color: var(--t3);
+  background: rgba(233, 233, 237, 0.07);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.t-subRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.t-capCompact {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 82px;
+  padding: 12px 6px 10px;
+  text-align: center;
+}
+
+.t-capCompact .t-capLbl {
+  flex: none;
+  text-align: center;
+}
+
+.t-flash {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px rgba(145, 132, 217, 0.25);
+}
+
+.t-flash svg {
+  stroke: var(--a300);
+}
+
+/* ── wake / sleep toggle ─────────────────────────────────────────────── */
+
+.t-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  width: 100%;
+}
+
+.t-side {
+  --tone: var(--accent);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 84px;
+  padding: 12px 0 10px;
+  border: 1px solid color-mix(in srgb, var(--tone) 42%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--tone) 10%, var(--surface-raised));
+  color: var(--t1);
+  font-weight: 600;
+  transition:
+    transform 150ms ease,
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+.t-side:not(.t-sideOff):hover {
+  border-color: color-mix(in srgb, var(--tone) 62%, transparent);
+  background: color-mix(in srgb, var(--tone) 14%, var(--surface-raised));
+}
+
+.t-side:not(.t-sideOff):active {
+  transform: scale(0.97);
+}
+
+.t-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--tone);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.t-side:not(.t-sideOff):active .t-fill {
+  opacity: 0.16;
+}
+
+.t-sideOff {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--t4);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.t-side svg {
+  color: var(--tone);
+  z-index: 1;
+}
+
+.t-sideOff svg {
+  color: var(--t4);
+  opacity: 0.42;
+}
+
+.t-sideLabel {
+  color: var(--t1);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  z-index: 1;
+}
+
+.t-sideOff .t-sideLabel {
+  color: var(--t4);
+}
+
+.t-sideMeta {
+  min-height: 12px;
+  font-size: 11px;
+  color: var(--t3);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  z-index: 1;
+}
+
+.t-sideOff .t-sideMeta {
+  color: var(--t5);
+}
+
+/* desktop variant: 40px row instead of an 84px card */
+.t-toggleWide .t-side {
+  min-height: 40px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.t-toggleWide .t-sideLabel {
+  flex: 1;
+  text-align: left;
+}
+
+.t-toggleWide .t-sideMeta {
+  min-height: auto;
+  font-size: 10.5px;
+}
+
+/* ── rating rows (mood / energy 1–5) ─────────────────────────────────── */
+
+.t-rateLabel {
+  display: flex;
+  justify-content: space-between;
+  color: var(--t2);
+  font-size: 11.5px;
+  margin-bottom: 6px;
+}
+
+.t-rateLabel span:last-child {
+  color: var(--t4);
+}
+
+.t-rate {
+  display: flex;
+  gap: 7px;
+}
+
+.t-rate button {
+  flex: 1;
+  min-height: 42px;
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  color: var(--t2);
+  font-size: 14px;
+  background: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-rate button:hover {
+  border-color: var(--a700);
+  color: var(--a200);
+}
+
+.t-rate button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: rgba(145, 132, 217, 0.07);
+  color: var(--accent);
+}
+
+/* ── sheet form controls ─────────────────────────────────────────────── */
+
+.t-scaleRow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+}
+
+.t-scaleBtn {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--dim);
+}
+
+.t-scaleBtn[aria-pressed='true'] {
+  background: var(--state);
+  border-color: var(--state);
+  color: var(--bg);
+}
+
+.t-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.t-stepper button {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--t1);
+}
+
+.t-stepperValue {
+  min-width: 6rem;
+  text-align: center;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-textInput {
+  width: 100%;
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: var(--text-base);
+  font-family: inherit;
+  padding: 0 var(--space-2);
+}
+
+.t-textInput:focus {
+  outline: none;
+  border-color: var(--sleep);
+  border-width: 2px;
+}
+
+.t-textarea {
+  width: 100%;
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: var(--text-base);
+  font-family: inherit;
+  padding: var(--space-2);
+  resize: vertical;
+}
+
+.t-textarea:focus {
+  outline: none;
+  border-color: var(--sleep);
+  border-width: 2px;
+}
+
+.t-macroRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.t-macroField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.t-macroField span {
+  color: var(--dim);
+  font-size: var(--text-xs);
+}
+
+.t-macroField input {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: var(--text-base);
+  font-family: inherit;
+  padding: 0 var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.t-macroField input:focus {
+  outline: none;
+  border-color: var(--sleep);
+  border-width: 2px;
+}
+
+.t-exerciseRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+}
+
+.t-exerciseFields {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.t-exerciseNum {
+  min-height: 48px;
+  width: 100%;
+  min-width: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: var(--text-base);
+  font-family: inherit;
+  padding: 0 var(--space-1);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.t-exerciseNum:focus {
+  outline: none;
+  border-color: var(--state);
+  border-width: 2px;
+}
+
+.t-exerciseX {
+  color: var(--dim);
+  flex-shrink: 0;
+}
+
+.t-exerciseRemove {
+  min-width: 48px;
+  min-height: 48px;
+  flex-shrink: 0;
+  color: var(--danger);
+  font-size: var(--text-base);
+}
+
+.t-timeField {
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  background: none;
+  border: 1px dashed var(--hairline);
+  color: var(--dim);
+  font-size: var(--text-base);
+  padding: var(--space-1) var(--space-2);
+}
+
+.t-timeField .num {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.t-timeFieldReset {
+  color: var(--dim);
+  font-size: var(--text-sm);
+  min-height: 32px;
+}
+
+.t-logBtn {
+  width: 100%;
+  min-height: var(--tap-min);
+  border-radius: var(--radius-lg);
+  background: var(--sleep);
+  color: var(--bg);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.t-logBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.t-deleteBtn {
+  min-height: var(--tap-min);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.t-editFooter {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-2);
+}
+
+.t-readOnlyNotice {
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--dim);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+/* ── wheel time picker ───────────────────────────────────────────────── */
+
+.t-wheelRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.t-wheelCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.t-wheelWindow {
+  position: relative;
+  height: 132px;
+  width: 84px;
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  overflow: hidden;
+}
+
+.t-wheel {
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  padding-block: 44px;
+  overscroll-behavior: contain;
+}
+
+.t-wheel::-webkit-scrollbar {
+  display: none;
+}
+
+.t-wheelItem {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  font-size: var(--text-lg);
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.t-wheelItemActive {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: var(--text-xl);
+}
+
+.t-wheelMask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--surface) 0%,
+    transparent 34%,
+    transparent 66%,
+    var(--surface) 100%
+  );
+  opacity: 0.75;
+}
+
+/* ── sheet / dialog ──────────────────────────────────────────────────── */
+
+.t-backdrop {
+  background: rgba(8, 10, 14, 0.7);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-top: 40px;
+}
+
+.t-backdropDesktop {
+  background: rgba(13, 14, 21, 0.72);
+  align-items: center;
+  padding: 40px 0;
+}
+
+.t-sheet {
+  width: 100%;
+  max-width: 28rem;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-bottom: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.t-sheetDialog {
+  width: 540px;
+  max-width: 540px;
+  background: var(--sheet);
+  border: 0;
+  border-radius: 16px;
+  box-shadow: var(--sh-lg);
+  padding: 20px 22px;
+}
+
+.t-grabber {
+  width: 44px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--dim);
+  opacity: 0.5;
+  margin: 0 auto;
+}
+
+.t-sheetTitle {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+/* ── goal card ───────────────────────────────────────────────────────── */
+
+.t-goals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.t-goalCard {
+  position: relative;
+  min-width: 0;
+  padding: 14px 15px;
+  border-radius: 12px;
+  background: var(--surface-raised);
+}
+
+.t-goalTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 26px;
+  margin-bottom: 10px;
+  color: var(--t3);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.t-goalTitle svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+}
+
+.t-goalValue {
+  color: var(--t1);
+  font-size: 27px;
+  font-weight: 300;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-goalValue small {
+  margin-left: 3px;
+  color: var(--t3);
+  font-size: 11.5px;
+  font-weight: 400;
+}
+
+.t-goalSummary {
+  margin-top: 9px;
+  color: var(--t3);
+  font-size: 11px;
+}
+
+.t-goalBar {
+  height: 3px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--rail);
+}
+
+.t-goalBar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--a600);
+}
+
+.t-statusDot {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.t-statusDot svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+}
+
+.t-statusDone { background: var(--ok-d); color: var(--ok); }
+.t-statusWarn { background: var(--warn-d); color: var(--warn); }
+.t-statusOpen { border: 1px solid var(--edge); color: var(--t4); }
+
+/* ── stat / panel card ───────────────────────────────────────────────── */
+
+.t-stat {
+  background: var(--surface-raised);
+  border-radius: 12px;
+  padding: 14px 15px;
+}
+
+.t-statK {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.t-statK b {
+  font-weight: 400;
+  color: var(--t4);
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 10.5px;
+}
+
+.t-panelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--t2);
+}
+
+.t-panelRow:last-child {
+  border-bottom: none;
+}
+
+.t-panelVal {
+  color: var(--t1);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-chartFoot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--t4);
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.t-chartFoot span:last-child {
+  color: var(--t2);
+}
+
+/* ── charts ──────────────────────────────────────────────────────────── */
+
+.t-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 46px;
+}
+
+.t-spark i {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  background: var(--a800);
+}
+
+.t-sparkOn { background: var(--a500) !important; }
+.t-sparkToday { background: var(--accent) !important; }
+.t-sparkLow { background: var(--a900) !important; }
+
+.t-sparkx {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.t-sparkx span {
+  flex: 1;
+  text-align: center;
+  font-size: 9.5px;
+  color: var(--t5);
+}
+
+.t-mgrid {
+  display: flex;
+  gap: 5px;
+}
+
+.t-mgrid > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 3px;
+}
+
+.t-mgrid i {
+  height: 8px;
+  border-radius: 2px;
+  background: var(--rail);
+}
+
+.t-mgridF { background: var(--a600) !important; }
+
+.t-crow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.t-crow:last-child {
+  border: none;
+}
+
+.t-crowD {
+  width: 26px;
+  color: var(--t4);
+  font-size: 11px;
+}
+
+.t-dots {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+
+.t-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--t4);
+}
+
+.t-dotLate { background: var(--accent) !important; }
+
+.t-lastt {
+  color: var(--t3);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 24h timeline ────────────────────────────────────────────────────── */
+
+.t-tl {
+  position: relative;
+  height: 34px;
+}
+
+.t-tlBase {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 16px;
+  height: 2px;
+  background: var(--rail);
+  border-radius: 1px;
+}
+
+.t-sleepspan {
+  position: absolute;
+  top: 11px;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--a800);
+  border: 1px solid var(--a600);
+}
+
+.t-evdot {
+  position: absolute;
+  top: -7px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  transform: translateX(-24px);
+  background: transparent;
+  padding: 0;
+}
+
+.t-evdot::before {
+  content: '';
+  position: absolute;
+  width: 19px;
+  height: 19px;
+  border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
+  border-radius: 50%;
+  background: var(--night);
+  box-shadow: 0 0 0 2px var(--night);
+}
+
+.t-evdot > svg,
+.t-evdot > .t-clusterCount {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.t-clusterCount {
+  font-family: var(--ds-mono);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.t-evdot:hover::before,
+.t-evdot:focus-visible::before,
+.t-evdot.is-tipOpen::before {
+  box-shadow:
+    0 0 0 2px var(--night),
+    0 0 10px currentColor;
+}
+
+.t-tip {
+  display: none;
+  position: absolute;
+  z-index: 4;
+  bottom: 42px;
+  left: 50%;
+  width: max-content;
+  max-width: 180px;
+  padding: 5px 7px;
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  transform: translateX(-50%);
+  background: var(--sheet);
+  box-shadow: var(--sh-md);
+  color: var(--t1);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.t-evdot:hover:not(.is-tipDismissed) .t-tip,
+.t-evdot:focus-visible:not(.is-tipDismissed) .t-tip,
+.t-evdot.is-tipOpen .t-tip {
+  display: block;
+}
+
+.t-nowline {
+  position: absolute;
+  top: 2px;
+  width: 1px;
+  height: 30px;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(145, 132, 217, 0.6);
+}
+
+.t-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--t5);
+  margin-top: 6px;
+}
+
+/* ── ledger ──────────────────────────────────────────────────────────── */
+
+.t-dayhd {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 2px 0 8px;
+}
+
+.t-dayhdL {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t2);
+}
+
+.t-dayhdR {
+  font-size: 11px;
+  color: var(--t4);
+}
+
+.t-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 10px 8px;
+  font-size: 13.5px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  background: linear-gradient(
+      to right,
+      transparent,
+      var(--line) 24px,
+      var(--line) calc(100% - 24px),
+      transparent
+    )
+    no-repeat bottom / 100% 1px;
+  text-align: left;
+  color: var(--t1);
+}
+
+.t-row:hover {
+  background-color: rgba(233, 233, 237, 0.03);
+}
+
+.t-rowSel {
+  background: rgba(145, 132, 217, 0.08);
+  border: 1px solid var(--a700);
+  background-image: none;
+}
+
+.t-rowGhost {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.t-rowT {
+  width: 42px;
+  color: var(--t3);
+  font-size: 12px;
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-rowG {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border: 1px solid var(--edge);
+}
+
+.t-rowTxt {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--t1);
+}
+
+.t-rowTxt em {
+  font-style: normal;
+  color: var(--t2);
+}
+
+.t-rowV {
+  font-size: 11px;
+  color: var(--t3);
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-rowAct {
+  display: flex;
+  gap: 9px;
+  font-size: 11px;
+  flex: none;
+}
+
+.t-rowActE { color: var(--accent); padding: 2px 4px; }
+.t-rowActD { color: var(--t2); padding: 2px 4px; }
+
+.t-rowLock {
+  font-size: 10px;
+  color: var(--t4);
+  flex: none;
+}
+
+.t-nightrow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  background: var(--a900);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--a200);
+}
+
+.t-nightEdit {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--a400);
+}
+
+.t-logTotals {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24px;
+  padding: 12px 8px;
+  border-top: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--t3);
+}
+
+.t-logTotals b {
+  font-weight: 500;
+  color: var(--a400);
+  font-variant-numeric: tabular-nums;
+}
+
+.t-emptyLog {
+  padding: 32px 8px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--t4);
+}
+
+/* ── feedback ────────────────────────────────────────────────────────── */
+
+.t-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface-raised);
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 12.5px;
+  color: var(--t1);
+  box-shadow: var(--sh-md);
+}
+
+.t-toastDot { color: var(--accent); }
+.t-toastA { color: var(--accent); font-size: 12.5px; }
+.t-toastU { color: var(--t2); font-size: 12.5px; }
+.t-toastErr { color: var(--bad); }
+
+.t-queueNote {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--warn-d);
+  color: var(--warn);
+  font-size: 11.5px;
+}
+
+.t-errorInline {
+  color: var(--danger);
+  font-size: var(--text-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.t-undoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 11px;
+  padding: 10px 8px;
+  font-size: 12px;
+  color: var(--t3);
+}
+
+.t-undoBtn {
+  color: var(--bad);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ── CBT ─────────────────────────────────────────────────────────────── */
+
+.t-ctaCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  padding: 18px;
+  border: 1px solid var(--a800);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--a900), var(--night) 70%);
+  color: var(--t1);
+  width: 100%;
+  transition: border-color var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.t-ctaCard:hover {
+  border-color: var(--a600);
+}
+
+.t-ctaCard:active {
+  transform: scale(0.985);
+}
+
+.t-ctaTriangle {
+  width: 52px;
+  height: 46px;
+  flex-shrink: 0;
+  color: var(--a700);
+}
+
+.t-ctaText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.t-ctaText b {
+  font-size: var(--text-base);
+  font-weight: 620;
+}
+
+.t-ctaText span {
+  color: var(--t3);
+  font-size: var(--text-xs);
+}
+
+.t-ctaArrow {
+  color: var(--accent);
+  font-size: var(--text-lg);
+}
+
+.t-distortionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.t-distortionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--night);
+  color: var(--t1);
+  text-align: left;
+}
+
+.t-distortionCard:hover {
+  border-color: var(--a700);
+}
+
+.t-distortionCard[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: rgba(145, 132, 217, 0.08);
+}
+
+.t-distortionIcon {
+  color: var(--a500);
+  display: inline-flex;
+}
+
+.t-distortionCard[aria-pressed='true'] .t-distortionIcon {
+  color: var(--accent);
+}
+
+.t-distortionLabel {
+  font-size: 12.5px;
+  font-weight: 550;
+}
+
+.t-distortionBlurb {
+  font-size: 10.5px;
+  color: var(--t3);
+  line-height: 1.45;
+}
+
+.t-dial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.t-dialArc {
+  width: 200px;
+  height: 112px;
+}
+
+.t-dialNumber {
+  font-size: 30px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-dialUnit {
+  font-size: 10px;
+}
+
+.t-dialEnds {
+  display: flex;
+  justify-content: space-between;
+  width: 190px;
+  font-size: 10px;
+  color: var(--t4);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.t-dialRange {
+  width: 190px;
+  accent-color: var(--accent);
+}
+
+.t-insightBarRow {
+  display: grid;
+  grid-template-columns: 20px minmax(7rem, auto) 1fr 2.2rem;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: var(--text-xs);
+  color: var(--t2);
+}
+
+.t-insightBarIcon {
+  color: var(--a500);
+  display: inline-flex;
+}
+
+.t-insightBarTrack {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--rail);
+  overflow: hidden;
+}
+
+.t-insightBarTrack i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--a600);
+}
+
+.t-insightBarRow b {
+  text-align: right;
+  font-weight: 500;
+  color: var(--t3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── layout frames ───────────────────────────────────────────────────── */
+
+.t-console {
+  display: grid;
+  grid-template-columns: var(--rail-w) 1fr;
+  height: 460px;
+  background: var(--canvas);
+  overflow: hidden;
+}
+
+.t-consoleMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.t-topbar {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 14px 26px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--night);
+  flex: none;
+}
+
+.t-clockbox {
+  flex: none;
+  width: 160px;
+}
+
+.t-wordmark {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+  margin-bottom: 6px;
+}
+
+.t-wordmark span {
+  color: var(--accent);
+}
+
+.t-clock {
+  font-weight: 300;
+  font-size: 38px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-clockDate {
+  font-size: 11.5px;
+  color: var(--t3);
+  margin-top: 5px;
+}
+
+.t-tlwrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.t-colGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) 296px;
+  overflow: hidden;
+}
+
+.t-col {
+  padding: 20px;
+  overflow: hidden;
+}
+
+.t-colMid {
+  background: var(--app);
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+
+.t-eyebrow {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t2);
+  margin-bottom: 11px;
+}
+
+.t-foot {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 9px 26px;
+  border-top: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--t3);
+  background: var(--night);
+  flex: none;
+}
+
+.t-footH {
+  margin-left: auto;
+  color: var(--t4);
+  font-size: 10.5px;
+}
+
+.t-phone {
+  width: 100%;
+  max-width: 28rem;
+  height: 460px;
+  display: flex;
+  flex-direction: column;
+  background: var(--app);
+  box-shadow: 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+
+.t-phoneTop {
+  padding: 12px var(--space-3) 10px;
+  background: var(--night);
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+
+.t-phoneBody {
+  flex: 1;
+  padding: 14px var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+/* ── proposed snooker training tracker ─────────────────────────────── */
+
+.x-snookerDecision {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--night);
+}
+
+.x-snookerDecision > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--a700);
+  border-radius: 11px;
+  background: var(--a900);
+  color: var(--a300);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.x-snookerDecision div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.x-snookerDecision strong {
+  color: var(--t1);
+  font-size: 12px;
+}
+
+.x-snookerDecision small {
+  color: var(--t2);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.x-snookerDecision a {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 13px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  color: var(--a300);
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.x-snookerGrid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.78fr) minmax(360px, 1.22fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.x-snookerLive,
+.x-snookerReview {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--app);
+}
+
+.x-snookerLive {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--a900) 30%, transparent), transparent 55%),
+    var(--app);
+}
+
+.x-snookerHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.x-snookerHead > div {
+  display: grid;
+  gap: 4px;
+}
+
+.x-snookerHead span,
+.x-snookerRun > span,
+.x-snookerRecord > span {
+  color: var(--t2);
+  font-size: 9px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.x-snookerHead strong {
+  color: var(--t1);
+  font-size: 13px;
+}
+
+.x-snookerHead time,
+.x-snookerHead > b {
+  color: var(--a300);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.x-snookerRun {
+  display: grid;
+  gap: 5px;
+  padding: 18px 0 14px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.x-snookerRun strong {
+  color: var(--t1);
+  font-size: 38px;
+  font-weight: 300;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.x-snookerRun small {
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.x-snookerStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.x-snookerStats div {
+  display: grid;
+  gap: 3px;
+  padding: 9px;
+  border-radius: 9px;
+  background: var(--surface);
+}
+
+.x-snookerStats dt {
+  color: var(--t2);
+  font-size: 9px;
+}
+
+.x-snookerStats dd {
+  margin: 0;
+  color: var(--t1);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.x-snookerPrimaryActions,
+.x-snookerSecondaryActions {
+  display: grid;
+  gap: 8px;
+}
+
+.x-snookerPrimaryActions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.x-snookerSecondaryActions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.x-snookerPrimaryActions button,
+.x-snookerSecondaryActions button,
+.x-snookerFinish {
+  min-height: 48px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface-raised);
+  color: var(--t1);
+  font: inherit;
+  font-size: 10px;
+}
+
+.x-snookerPrimaryActions button:last-child,
+.x-snookerFinish {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--canvas);
+  font-weight: 700;
+}
+
+.x-snookerLive > p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: var(--t2);
+  font-size: 9.5px;
+}
+
+.x-snookerLive > p i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+}
+
+.x-snookerReview {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.x-snookerSummary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.x-snookerSummary span {
+  display: grid;
+  gap: 2px;
+  padding: 10px;
+  color: var(--t2);
+  font-size: 9px;
+}
+
+.x-snookerSummary span + span {
+  border-left: 1px solid var(--line);
+}
+
+.x-snookerSummary b {
+  color: var(--t1);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.x-snookerRuns {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.x-snookerRuns li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 54px;
+  border-bottom: 1px solid var(--line);
+}
+
+.x-snookerRuns li > span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.x-snookerRuns b,
+.x-snookerRuns strong {
+  color: var(--t1);
+  font-size: 11px;
+}
+
+.x-snookerRuns small {
+  color: var(--t2);
+  font-size: 9px;
+}
+
+.x-snookerRuns strong {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.x-snookerRecord {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--a700);
+  border-radius: 10px;
+  background: var(--a900);
+}
+
+.x-snookerRecord strong {
+  color: var(--a300);
+  font-size: 12px;
+}
+
+.x-snookerRecord small {
+  color: var(--t2);
+  font-size: 9.5px;
+}
+
+@media (max-width: 760px) {
+  .x-snookerDecision,
+  .x-snookerGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .x-snookerDecision a {
+    justify-content: center;
+  }
+
+  .x-snookerSecondaryActions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

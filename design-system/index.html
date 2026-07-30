@@ -1,0 +1,1384 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Technical UI and UX contract for Tracker, a personal life-tracking application.">
+  <title>Tracker — UI/UX Engineering Manual</title>
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/docs.css">
+  <link rel="stylesheet" href="styles/handbook.css">
+  <link rel="stylesheet" href="styles/datetime.css">
+</head>
+<body class="ds-handbook">
+  <nav class="ds-nav" aria-label="UI and UX manual sections">
+    <div class="ds-brand">
+      <span class="ds-brandMark" aria-hidden="true">⌁</span>
+      <span class="ds-brandText">
+        <b>floor <span>.</span> logger</b>
+        <small>UI/UX engineering</small>
+      </span>
+    </div>
+
+    <div class="ds-pageNav" aria-label="Design system pages">
+      <a href="index.html" aria-current="page">UX contract</a>
+      <a href="components.html">Components</a>
+    </div>
+
+    <div class="ds-navGroup">
+      <h4>System</h4>
+      <a class="ds-navLink" href="#contract">Product contract <em>C-01</em></a>
+      <a class="ds-navLink" href="#architecture">Architecture <em>C-02</em></a>
+      <a class="ds-navLink" href="#lifecycle">Tracking lifecycle <em>C-03</em></a>
+      <a class="ds-navLink" href="#tracker-model">Tracker model <em>C-04</em></a>
+    </div>
+
+    <div class="ds-navGroup">
+      <h4>Interaction</h4>
+      <a class="ds-navLink" href="#navigation">Navigation <em>I-01</em></a>
+      <a class="ds-navLink" href="#capture">Capture <em>I-02</em></a>
+      <a class="ds-navLink" href="#forms">Forms &amp; overlays <em>I-03</em></a>
+      <a class="ds-navLink" href="#datetime">Date &amp; time <em>I-04</em></a>
+      <a class="ds-navLink" href="#records">Records &amp; correction <em>I-05</em></a>
+      <a class="ds-navLink" href="#states">System states <em>I-06</em></a>
+    </div>
+
+    <div class="ds-navGroup">
+      <h4>Understanding</h4>
+      <a class="ds-navLink" href="#reflection">Reflection &amp; charts <em>U-01</em></a>
+      <a class="ds-navLink" href="#goals">Goals &amp; language <em>U-02</em></a>
+      <a class="ds-navLink" href="#relationships">Cross-tracker insights <em>U-03</em></a>
+    </div>
+
+    <div class="ds-navGroup">
+      <h4>Quality</h4>
+      <a class="ds-navLink" href="#responsive">Responsive behavior <em>Q-01</em></a>
+      <a class="ds-navLink" href="#accessibility">Accessibility <em>Q-02</em></a>
+      <a class="ds-navLink" href="#privacy">Privacy &amp; trust <em>Q-03</em></a>
+      <a class="ds-navLink" href="#content">Content system <em>Q-04</em></a>
+      <a class="ds-navLink" href="#delivery">New tracker delivery <em>Q-05</em></a>
+      <a class="ds-navLink" href="#governance">Governance <em>Q-06</em></a>
+    </div>
+
+    <p class="ds-navFoot">
+      This page is normative. The component catalog is visual reference.
+      App code remains the implementation source of truth.
+    </p>
+  </nav>
+
+  <main class="ds-main">
+    <header class="ds-hero ds-handbookHero">
+      <p class="ds-kicker">Technical UI/UX contract · v1.1</p>
+      <h1>Build new trackers without inventing a new <b>experience.</b></h1>
+      <p>
+        A durable interaction model for capturing, correcting, understanding,
+        and acting on personal data as Tracker grows across more areas of life.
+      </p>
+      <div class="ds-heroMeta" aria-label="Contract scope">
+        <span class="ds-pill"><b>5</b> current destinations</span>
+        <span class="ds-pill"><b>WCAG 2.2 AA</b> target</span>
+        <span class="ds-pill"><b>IANA-zone</b> time semantics</span>
+        <span class="ds-pill"><b>app-first</b> source of truth</span>
+      </div>
+
+      <div class="ds-outcomeGrid" aria-label="Experience outcomes">
+        <article>
+          <span>01</span>
+          <h2>Capture quickly</h2>
+          <p>The common case is one action; uncommon detail remains available.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Trust the record</h2>
+          <p>Time, sync, edits, and failures are visible and recoverable.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>Reflect calmly</h2>
+          <p>Views answer a question without judgment or false certainty.</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h2>Resume easily</h2>
+          <p>A lapse is normal; the product never punishes missing data.</p>
+        </article>
+      </div>
+    </header>
+
+    <section class="ds-section" id="contract">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">C-01</span>
+        <h2>Product contract</h2>
+      </div>
+      <p class="ds-lede">
+        These rules resolve design decisions. They describe behavior, not merely
+        appearance, and apply to every current and future tracker.
+      </p>
+
+      <div class="ds-priority">
+        <div>
+          <span>1</span>
+          <strong>Data integrity</strong>
+          <p>Record the intended event and wall time; never fabricate detail.</p>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div>
+          <span>2</span>
+          <strong>User agency</strong>
+          <p>Make capture reversible, editable, and understandable.</p>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div>
+          <span>3</span>
+          <strong>Low effort</strong>
+          <p>Minimize decisions and actions in the frequent path.</p>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div>
+          <span>4</span>
+          <strong>Useful reflection</strong>
+          <p>Turn records into context without claiming causation.</p>
+        </div>
+      </div>
+
+      <div class="ds-cols ds-contractGrid">
+        <article class="ds-contractCard">
+          <span class="ds-contractWord">MUST</span>
+          <p>A release-blocking requirement for correctness, accessibility, or trust.</p>
+        </article>
+        <article class="ds-contractCard">
+          <span class="ds-contractWord is-should">SHOULD</span>
+          <p>The default pattern. Deviations need a written product reason.</p>
+        </article>
+        <article class="ds-contractCard">
+          <span class="ds-contractWord is-may">MAY</span>
+          <p>An optional enhancement that cannot become the only usable path.</p>
+        </article>
+      </div>
+
+      <div class="ds-rules">
+        <article class="ds-rule ds-do">
+          <h4><span class="ds-ruleTag">Do</span> Design the whole record lifecycle</h4>
+          <p>Specify entry, confirmation, sync, correction, review, and deletion together.</p>
+        </article>
+        <article class="ds-rule ds-dont">
+          <h4><span class="ds-ruleTag">Avoid</span> Optimizing only the logging screen</h4>
+          <p>A fast event that cannot be verified or corrected creates invisible data debt.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="ds-section" id="architecture">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">C-02</span>
+        <h2>Design-system architecture</h2>
+      </div>
+      <p class="ds-lede">
+        Each decision belongs to one layer. The manual defines interaction
+        contracts; the catalog demonstrates visuals; production code implements both.
+      </p>
+
+      <div class="ds-layerStack" aria-label="Design system layers">
+        <article>
+          <code>01 · Product behavior</code>
+          <strong>This manual</strong>
+          <p>Journeys, tracker anatomy, states, accessibility, content, and quality gates.</p>
+        </article>
+        <article>
+          <code>02 · Visual language</code>
+          <strong>Component catalog</strong>
+          <p>Tokens, primitives, navigation, fields, lists, charts, and responsive specimens.</p>
+        </article>
+        <article>
+          <code>03 · Implementation</code>
+          <strong><span>app/</span> source</strong>
+          <p>React behavior, CSS Modules, data mapping, validation, cache, and tests.</p>
+        </article>
+      </div>
+
+      <table class="ds-table ds-wideTable">
+        <thead>
+          <tr>
+            <th>Concern</th>
+            <th>Authoritative location</th>
+            <th>Verification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">Tokens</td>
+            <td><code>app/styles/tokens.css</code></td>
+            <td>Automated exact mirror check</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Event and data semantics</td>
+            <td><code>app/lib/types.ts</code>, mapping and validation</td>
+            <td>Unit tests</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Interaction contract</td>
+            <td>This manual</td>
+            <td>RFC and conformance review</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Rendered behavior</td>
+            <td>Production surfaces</td>
+            <td>Keyboard, mobile, desktop, and state testing</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="ds-section" id="lifecycle">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">C-03</span>
+        <h2>Tracking lifecycle</h2>
+      </div>
+      <p class="ds-lede">
+        Tracking is an ongoing loop, not a streak. A feature is incomplete if it
+        supports collection but not interpretation, action, and resumption.
+      </p>
+
+      <ol class="ds-lifecycle" aria-label="Personal tracking lifecycle">
+        <li>
+          <span>Prepare</span>
+          <strong>Choose what matters</strong>
+          <p>Intent, fields, cadence, and privacy are clear before logging.</p>
+        </li>
+        <li>
+          <span>Capture</span>
+          <strong>Record with low effort</strong>
+          <p>Fast defaults, honest detail, immediate confirmation.</p>
+        </li>
+        <li>
+          <span>Integrate</span>
+          <strong>Make records coherent</strong>
+          <p>Normalize time, pair intervals, sync, and expose data quality.</p>
+        </li>
+        <li>
+          <span>Reflect</span>
+          <strong>Answer a question</strong>
+          <p>Use context, comparison, and accessible underlying values.</p>
+        </li>
+        <li>
+          <span>Act</span>
+          <strong>Choose a next step</strong>
+          <p>Offer an optional adjustment, not a moral verdict.</p>
+        </li>
+      </ol>
+
+      <div class="ds-resumeLoop">
+        <span class="ds-statusIcon" aria-hidden="true">↻</span>
+        <div>
+          <strong>Lapse → resume is a first-class path</strong>
+          <p>
+            Missing days MUST NOT trigger shame, forced backfill, broken-state
+            visuals, or permanent loss of progress. Return users see a neutral
+            present-tense action: “Log now.”
+          </p>
+        </div>
+      </div>
+
+      <h3 class="ds-eyebrow">Reminder contract</h3>
+      <div class="ds-decisionGrid">
+        <article>
+          <span>User controlled</span>
+          <strong>Opt in and adjustable</strong>
+          <p>Cadence, quiet hours, snooze, pause, and disable remain easy to change.</p>
+        </article>
+        <article>
+          <span>Contextual</span>
+          <strong>Prompt near the useful moment</strong>
+          <p>A reminder supports capture; it does not punish an unlogged interval.</p>
+        </article>
+        <article>
+          <span>Private</span>
+          <strong>Generic by default</strong>
+          <p>Lock-screen copy hides sensitive tracker names and values unless explicitly enabled.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="ds-section" id="tracker-model">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">C-04</span>
+        <h2>Universal tracker model</h2>
+      </div>
+      <p class="ds-lede">
+        New domains differ in data, but they should be assembled from a small
+        number of tracking shapes and the same lifecycle.
+      </p>
+
+      <div class="ds-purposeStrip" aria-label="Supported tracker purposes">
+        <span><b>Record</b>Remember what happened</span>
+        <span><b>Learn</b>Explore patterns and context</span>
+        <span><b>Change</b>Work toward a chosen adjustment</span>
+        <span><b>Maintain</b>Monitor a stable routine</span>
+      </div>
+
+      <table class="ds-table ds-wideTable">
+        <thead>
+          <tr>
+            <th>Shape</th>
+            <th>Examples</th>
+            <th>Primary path</th>
+            <th>Required correction</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">Instant event</td>
+            <td>Coffee, medication, symptom</td>
+            <td>Log now when defaults are safe</td>
+            <td>Time, subtype, amount</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Scalar check-in</td>
+            <td>Mood, energy, pain</td>
+            <td>Select a labeled value</td>
+            <td>Value, time, optional context</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Start / stop interval</td>
+            <td>Sleep, fasting, focus</td>
+            <td>State-aware start or stop</td>
+            <td>Both boundaries; duplicate-state guard</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Duration session</td>
+            <td>Nap, gym, meditation</td>
+            <td>Start timer or enter completed session</td>
+            <td>Start, duration/end, type</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Composed record</td>
+            <td>Meal, workout, expense</td>
+            <td>Open a short composer</td>
+            <td>Items and meaningful domain fields</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Composed session</td>
+            <td>Snooker training, structured practice</td>
+            <td>Start/resume, capture children, finish review</td>
+            <td>Session boundaries, child order, raw results</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Narrative workflow</td>
+            <td>CBT thought, journal, reflection</td>
+            <td>Saveable multi-step flow</td>
+            <td>Step values and completion state</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="ds-eyebrow">Minimum record contract</h3>
+      <div class="ds-schema" aria-label="Minimum record schema">
+        <code><b>id</b><span>stable identity</span></code>
+        <code><b>type</b><span>semantic event type</span></code>
+        <code><b>temporalShape</b><span>instant / interval / duration / wall date</span></code>
+        <code><b>temporal</b><span>shape-specific fields shown below</span></code>
+        <code><b>wallDate</b><span>display grouping date</span></code>
+        <code><b>timeZone</b><span>IANA zone used to resolve wall time</span></code>
+        <code><b>recordedAt</b><span>capture timestamp</span></code>
+        <code><b>payload</b><span>validated domain fields</span></code>
+        <code><b>source</b><span>manual / imported</span></code>
+        <code><b>quality</b><span>observed / approximate</span></code>
+        <code><b>syncState</b><span>queued / synced / failed</span></code>
+      </div>
+
+      <table class="ds-table">
+        <thead>
+          <tr><th>Temporal shape</th><th>Required temporal fields</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="ds-tdKey">Instant · clock</td><td><code>occurredAt</code> + exact/about <code>precision</code></td></tr>
+          <tr><td class="ds-tdKey">Instant · part of day</td><td><code>occurredPeriod.part</code> + <code>wallDate</code>; no invented <code>occurredAt</code></td></tr>
+          <tr><td class="ds-tdKey">Interval</td><td><code>start.at</code> + <code>start.precision</code> + <code>end.at</code> + <code>end.precision</code></td></tr>
+          <tr><td class="ds-tdKey">Duration</td><td><code>anchorAt</code> + <code>anchor</code> + <code>durationMinutes</code> + exact/about <code>precision</code></td></tr>
+          <tr><td class="ds-tdKey">Wall date</td><td><code>wallDate</code>; no invented clock time</td></tr>
+        </tbody>
+      </table>
+
+      <div class="ds-callout">
+        <strong>Time is domain data.</strong>
+        <p>
+          Every RFC MUST define whether a record is an instant, interval,
+          duration, or wall-date fact; what its timestamp means; how it behaves
+          across midnight; and how an IANA timezone resolves edits. Follow the
+          <a href="DATETIME_INPUTS.md">date and time input contract</a> and use
+          tested domain helpers—never local ad hoc date math.
+        </p>
+      </div>
+      <div class="ds-callout">
+        <strong>Reference tracker: Snooker training.</strong>
+        <p>
+          A practice session composes ordered exercises, scored runs, optional
+          shot results, and derived personal records. It demonstrates how a new
+          domain grows without flattening rich records into unrelated events.
+          Read the <a href="SNOOKER_TRAINING.md">technical tracker contract</a>.
+        </p>
+      </div>
+    </section>
+
+    <section class="ds-section" id="navigation">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">I-01</span>
+        <h2>Navigation and growth</h2>
+      </div>
+      <p class="ds-lede">
+        Navigation represents stable destinations, never logging actions. Labels,
+        order, and meaning stay consistent across mobile and desktop.
+      </p>
+
+      <div class="ds-routeStrip" aria-label="Canonical current navigation order">
+        <span><b>1</b>Today</span>
+        <span><b>2</b>Sleep</span>
+        <span><b>3</b>Nutrition</span>
+        <span><b>4</b>Gym</span>
+        <span><b>5</b>Mind</span>
+      </div>
+      <p class="ds-caption">
+        Canonical current destinations: <strong>Today / Sleep / Nutrition / Gym / Mind</strong>.
+        “Floor” and “Food” are not alternate navigation labels.
+      </p>
+
+      <div class="ds-decisionGrid">
+        <article>
+          <span>1–5 destinations</span>
+          <strong>Expose all five</strong>
+          <p>Keep a stable order on every surface. Current active destination remains visible.</p>
+        </article>
+        <article>
+          <span>6+ destinations</span>
+          <strong>Introduce domains</strong>
+          <p>Group related trackers into a hub or intentional “More” destination; do not keep appending tabs.</p>
+        </article>
+        <article>
+          <span>Frequent capture</span>
+          <strong>Use capture surfaces</strong>
+          <p>Place actions on Today or inside the relevant domain—not in the tab bar.</p>
+        </article>
+      </div>
+
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Rule</th>
+            <th>Contract</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">Names</td>
+            <td>Use one canonical user-facing label across tab bar, rail, page title, and links.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Order</td>
+            <td>Repeated navigation MUST keep the same relative order.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Icons</td>
+            <td>Support recognition; never replace a required text label on mobile.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Deep links</td>
+            <td>Every review or history view has a stable URL and clear way back to its domain.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="ds-section" id="capture">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">I-02</span>
+        <h2>Capture contract</h2>
+      </div>
+      <p class="ds-lede">
+        The fastest path is determined by data certainty. Speed never justifies
+        saving an invented or ambiguous record.
+      </p>
+
+      <div class="ds-flow" aria-label="Capture decision">
+        <article>
+          <span>Can safe defaults produce a truthful record?</span>
+        </article>
+        <i aria-hidden="true">→</i>
+        <article class="is-positive">
+          <span>Yes</span>
+          <strong>Primary activation logs now</strong>
+          <p>Confirm immediately; expose Undo and Edit.</p>
+        </article>
+        <article class="is-neutral">
+          <span>No</span>
+          <strong>Primary activation opens composer</strong>
+          <p>Focus the first meaningful missing field.</p>
+        </article>
+      </div>
+
+      <table class="ds-table ds-wideTable">
+        <thead>
+          <tr>
+            <th>Input</th>
+            <th>Required behavior</th>
+            <th>Never rely on</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">Tap / click</td>
+            <td>Execute the named primary action consistently.</td>
+            <td>Hidden gesture knowledge</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Keyboard</td>
+            <td><kbd>Enter</kbd>/<kbd>Space</kbd> matches primary activation; shortcuts are supplemental.</td>
+            <td>A shortcut as the only path</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Long press</td>
+            <td>MAY accelerate an action only when a visible alternative exists.</td>
+            <td>Long press for essential detail</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Drag</td>
+            <td>Provide buttons, fields, or other single-pointer no-drag alternative.</td>
+            <td>Drag-only time correction</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Voice / assistive tech</td>
+            <td>Accessible name states event and outcome: “Log coffee now”.</td>
+            <td>Icon shape or color alone</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="ds-eyebrow">After capture</h3>
+      <ol class="ds-responseSequence">
+        <li><b>0–150 ms</b><span>Pressed or progress feedback</span></li>
+        <li><b>Immediate</b><span>Optimistic record with visible pending state</span></li>
+        <li><b>Up to 12 s</b><span>Undo remains available without blocking continued use</span></li>
+        <li><b>On sync</b><span>Pending state resolves without moving the record unexpectedly</span></li>
+        <li><b>On failure</b><span>Keep the record, explain status, and offer Retry/Edit</span></li>
+      </ol>
+
+      <div class="ds-debt">
+        <span>Current conformance note</span>
+        <p>
+          Desktop currently uses click to open and hold to log, while mobile
+          presents other behavior. This inversion is legacy debt. Future trackers
+          MUST follow the contract above; do not copy the inversion.
+        </p>
+      </div>
+    </section>
+
+    <section class="ds-section" id="forms">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">I-03</span>
+        <h2>Forms and overlays</h2>
+      </div>
+      <p class="ds-lede">
+        Sheets and dialogs collect only what is needed for a trustworthy record.
+        They behave as one semantic form across breakpoints.
+      </p>
+
+      <div class="ds-anatomy">
+        <div class="ds-anatomyFrame">
+          <span class="ds-anatomyTag is-one">1</span>
+          <header>
+            <strong>Log meal</strong>
+            <button type="button" aria-label="Close example dialog">×</button>
+          </header>
+          <div>
+            <label>Meal type <i>Required</i></label>
+            <span class="ds-fieldExample">Dinner</span>
+            <label>Time <i>Required</i></label>
+            <span class="ds-fieldExample">20:15</span>
+          </div>
+          <footer>
+            <span>Cancel</span>
+            <b>Save meal</b>
+          </footer>
+          <span class="ds-anatomyTag is-two">2</span>
+          <span class="ds-anatomyTag is-three">3</span>
+        </div>
+        <ol>
+          <li><b>1 · Identity</b> Action-specific title and visible close button.</li>
+          <li><b>2 · Minimum fields</b> Required before optional; labels remain visible.</li>
+          <li><b>3 · Commit</b> Explicit outcome label; never generic “OK”.</li>
+        </ol>
+      </div>
+
+      <div class="ds-cols">
+        <article class="ds-checklist">
+          <h3>Dialog keyboard contract</h3>
+          <ul>
+            <li>Focus moves inside when opened.</li>
+            <li><kbd>Tab</kbd> and <kbd>Shift</kbd>+<kbd>Tab</kbd> stay inside.</li>
+            <li><kbd>Escape</kbd> closes when doing so is safe.</li>
+            <li>Focus returns to the control that opened it.</li>
+            <li>Role, title, and description are programmatically associated.</li>
+          </ul>
+        </article>
+        <article class="ds-checklist">
+          <h3>Validation contract</h3>
+          <ul>
+            <li>Validate on submit; use earlier validation only when it helps.</li>
+            <li>Preserve every value after an error.</li>
+            <li>Say what happened and how to fix it.</li>
+            <li>Put the message next to the field and summarize when multiple fail.</li>
+            <li>Move focus to the error summary when one is present.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="ds-section" id="datetime">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">I-04</span>
+        <h2>Date and time inputs</h2>
+      </div>
+      <p class="ds-lede">
+        Date and time are part of the record’s meaning. The shared input must be
+        typable, backdateable within policy, timezone-safe, and stable inside a
+        mobile sheet before it is visually distinctive.
+      </p>
+
+      <div class="ds-dtDecision">
+        <span>DT</span>
+        <div>
+          <strong>One temporal field family replaces per-tracker picker rules</strong>
+          <small>React Aria is the reference architecture; native controls are the zero-dependency baseline and mobile fallback.</small>
+        </div>
+        <a href="DATETIME_INPUTS.md">Open the complete contract →</a>
+      </div>
+
+      <div class="ds-priority">
+        <div>
+          <span>1</span>
+          <strong>Name the meaning</strong>
+          <p>Occurred, started, ended, or observed. “Time” alone is not a specification.</p>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div>
+          <span>2</span>
+          <strong>Choose the shape</strong>
+          <p>Instant, interval, duration with an anchor, or a clockless wall date.</p>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div>
+          <span>3</span>
+          <strong>Capture truthfully</strong>
+          <p>Now, direct date/time entry, calendar choice, or explicit approximation.</p>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div>
+          <span>4</span>
+          <strong>Resolve and display</strong>
+          <p>IANA zone, shared bounds, full date context, precision, and correction state.</p>
+        </div>
+      </div>
+
+      <table class="ds-table">
+        <thead>
+          <tr><th>Contract</th><th>Required behavior</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">Direct entry</td>
+            <td>Date and time are visible editable fields on desktop. The React Aria target enforces 24-hour segments; native fallback values serialize as HH:mm but may display in the device locale. A calendar is an additional path, never the only path.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Date choice</td>
+            <td>Now, Today, and Yesterday are shortcuts. “Choose date” exposes every date permitted by the tracker’s range.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Mobile overlay</td>
+            <td>The form body owns vertical scrolling. Swipe-to-dismiss can begin only on the handle or header, never on a field or calendar.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Now</td>
+            <td>Store a live-now intent and resolve it when Save is pressed; do not freeze the time when the sheet opens.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Bounds</td>
+            <td>Past-only by default. UI and API share min/max rules; future values require an explicit planned-event product state.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Precision</td>
+            <td>Exact, About, and Part of day are different domain values. Approximate entries never become invented exact minutes.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Timezone</td>
+            <td>Resolve wall time in an explicit IANA zone and show the zone in the editor. Never preserve a stale offset across an edit.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Validation</td>
+            <td>Never silently clamp invalid input. Preserve it, explain the correction, associate the error, and focus the invalid field.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="ds-eyebrow">Responsive contract</h3>
+      <div class="ds-cols">
+        <article class="ds-checklist">
+          <h3>Mobile sheet</h3>
+          <ul>
+            <li>Use the platform picker or an equally tested touch control.</li>
+            <li>Keep Close/Cancel and the outcome action visible.</li>
+            <li>Contain body overscroll and respect keyboard/safe-area insets.</li>
+            <li>Do not put a vertically scrolling wheel inside a draggable sheet.</li>
+            <li>Protect a changed draft from accidental dismissal.</li>
+          </ul>
+        </article>
+        <article class="ds-checklist">
+          <h3>Desktop popover</h3>
+          <ul>
+            <li>Typing works immediately; the picker button is supplemental.</li>
+            <li>Enter applies only a complete valid value.</li>
+            <li>Escape cancels and returns focus to the invoker.</li>
+            <li>The closed field summarizes date, time, zone, and approximation.</li>
+            <li>Intervals use a dialog when a small popover cannot remain clear.</li>
+          </ul>
+        </article>
+      </div>
+
+      <h3 class="ds-eyebrow">Shape selection</h3>
+      <table class="ds-table">
+        <thead>
+          <tr><th>Shape</th><th>Example</th><th>Required preview</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="ds-tdKey">Instant</td><td>Caffeine, meal, mood, CBT trigger</td><td><code>Yesterday · about 15:30</code></td></tr>
+          <tr><td class="ds-tdKey">Interval</td><td>Sleep, explicit nap</td><td><code>Tue 23:40 → Wed 07:18 · 7 h 38 min</code></td></tr>
+          <tr><td class="ds-tdKey">Duration</td><td>Gym start + duration, nap end − duration</td><td>Both derived boundaries plus the declared anchor</td></tr>
+          <tr><td class="ds-tdKey">Wall date</td><td>History filter, calendar fact</td><td>Date or inclusive date range; no artificial clock</td></tr>
+        </tbody>
+      </table>
+
+      <div class="ds-linkPanel">
+        <a href="components.html#inputs"><span>Live specimens</span><strong>Open mobile and desktop examples →</strong></a>
+        <a href="DATETIME_INPUTS.md"><span>Engineering contract</span><strong>Open API, states, and tests →</strong></a>
+      </div>
+    </section>
+
+    <section class="ds-section" id="records">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">I-05</span>
+        <h2>Records, history, and correction</h2>
+      </div>
+      <p class="ds-lede">
+        Every saved item remains inspectable and correctable. The timeline is an
+        audit surface, not decoration.
+      </p>
+
+      <div class="ds-recordAnatomy">
+        <span class="ds-recordIcon" aria-hidden="true">☾</span>
+        <div>
+          <strong aria-describedby="record-identity-label">Sleep</strong>
+          <span aria-describedby="record-summary-label">23:41 → 07:18 · 7 h 37 min</span>
+        </div>
+        <span class="ds-sync is-synced" aria-describedby="record-state-label">Synced</span>
+        <button type="button" aria-describedby="record-correction-label">Edit</button>
+      </div>
+      <div class="ds-recordLabels">
+        <span id="record-identity-label">record identity</span>
+        <span id="record-summary-label">human summary</span>
+        <span id="record-state-label">data state</span>
+        <span id="record-correction-label">correction action</span>
+      </div>
+
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Operation</th>
+            <th>UX requirement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">Edit</td>
+            <td>Reuse the event’s composer with current values; show changed summary in place.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Delete</td>
+            <td>Use a five-second pending state with Undo, then soft-archive. A committed archive MUST remain user-restorable from an archived-records surface; operator/database recovery alone is insufficient.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Duplicate state</td>
+            <td>Explain the conflict and offer correction; never silently double-log.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Ghost record</td>
+            <td>Visually identify pending sync; disable edit/delete until identity is stable.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Grouping</td>
+            <td>Use wall dates and explicit night-boundary rules, not raw UTC dates.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="ds-section" id="states">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">I-06</span>
+        <h2>System states</h2>
+      </div>
+      <p class="ds-lede">
+        A tracker must specify state behavior before implementation. Silence is
+        not an acceptable loading, offline, or failure state.
+      </p>
+
+      <div class="ds-stateRail" aria-label="Record synchronization states">
+        <span><b>Local</b><i>created</i></span>
+        <span><b>Queued</b><i>offline</i></span>
+        <span><b>Syncing</b><i>in flight</i></span>
+        <span><b>Synced</b><i>confirmed</i></span>
+        <span class="is-error"><b>Failed</b><i>retryable</i></span>
+      </div>
+
+      <table class="ds-table ds-wideTable">
+        <thead>
+          <tr>
+            <th>View state</th>
+            <th>What is shown</th>
+            <th>Available action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">First load</td>
+            <td>Structure-matched skeleton or compact progress status.</td>
+            <td>None unless load becomes slow.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Empty</td>
+            <td>Plain reason plus what will appear here.</td>
+            <td>One relevant capture action.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Offline</td>
+            <td>Existing data stays usable; queued records are labeled.</td>
+            <td>Continue logging; optional Retry.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Partial data</td>
+            <td>Known values plus precise missing-data note.</td>
+            <td>Add or edit missing detail.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Error</td>
+            <td>Specific message that does not erase existing content.</td>
+            <td>Retry, Edit, or return safely.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Unauthorized</td>
+            <td>Session-expired explanation before redirect where possible.</td>
+            <td>Unlock again.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="ds-callout">
+        <strong>Status is semantic.</strong>
+        <p>
+          Async confirmations and failures MUST be announced through an
+          appropriate live status region without unexpectedly moving focus.
+          Color and animation may reinforce the message, never carry it alone.
+        </p>
+      </div>
+    </section>
+
+    <section class="ds-section" id="reflection">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">U-01</span>
+        <h2>Reflection and charts</h2>
+      </div>
+      <p class="ds-lede">
+        Start with the user’s question, then choose the smallest representation
+        that answers it. A chart without a decision or reflection task is noise.
+      </p>
+
+      <div class="ds-modePair">
+        <article>
+          <span>Status mode</span>
+          <strong>Glance, orient, continue</strong>
+          <p>Current value, data coverage, chosen-range comparison, and at most one relevant action.</p>
+        </article>
+        <article>
+          <span>Explore mode</span>
+          <strong>Investigate, compare, annotate</strong>
+          <p>History, filters, source records, goals, context, anomalies, and cross-domain overlays.</p>
+        </article>
+      </div>
+
+      <div class="ds-questionMap">
+        <article><span>When?</span><strong>Timeline</strong><p>Sequence, gaps, and daily rhythm.</p></article>
+        <article><span>How much?</span><strong>Value + trend</strong><p>Magnitude with recent context.</p></article>
+        <article><span>How often?</span><strong>Calendar or bars</strong><p>Frequency by day or week.</p></article>
+        <article><span>What changed?</span><strong>Before / after</strong><p>Comparable periods and explicit baseline.</p></article>
+        <article><span>What relates?</span><strong>Paired context</strong><p>Aligned observations with no causal claim.</p></article>
+      </div>
+
+      <h3 class="ds-eyebrow">Chart release contract</h3>
+      <div class="ds-checkGrid">
+        <label><input type="checkbox" checked disabled> Title states the question or measure</label>
+        <label><input type="checkbox" checked disabled> Time range and timezone are explicit</label>
+        <label><input type="checkbox" checked disabled> Units and baseline are visible</label>
+        <label><input type="checkbox" checked disabled> Critical values need no hover</label>
+        <label><input type="checkbox" checked disabled> Pattern is not encoded by color alone</label>
+        <label><input type="checkbox" checked disabled> Keyboard-accessible data view exists</label>
+        <label><input type="checkbox" checked disabled> Missing data differs from zero</label>
+        <label><input type="checkbox" checked disabled> Summary is factual, not causal</label>
+      </div>
+
+      <div class="ds-rules">
+        <article class="ds-rule ds-do">
+          <h4><span class="ds-ruleTag">Say</span> “Energy was higher on 4 of 5 logged gym days.”</h4>
+          <p>Names the data, denominator, and scope.</p>
+        </article>
+        <article class="ds-rule ds-dont">
+          <h4><span class="ds-ruleTag">Avoid</span> “Gym improves your energy.”</h4>
+          <p>Implies causation and hides missing or confounding context.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="ds-section" id="goals">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">U-02</span>
+        <h2>Goals, tone, and nonjudgment</h2>
+      </div>
+      <p class="ds-lede">
+        Personal data can inform without grading the person. Goals are optional,
+        user-selected, revisable, and separate from the factual record.
+      </p>
+
+      <div class="ds-goalLayers">
+        <article>
+          <span>Observation</span>
+          <strong>“6 h 42 min sleep”</strong>
+          <p>Always available. Neutral and factual.</p>
+        </article>
+        <article>
+          <span>User goal</span>
+          <strong>“Target: 7–8 hours”</strong>
+          <p>Shown only when the user set or accepted it.</p>
+        </article>
+        <article>
+          <span>Reflection</span>
+          <strong>“45 min below your range”</strong>
+          <p>Context, not success/failure identity.</p>
+        </article>
+        <article>
+          <span>Next action</span>
+          <strong>“Adjust tonight’s reminder”</strong>
+          <p>Optional and directly controllable.</p>
+        </article>
+      </div>
+
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Prefer</th>
+            <th>Avoid</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">No data logged</td>
+            <td>Failed day</td>
+            <td>Absence is not a moral outcome.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Outside your range</td>
+            <td>Bad / unhealthy</td>
+            <td>Names user context without diagnosing.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Resume logging</td>
+            <td>Restore your streak</td>
+            <td>Supports return without loss framing.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Pattern to explore</td>
+            <td>We found the cause</td>
+            <td>Observational data rarely establishes causality.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="ds-section" id="relationships">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">U-03</span>
+        <h2>Cross-tracker relationships</h2>
+      </div>
+      <p class="ds-lede">
+        A larger Tracker becomes valuable when domains can be viewed together,
+        but combination must preserve provenance, uncertainty, and user control.
+      </p>
+
+      <div class="ds-relationship">
+        <div>
+          <span class="is-sleep">Sleep</span>
+          <span class="is-intake">Caffeine</span>
+          <span class="is-state">Energy</span>
+        </div>
+        <i aria-hidden="true">→</i>
+        <article>
+          <small>Question</small>
+          <strong>“How did next-morning energy vary with bedtime and late caffeine?”</strong>
+          <p>Align by explicit windows; show the individual records behind the summary.</p>
+        </article>
+      </div>
+
+      <div class="ds-cols">
+        <article class="ds-checklist">
+          <h3>Combination requirements</h3>
+          <ul>
+            <li>Define join key and time window.</li>
+            <li>Show sample size and missing records.</li>
+            <li>Let users inspect contributing events.</li>
+            <li>Use “associated with” or factual comparison language.</li>
+            <li>Allow tracker inclusion to be changed.</li>
+          </ul>
+        </article>
+        <article class="ds-checklist">
+          <h3>Do not combine when</h3>
+          <ul>
+            <li>Timestamps have incompatible meanings.</li>
+            <li>Sample size cannot support the proposed summary.</li>
+            <li>Missingness is likely to distort the view.</li>
+            <li>The result would reveal sensitive data out of context.</li>
+            <li>The product cannot explain the calculation.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="ds-section" id="responsive">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">Q-01</span>
+        <h2>Responsive behavior</h2>
+      </div>
+      <p class="ds-lede">
+        Mobile and desktop may compose information differently, but the same
+        action keeps the same meaning and the same data outcome.
+      </p>
+
+      <table class="ds-table ds-wideTable">
+        <thead>
+          <tr>
+            <th>Concern</th>
+            <th>Mobile &lt;1024 px</th>
+            <th>Desktop ≥1024 px</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">Primary posture</td>
+            <td>One-thumb, short sessions, vertical priority.</td>
+            <td>Scan, compare, keyboard, denser context.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Navigation</td>
+            <td>Five-destination tab bar.</td>
+            <td>Rail with same labels, order, and destinations.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Composer</td>
+            <td>Bottom sheet, safe-area aware.</td>
+            <td>Centered dialog, maximum 540 px.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Capture</td>
+            <td>Large explicit targets and visible alternate action.</td>
+            <td>Same primary meaning; optional shortcuts are displayed.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Data views</td>
+            <td>Progressive disclosure and horizontal-safe tables.</td>
+            <td>Multiple coordinated panels where useful.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="ds-callout">
+        <strong>Responsive does not mean two products.</strong>
+        <p>
+          The event name, primary activation, form fields, validation, undo
+          behavior, record summary, and accessible name MUST remain semantically equivalent.
+        </p>
+      </div>
+    </section>
+
+    <section class="ds-section" id="accessibility">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">Q-02</span>
+        <h2>Accessibility contract</h2>
+      </div>
+      <p class="ds-lede">
+        WCAG 2.2 AA is the release target. Touch, mouse, keyboard, screen reader,
+        zoom, and reduced-motion paths are part of the component—not later QA.
+      </p>
+
+      <div class="ds-a11yGrid">
+        <article><span>4.5:1</span><strong>Normal text</strong><p>3:1 only for large text.</p></article>
+        <article><span>3:1</span><strong>UI and focus</strong><p>Against adjacent colors.</p></article>
+        <article><span>48×48</span><strong>Product touch target</strong><p>WCAG AA floor remains 24×24 CSS px.</p></article>
+        <article><span>200%</span><strong>Text zoom</strong><p>No lost content or operation.</p></article>
+      </div>
+
+      <table class="ds-table ds-wideTable">
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Required test</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">Keyboard</td>
+            <td>Logical order, visible focus, no trap except a correctly managed modal.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Names and roles</td>
+            <td>Every control announces identity, role, state, and value when needed.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Color</td>
+            <td>Event category, status, and chart series also use text, icon, shape, or pattern.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Motion</td>
+            <td>Reduced motion removes nonessential transforms; no timed gesture is required.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Drag</td>
+            <td>Every drag operation has a no-drag pointer and keyboard alternative.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Charts</td>
+            <td>Summary, axes/units, and an accessible value representation are available.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Status</td>
+            <td>Save, queue, retry, undo, and errors are programmatically announced.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="ds-debt">
+        <span>Known blockers</span>
+        <p>
+          Current low-emphasis text tokens, modal focus behavior, drag-only sleep
+          editing, nested ledger controls, and chart alternatives require
+          conformance work. See <a href="CONFORMANCE.md">CONFORMANCE.md</a>.
+        </p>
+      </div>
+    </section>
+
+    <section class="ds-section" id="privacy">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">Q-03</span>
+        <h2>Privacy and trust</h2>
+      </div>
+      <p class="ds-lede">
+        Life-tracking data is sensitive even when a field looks ordinary.
+        Collection, display, and sharing use the minimum necessary information.
+      </p>
+
+      <div class="ds-privacyFlow">
+        <article><span>Collect</span><p>Only fields needed for the stated tracker purpose.</p></article>
+        <article><span>Explain</span><p>Plain-language reason at the point of request.</p></article>
+        <article><span>Control</span><p>Edit, archive, restore, export, and inclusion choices.</p></article>
+        <article><span>Protect</span><p>Lock sensitive surfaces and avoid accidental exposure.</p></article>
+      </div>
+
+      <div class="ds-rules">
+        <article class="ds-rule ds-do">
+          <h4><span class="ds-ruleTag">Do</span> Ask in context</h4>
+          <p>Explain why a sensitive field or permission is useful immediately before it is needed.</p>
+        </article>
+        <article class="ds-rule ds-dont">
+          <h4><span class="ds-ruleTag">Avoid</span> Future-proof collection</h4>
+          <p>Do not collect extra life data only because a future feature might use it.</p>
+        </article>
+      </div>
+
+      <h3 class="ds-eyebrow">PIN and accessible authentication</h3>
+      <div class="ds-cols">
+        <article class="ds-checklist">
+          <h3>Input contract</h3>
+          <ul>
+            <li>Use one semantic PIN input even if it looks segmented.</li>
+            <li>Allow paste, autofill, and password-manager assistance.</li>
+            <li>Provide a visible label, numeric keyboard hint, and Show/Hide control.</li>
+            <li>Preserve the value after failure, announce the error, and focus the field.</li>
+          </ul>
+        </article>
+        <article class="ds-checklist">
+          <h3>Alternative contract</h3>
+          <ul>
+            <li>Keep a non-memory option such as passkey visible when feasible.</li>
+            <li>Do not make manual transcription or a cognitive puzzle the only path.</li>
+            <li>Rate-limit abuse without introducing inaccessible CAPTCHA.</li>
+            <li>Explain session expiry before requiring unlock again where possible.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="ds-section" id="content">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">Q-04</span>
+        <h2>Content system</h2>
+      </div>
+      <p class="ds-lede">
+        Copy describes an observable state and the next available action. It is
+        compact, human, specific, and stable across surfaces.
+      </p>
+
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th>Pattern</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ds-tdKey">Capture action</td>
+            <td>Verb + object + time when relevant</td>
+            <td>Log coffee now</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Dialog title</td>
+            <td>Verb + record</td>
+            <td>Edit sleep</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Confirmation</td>
+            <td>Past-tense outcome + key detail</td>
+            <td>Coffee logged at 14:20</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Error</td>
+            <td>Problem + retained state + recovery</td>
+            <td>Couldn’t sync this meal. It is saved on this device. Retry.</td>
+          </tr>
+          <tr>
+            <td class="ds-tdKey">Empty state</td>
+            <td>What is absent + how it appears</td>
+            <td>No gym sessions this week. Log one when you finish.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="ds-cols">
+        <article class="ds-checklist">
+          <h3>Vocabulary rules</h3>
+          <ul>
+            <li><strong>Today</strong> is the cross-domain activity view.</li>
+            <li><strong>Nutrition</strong> is the canonical food domain label.</li>
+            <li><strong>Record</strong> is a saved item; <strong>event</strong> is the technical model.</li>
+            <li><strong>Log</strong> creates; <strong>Edit</strong> corrects; <strong>Undo</strong> reverses a recent action.</li>
+          </ul>
+        </article>
+        <article class="ds-checklist">
+          <h3>Error language rules</h3>
+          <ul>
+            <li>No “Oops”, blame, or vague “Something went wrong”.</li>
+            <li>Do not expose Notion or transport implementation terms.</li>
+            <li>Say whether the record is safe, queued, or needs attention.</li>
+            <li>Use the same event name as the originating surface.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="ds-section" id="delivery">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">Q-05</span>
+        <h2>New tracker delivery</h2>
+      </div>
+      <p class="ds-lede">
+        Every new life area starts with the same technical product specification.
+        Copy <a href="NEW_TRACKER_SPEC.md">NEW_TRACKER_SPEC.md</a> into the feature work.
+      </p>
+
+      <ol class="ds-delivery">
+        <li><span>01</span><div><strong>Intent</strong><p>State the question this tracker helps answer and what it will not infer.</p></div></li>
+        <li><span>02</span><div><strong>Record</strong><p>Select a tracker shape; define time, fields, defaults, validation, and privacy.</p></div></li>
+        <li><span>03</span><div><strong>Capture</strong><p>Specify primary activation, alternate-time path, confirmation, undo, and offline behavior.</p></div></li>
+        <li><span>04</span><div><strong>Review</strong><p>Define summary, history grouping, edit, delete, and empty/error states.</p></div></li>
+        <li><span>05</span><div><strong>Reflection</strong><p>Name the user question, calculation, missing-data behavior, and accessible view.</p></div></li>
+        <li><span>06</span><div><strong>Quality</strong><p>Pass the contract, accessibility, responsive, data, test, and documentation gates.</p></div></li>
+      </ol>
+
+      <h3 class="ds-eyebrow">Definition of done</h3>
+      <div class="ds-checkGrid">
+        <label><input type="checkbox" disabled> RFC approved with tracker shape and time semantics</label>
+        <label><input type="checkbox" disabled> Mobile and desktop behavior are semantically equivalent</label>
+        <label><input type="checkbox" disabled> Loading, empty, offline, success, and error states exist</label>
+        <label><input type="checkbox" disabled> Edit, archive, immediate Undo, later Restore, and duplicate protection are defined</label>
+        <label><input type="checkbox" disabled> Keyboard, focus, contrast, target, and screen-reader checks pass</label>
+        <label><input type="checkbox" disabled> Mapping and validation unit tests pass</label>
+        <label><input type="checkbox" disabled> Component catalog and event presentation are updated</label>
+        <label><input type="checkbox" disabled> Design-system conformance check passes</label>
+      </div>
+    </section>
+
+    <section class="ds-section" id="governance">
+      <div class="ds-sectionHead">
+        <span class="ds-sectionNum">Q-06</span>
+        <h2>Governance and conformance</h2>
+      </div>
+      <p class="ds-lede">
+        The design system stays useful only when decisions, code, and examples
+        evolve together. Known divergence is recorded, prioritized, and never copied forward.
+      </p>
+
+      <div class="ds-governanceGrid">
+        <article>
+          <span>Change behavior</span>
+          <strong>Update contract → code → specimen</strong>
+          <p>Include the reason and migration impact in the feature review.</p>
+        </article>
+        <article>
+          <span>Change tokens</span>
+          <strong>Update app → mirror → check</strong>
+          <p>The app token file is authoritative; the checker prevents drift.</p>
+        </article>
+        <article>
+          <span>Find divergence</span>
+          <strong>Record debt → set target</strong>
+          <p>Document current behavior and the intended contract separately.</p>
+        </article>
+      </div>
+
+      <div class="ds-linkPanel">
+        <a href="components.html"><span>Visual reference</span><strong>Open component catalog →</strong></a>
+        <a href="NEW_TRACKER_SPEC.md"><span>Implementation template</span><strong>Open new tracker spec →</strong></a>
+        <a href="CONFORMANCE.md"><span>Current gaps</span><strong>Open conformance register →</strong></a>
+        <a href="RESEARCH.md"><span>Evidence</span><strong>Open research basis →</strong></a>
+      </div>
+
+      <h3 class="ds-eyebrow">Research foundation</h3>
+      <p class="ds-researchNote">
+        The lifecycle, lapse/resumption, accessible interaction, chart, privacy,
+        validation, and nonjudgment rules are grounded in primary research and
+        official platform/accessibility guidance. Source links and the exact
+        design implications are maintained in <a href="RESEARCH.md">RESEARCH.md</a>.
+      </p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

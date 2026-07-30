@@ -1,0 +1,881 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Charts lab — PROPOSED primitives only.
+   Prefix `x-` marks a proposal: not yet transcribed from the app, and not
+   yet implemented in it. `t-` = transcribed production, `ds-` = doc chrome.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* Visible to assistive tech only. */
+.ds-srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── shared chart frame ── */
+
+.x-chart {
+  position: relative;
+}
+
+.x-plot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 64px; /* was 46px — a plot that carries a baseline needs the room */
+}
+
+.x-plot > i {
+  position: relative;
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  background: var(--a800);
+}
+
+/* ── state fills ──
+   Selectors stay at `.x-plot > i.x-*` so a state always outranks the base
+   fill. The production sheet solves the same collision with `!important`;
+   this is the same fix without the escape hatch. */
+
+.x-plot > i.x-hit {
+  background: var(--a500);
+}
+
+/* Soft breach: outside the goal, not yet a problem. Hue + hatch. */
+.x-plot > i.x-warn {
+  background: var(--warn);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.34) 0 2px,
+    transparent 2px 5px
+  );
+}
+
+/* Hard breach: the thing the goal exists to prevent. Denser hatch. */
+.x-plot > i.x-bad {
+  background: var(--bad);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.4) 0 2px,
+    transparent 2px 4px
+  );
+}
+
+/* ── today marker — BELOW the baseline, so it never competes with state ── */
+
+.x-today::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -5px 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+/* ── missing data — absent, not short ── */
+
+.x-plot > i.x-miss {
+  align-self: stretch;
+  background: none;
+}
+
+.x-miss::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 100%;
+  border-left: 1px dotted var(--t5);
+  border-right: 1px dotted var(--t5);
+  opacity: 0.55;
+}
+
+.x-miss::after {
+  content: '';
+  position: absolute;
+  inset: auto 50% 0 50%;
+  width: 7px;
+  height: 7px;
+  margin: 0 0 0 -3.5px;
+  border: 1px solid var(--t5);
+  border-radius: 50%;
+}
+
+/* ── overshoot — never clip silently ── */
+
+.x-plot > i.x-over {
+  border-radius: 0;
+  box-shadow: inset 0 3px 0 var(--a200);
+}
+
+.x-overTag {
+  position: absolute;
+  inset: -14px 0 auto 0;
+  text-align: center;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--a300);
+}
+
+/* ── reference line (goal) ── */
+
+.x-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--t4);
+  pointer-events: none;
+}
+
+.x-ruleK {
+  position: absolute;
+  right: 0;
+  top: -13px;
+  padding: 0 3px;
+  background: var(--surface-raised);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--t2);
+}
+
+.x-ruleK.is-left {
+  right: auto;
+  left: 0;
+}
+
+/* ── target band (range goals) ── */
+
+.x-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: color-mix(in srgb, var(--ok) 20%, transparent);
+  border-top: 1px dashed color-mix(in srgb, var(--ok) 70%, transparent);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ok) 70%, transparent);
+  pointer-events: none;
+}
+
+/* Label rides the band's top edge on a chip, at the right, so it never
+   lands on a bar — same placement rule as .x-ruleK. */
+.x-bandK {
+  position: absolute;
+  right: 0;
+  top: -6px;
+  padding: 0 3px;
+  background: var(--surface-raised);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--ok) 75%, var(--t1));
+}
+
+/* ── axis ── */
+
+.x-ax {
+  display: flex;
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.x-ax span {
+  flex: 1;
+  text-align: center;
+  font-size: 9.5px;
+  color: var(--t3);
+}
+
+.x-axToday {
+  color: var(--accent);
+}
+
+.x-axMiss {
+  color: var(--t5);
+}
+
+.x-axFlag {
+  color: var(--warn);
+}
+
+/* ── chart footer: summary + coverage ── */
+
+.x-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 11px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+  font-size: 10.5px;
+  color: var(--t2);
+}
+
+.x-foot b {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--t1);
+}
+
+.x-cov {
+  flex: none;
+  padding: 2px 6px;
+  border: 1px solid var(--edge);
+  border-radius: 20px;
+  font-size: 9.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--t2);
+}
+
+.x-cov.is-thin {
+  border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+  color: var(--warn);
+}
+
+/* ── goal card bar with pace marker ── */
+
+.x-bar {
+  position: relative;
+  height: 4px;
+  margin-top: 12px;
+  border-radius: 2px;
+  background: var(--rail);
+}
+
+.x-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--a600);
+}
+
+.x-bar > i.is-ahead {
+  background: var(--a500);
+}
+
+.x-bar > i.is-behind {
+  background: var(--warn);
+}
+
+.x-pace {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 1px;
+  background: var(--t2);
+}
+
+.x-pace::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -2px;
+  border-left: 2.5px solid transparent;
+  border-right: 2.5px solid transparent;
+  border-top: 4px solid var(--t2);
+}
+
+.x-paceK {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 7px;
+  font-size: 10px;
+  color: var(--t2);
+}
+
+.x-paceK b {
+  font-weight: 400;
+  color: var(--t1);
+}
+
+/* ── cutoff track: lateness encoded by POSITION, not hue ── */
+
+.x-ct {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+}
+
+.x-ct:last-of-type {
+  border-bottom: none;
+}
+
+.x-ctD {
+  width: 26px;
+  color: var(--t2);
+}
+
+.x-ctTrack {
+  position: relative;
+  flex: 1;
+  height: 16px;
+}
+
+.x-ctTrack::before {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 1px;
+  background: var(--rail);
+}
+
+.x-ctCut {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--warn);
+}
+
+/* Everything after the cutoff sits in a tinted zone — visible before any dot. */
+.x-ctAfter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background: color-mix(in srgb, var(--warn) 8%, transparent);
+}
+
+.x-ctDot {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--t3);
+}
+
+.x-ctDot.is-late {
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  background: var(--warn);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--warn) 30%, transparent);
+}
+
+.x-ctLast {
+  width: 40px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--t2);
+}
+
+.x-ctLast.is-late {
+  color: var(--warn);
+}
+
+.x-ctAx {
+  position: relative;
+  height: 12px;
+  margin: 4px 0 0 35px;
+}
+
+.x-ctAx span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: var(--t3);
+}
+
+.x-ctAx span.is-cut {
+  color: var(--warn);
+  transform: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   Segmented hour bar — magnitude you can COUNT.
+   Same argument as the existing mood grid: discrete blocks keep units
+   countable in a way a continuous bar height never is.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.x-hours {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 124px;
+}
+
+.x-hourCol {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  gap: 2px;
+  height: 100%;
+}
+
+/* One block = one hour. Empty blocks keep the scale visible but must stay
+   quiet enough that the filled run is what you count. */
+.x-hourCol > i {
+  flex: 1;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--rail) 42%, transparent);
+}
+
+/* Hours up to the goal. */
+.x-hourCol > i.is-base {
+  background: var(--a800);
+}
+
+/* Hours at or past the goal — the reward band. */
+.x-hourCol > i.is-goal {
+  background: var(--a500);
+}
+
+/* Hours beyond the upper bound of a band goal. */
+.x-hourCol > i.is-over {
+  background: var(--warn);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.34) 0 2px,
+    transparent 2px 5px
+  );
+}
+
+/* A column that fell short: its filled hours take the breach tone. */
+.x-hourCol.is-short > i.is-base {
+  background: var(--warn);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.34) 0 2px,
+    transparent 2px 5px
+  );
+}
+
+.x-hourCol.is-bad > i.is-base {
+  background: var(--bad);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.4) 0 2px,
+    transparent 2px 4px
+  );
+}
+
+/* The remainder block — a part-hour, drawn at partial opacity. */
+.x-hourCol > i.is-part {
+  opacity: 0.45;
+}
+
+.x-hourCol.is-miss > i {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--t5);
+  opacity: 0.4;
+}
+
+/* Today: same underline rule as the bar charts — below the baseline. */
+.x-hourCol.is-today::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -6px 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+/* Hour ruler down the left edge. */
+.x-hourScale {
+  position: absolute;
+  inset: 0 auto 0 -20px;
+  width: 18px;
+}
+
+.x-hourScale span {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--t3);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   Tooltip — hover, focus AND tap. Critical values never require a hover.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.x-hit-area {
+  position: absolute;
+  inset: -6px -2px -18px -2px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.x-hit-area:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-radius: 3px;
+}
+
+.x-tip {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  z-index: 5;
+  min-width: 132px;
+  padding: 8px 10px;
+  transform: translateX(-50%) translateY(3px);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: var(--sheet);
+  box-shadow: var(--sh-md);
+  text-align: left;
+  /* The bar it hangs off is an <i>, so the italic must be cancelled. */
+  font-style: normal;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--duration-fast) var(--ease-out-expo),
+    transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.x-tipCol:hover .x-tip,
+.x-hit-area:focus-visible .x-tip,
+.x-tipCol.is-open .x-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.x-tipD {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+.x-tipV {
+  display: block;
+  font-size: 15px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  color: var(--t1);
+}
+
+.x-tipS {
+  display: block;
+  margin-top: 3px;
+  font-size: 10.5px;
+  color: var(--t2);
+}
+
+.x-tipS.is-warn {
+  color: var(--warn);
+}
+
+.x-tipS.is-bad {
+  color: var(--bad);
+}
+
+.x-tipS.is-ok {
+  color: var(--ok);
+}
+
+/* Composition rows — what made the number up, so no other log is needed. */
+.x-tipRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid var(--line);
+  font-size: 10.5px;
+  color: var(--t2);
+}
+
+.x-tipRow b {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--t1);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   Week matrix — every tracker, every day, one glance.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.x-matrix {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.x-matrix th,
+.x-matrix td {
+  padding: 0;
+  text-align: center;
+}
+
+.x-matrix thead th {
+  padding-bottom: 9px;
+  font-size: 9.5px;
+  font-weight: 400;
+  color: var(--t3);
+}
+
+.x-matrix thead th.is-today {
+  color: var(--accent);
+}
+
+.x-matrix tbody th {
+  width: 78px;
+  padding-right: 10px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--t2);
+}
+
+.x-matrix tbody tr + tr td,
+.x-matrix tbody tr + tr th {
+  padding-top: 6px;
+}
+
+.x-cell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--a900);
+  color: var(--a200);
+}
+
+.x-cell svg {
+  width: 13px;
+  height: 13px;
+}
+
+.x-cell.is-goal {
+  background: var(--a600);
+  color: var(--a200);
+}
+
+.x-cell.is-over,
+.x-cell.is-under {
+  background: color-mix(in srgb, var(--warn) 26%, var(--app));
+  color: var(--warn);
+}
+
+.x-cell.is-bad {
+  background: color-mix(in srgb, var(--bad) 26%, var(--app));
+  color: var(--bad);
+}
+
+.x-cell.is-none {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--edge);
+  color: var(--t4);
+}
+
+/* In progress: today's accumulating goal, not yet resolved either way. */
+.x-cell.is-partial {
+  background: var(--a800);
+  color: var(--a300);
+}
+
+/* Today gets a rail behind its whole column, never a different chip color —
+   so "which day is now" and "how did that day go" stay separate channels. */
+.x-matrix td.is-todayCol,
+.x-matrix thead th.is-today {
+  background: color-mix(in srgb, var(--accent) 17%, transparent);
+}
+
+.x-matrix thead th.is-today {
+  border-radius: 8px 8px 0 0;
+}
+
+.x-matrix tbody tr:last-child td.is-todayCol {
+  border-radius: 0 0 8px 8px;
+}
+
+.x-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 15px;
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
+  color: var(--t2);
+}
+
+.x-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.x-legend i {
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  background: var(--a600);
+}
+
+.x-legend i.is-warn {
+  background: color-mix(in srgb, var(--warn) 45%, var(--app));
+}
+
+.x-legend i.is-bad {
+  background: color-mix(in srgb, var(--bad) 45%, var(--app));
+}
+
+.x-legend i.is-none {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* ── goal-shape taxonomy grid ── */
+
+.x-shapes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin: 14px 0 6px;
+}
+
+.x-shape {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-raised);
+}
+
+.x-shapeK {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.x-shapeK b {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.x-shapeK span {
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+.x-shapeFig {
+  position: relative;
+  height: 46px;
+  margin-bottom: 11px;
+}
+
+.x-shapeP {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--t2);
+}
+
+.x-shapeP code {
+  font-family: var(--ds-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  color: var(--a300);
+}
+
+/* ── before/after pairing ── */
+
+.x-ba {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin: 12px 0;
+}
+
+.x-baCol > h4 {
+  margin: 0 0 9px;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+.x-baCol.is-now > h4::before {
+  content: 'Now · ';
+  color: var(--bad);
+}
+
+.x-baCol.is-next > h4::before {
+  content: 'Proposed · ';
+  color: var(--ok);
+}
+
+.x-card {
+  padding: 15px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-raised);
+}
+
+.x-cardK {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 15px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+.x-cardK b {
+  font-weight: 400;
+  font-size: 10.5px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--t2);
+}
+
+/* ── findings table emphasis ── */
+
+.x-sev {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 20px;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.x-sev.is-block {
+  background: var(--bad-d);
+  color: var(--bad);
+}
+
+.x-sev.is-high {
+  background: var(--warn-d);
+  color: var(--warn);
+}
+
+.x-sev.is-med {
+  background: var(--a900);
+  color: var(--a300);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .x-chart *,
+  .x-shape * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

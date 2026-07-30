@@ -1,0 +1,1120 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   DATE + TIME INPUT LAB
+   Target design-system specimens only. These classes do not ship to the app.
+   Production implementation is governed by DATETIME_INPUTS.md.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.ds-dtDecision {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin: 18px 0 28px;
+  padding: 14px 16px;
+  border: 1px solid var(--a800);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--a900), var(--app));
+}
+
+.ds-dtDecision > span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--a800);
+  color: var(--a200);
+  font-family: var(--ds-mono);
+  font-size: 11px;
+}
+
+.ds-dtDecision strong,
+.ds-dtDecision small {
+  display: block;
+}
+
+.ds-dtDecision strong {
+  color: var(--t1);
+  font-size: 12.5px;
+}
+
+.ds-dtDecision small {
+  margin-top: 2px;
+  color: var(--t2);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.ds-dtDecision a {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--a300);
+  font-size: 11.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ds-dtDecision a:hover {
+  color: var(--a200);
+}
+
+.ds-dtSurfaceGrid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.86fr) minmax(390px, 1.14fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.ds-dtSurface {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+.ds-dtSurface [hidden] {
+  display: none !important;
+}
+
+.ds-dtSurfaceHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--night);
+}
+
+.ds-dtSurfaceHead span,
+.ds-dtSurfaceHead strong,
+.ds-dtSurfaceHead small {
+  display: block;
+}
+
+.ds-dtSurfaceHead span {
+  color: var(--a400);
+  font-family: var(--ds-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-dtSurfaceHead strong {
+  margin-top: 3px;
+  color: var(--t1);
+  font-size: 12.5px;
+}
+
+.ds-dtSurfaceHead small {
+  max-width: 31ch;
+  color: var(--t2);
+  font-size: 10.5px;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.ds-dtMobileStage {
+  flex: 1;
+  min-height: 600px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 32px 14px 0;
+  background:
+    linear-gradient(rgba(13, 14, 21, 0.46), rgba(13, 14, 21, 0.86)),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 35px,
+      var(--line) 36px
+    ),
+    var(--app);
+}
+
+.ds-dtMobileAnchor {
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin: 14px;
+  padding: 8px 12px 8px 14px;
+  border: 1px solid var(--a700);
+  border-radius: 12px;
+  background: var(--surface-raised);
+  color: var(--t1);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ds-dtMobileAnchor span,
+.ds-dtMobileAnchor strong,
+.ds-dtMobileAnchor small {
+  display: block;
+}
+
+.ds-dtMobileAnchor span {
+  color: var(--t2);
+  font-size: 10px;
+}
+
+.ds-dtMobileAnchor strong {
+  margin-top: 2px;
+  color: var(--t1);
+  font-size: 13px;
+}
+
+.ds-dtMobileAnchor small {
+  color: var(--a300);
+  font-size: 11px;
+}
+
+.ds-dtPhoneSheet {
+  width: 100%;
+  max-width: 390px;
+  max-height: 568px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border: 1px solid var(--edge);
+  border-bottom: 0;
+  border-radius: 22px 22px 0 0;
+  overflow: hidden;
+  background: var(--sheet);
+  box-shadow: var(--sh-lg);
+}
+
+.ds-dtSheetHead {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  min-height: 72px;
+  padding: 14px 12px 8px;
+  border-bottom: 1px solid var(--line);
+  touch-action: none;
+}
+
+.ds-dtGrabber {
+  position: absolute;
+  width: 40px;
+  height: 4px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--t2);
+  opacity: 0.58;
+}
+
+.ds-dtSheetTitle {
+  grid-column: 2;
+  text-align: center;
+}
+
+.ds-dtSheetTitle strong,
+.ds-dtSheetTitle small {
+  display: block;
+}
+
+.ds-dtSheetTitle strong {
+  color: var(--t1);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ds-dtSheetTitle small {
+  margin-top: 2px;
+  color: var(--t2);
+  font-size: 10.5px;
+}
+
+.ds-dtClose {
+  grid-column: 3;
+  justify-self: end;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--t2);
+  font: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.ds-dtClose:hover {
+  color: var(--t1);
+  background: var(--surface-raised);
+}
+
+.ds-dtSheetBody {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding: 16px 16px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--a700) transparent;
+}
+
+.ds-dtSheetFoot {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  gap: 10px;
+  padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--sheet);
+}
+
+.ds-dtDesktopStage {
+  flex: 1;
+  min-height: 600px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 42px 22px;
+  background:
+    linear-gradient(90deg, var(--line) 1px, transparent 1px),
+    linear-gradient(var(--line) 1px, transparent 1px),
+    var(--app);
+  background-size: 28px 28px;
+}
+
+.ds-dtDesktopStack {
+  width: min(100%, 460px);
+}
+
+.ds-dtDesktopAnchor {
+  width: 100%;
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px 8px 14px;
+  border: 1px solid var(--a700);
+  border-radius: 12px;
+  background: var(--surface-raised);
+  color: var(--t1);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ds-dtDesktopAnchor span,
+.ds-dtDesktopAnchor strong,
+.ds-dtDesktopAnchor small {
+  display: block;
+}
+
+.ds-dtDesktopAnchor span {
+  color: var(--t2);
+  font-size: 10px;
+}
+
+.ds-dtDesktopAnchor strong {
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-dtDesktopAnchor small {
+  color: var(--a300);
+  font-size: 11px;
+}
+
+.ds-dtPopover {
+  position: relative;
+  margin-top: 8px;
+  padding: 18px;
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+  background: var(--sheet);
+  box-shadow: var(--sh-lg);
+}
+
+.ds-dtPopover::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -6px;
+  right: 30px;
+  transform: rotate(45deg);
+  border-left: 1px solid var(--edge);
+  border-top: 1px solid var(--edge);
+  background: var(--sheet);
+}
+
+.ds-dtForm {
+  display: grid;
+  gap: 16px;
+}
+
+.ds-dtPopoverHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -8px -8px 0 0;
+}
+
+.ds-dtQuestion {
+  margin: 0;
+  color: var(--t1);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ds-dtHelp {
+  margin: -10px 0 0;
+  color: var(--t2);
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.ds-dtPresetGroup,
+.ds-dtPrecisionGroup {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ds-dtPresetGroup legend,
+.ds-dtPrecisionGroup legend {
+  margin-bottom: 7px;
+  padding: 0;
+  color: var(--t2);
+  font-family: var(--ds-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-dtPresets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.ds-dtPreset,
+.ds-dtPrecision,
+.ds-dtSecondary,
+.ds-dtPrimary,
+.ds-dtDanger {
+  min-height: 48px;
+  border-radius: 11px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ds-dtPreset,
+.ds-dtPrecision {
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--t2);
+  font-size: 11px;
+  font-weight: 550;
+}
+
+.ds-dtPrecision {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0 8px;
+  text-align: center;
+}
+
+.ds-dtPrecision input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ds-dtPreset:hover,
+.ds-dtPrecision:hover {
+  border-color: var(--a700);
+  color: var(--t1);
+}
+
+.ds-dtPreset[aria-pressed='true'],
+.ds-dtPrecision:has(input:checked) {
+  border-color: var(--a600);
+  background: var(--a900);
+  color: var(--a200);
+}
+
+.ds-dtFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(118px, 0.7fr);
+  gap: 10px;
+}
+
+.ds-dtFields.is-even {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ds-dtField {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.ds-dtField > span,
+.ds-dtField > label {
+  color: var(--t2);
+  font-size: 10.5px;
+  font-weight: 550;
+}
+
+.ds-dtField small {
+  color: var(--t2);
+  font-size: 9.5px;
+  line-height: 1.45;
+}
+
+.ds-dtInput,
+.ds-dtSelect {
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  border: 1px solid var(--hairline);
+  border-radius: 11px;
+  background: var(--surface-raised);
+  color: var(--t1);
+  color-scheme: dark;
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  padding: 0 11px;
+}
+
+.ds-dtInput[type='time'] {
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+}
+
+.ds-dtInput[type='number'] {
+  appearance: textfield;
+}
+
+.ds-dtInput[type='number']::-webkit-inner-spin-button,
+.ds-dtInput[type='number']::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.ds-dtSelect {
+  appearance: auto;
+}
+
+.ds-dtPrecisionRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.ds-dtOffsetGroup {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--warn);
+  border-radius: 11px;
+  background: var(--warn-d);
+}
+
+.ds-dtOffsetGroup legend {
+  padding: 0 4px;
+  color: var(--t1);
+  font-size: 10.5px;
+  font-weight: 650;
+}
+
+.ds-dtOffsetGroup > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ds-dtOffsetChoice {
+  min-height: 52px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--t1);
+  cursor: pointer;
+}
+
+.ds-dtOffsetChoice:has(input:checked) {
+  border-color: var(--a500);
+  background: var(--a900);
+}
+
+.ds-dtOffsetChoice input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.ds-dtOffsetChoice strong,
+.ds-dtOffsetChoice small {
+  display: block;
+}
+
+.ds-dtOffsetChoice strong {
+  color: var(--t1);
+  font-size: 10.5px;
+}
+
+.ds-dtOffsetChoice small {
+  margin-top: 2px;
+  color: var(--t2);
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.ds-dtPartField {
+  display: none;
+}
+
+.ds-dtForm[data-precision='part-of-day'] .ds-dtClockField {
+  display: none;
+}
+
+.ds-dtForm[data-precision='part-of-day'] .ds-dtPartField {
+  display: grid;
+}
+
+.ds-dtSummary {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--night);
+}
+
+.ds-dtSummary::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--sleep-dim);
+}
+
+.ds-dtSummary span,
+.ds-dtSummary strong,
+.ds-dtSummary small {
+  display: block;
+}
+
+.ds-dtSummary span {
+  color: var(--t2);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-dtSummary > span:last-child {
+  color: inherit;
+  font-size: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.ds-dtSummary strong {
+  margin-top: 3px;
+  color: var(--t1);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-dtSummary small {
+  margin-top: 3px;
+  color: var(--t2);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.ds-dtZone {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: -8px 0 0;
+  color: var(--t2);
+  font-size: 10px;
+}
+
+.ds-dtZone::before {
+  content: '◷';
+  color: var(--a400);
+  font-size: 13px;
+}
+
+.ds-dtError {
+  display: none;
+  margin: -6px 0 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--bad);
+  color: var(--bad);
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.ds-dtForm.is-invalid .ds-dtError,
+.ds-dtError.is-visible {
+  display: block;
+}
+
+.ds-dtInput[aria-invalid='true'],
+.ds-dtSelect[aria-invalid='true'],
+.ds-dtOffsetGroup[aria-invalid='true'],
+.ds-dtBoundaryPrecision select[aria-invalid='true'] {
+  border-color: var(--bad);
+}
+
+.ds-dtActions {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  gap: 9px;
+}
+
+.ds-dtSecondary {
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--t2);
+}
+
+.ds-dtPrimary {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--canvas);
+  font-weight: 700;
+}
+
+.ds-dtDanger {
+  border: 1px solid var(--bad);
+  background: var(--bad-d);
+  color: var(--t1);
+  font-weight: 650;
+}
+
+.ds-dtSecondary:hover {
+  color: var(--t1);
+  border-color: var(--a700);
+}
+
+.ds-dtPrimary:hover {
+  background: var(--a400);
+  border-color: var(--a400);
+}
+
+.ds-dtDanger:hover {
+  background: var(--bad);
+  color: var(--canvas);
+}
+
+.ds-dtDiscardPrompt {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid var(--bad);
+  border-radius: 11px;
+  background: var(--bad-d);
+}
+
+.ds-dtDiscardPrompt strong,
+.ds-dtDiscardPrompt span {
+  display: block;
+}
+
+.ds-dtDiscardPrompt strong {
+  color: var(--t1);
+  font-size: 12px;
+}
+
+.ds-dtDiscardPrompt span {
+  color: var(--t2);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.ds-dtDiscardPrompt > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ds-dtPreset:focus-visible,
+.ds-dtPrecision:has(input:focus-visible),
+.ds-dtInput:focus-visible,
+.ds-dtSelect:focus-visible,
+.ds-dtSecondary:focus-visible,
+.ds-dtPrimary:focus-visible,
+.ds-dtDanger:focus-visible,
+.ds-dtClose:focus-visible,
+.ds-dtMobileAnchor:focus-visible,
+.ds-dtDesktopAnchor:focus-visible,
+.ds-dtDecision a:focus-visible {
+  outline: 2px solid var(--a300);
+  outline-offset: 2px;
+}
+
+.ds-dtOffsetChoice:has(input:focus-visible),
+.ds-dtBoundaryPrecision select:focus-visible {
+  outline: 2px solid var(--a300);
+  outline-offset: 2px;
+}
+
+.ds-dtInput:focus,
+.ds-dtSelect:focus {
+  border-color: var(--a500);
+}
+
+.ds-dtUseCaseGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ds-dtUseCase {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--app);
+}
+
+.ds-dtUseCase .ds-dtInput[type='date'] {
+  padding-inline: 8px;
+  font-size: 12px;
+}
+
+.ds-dtUseCaseHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ds-dtUseCaseHead span,
+.ds-dtUseCaseHead strong,
+.ds-dtUseCaseHead small {
+  display: block;
+}
+
+.ds-dtUseCaseHead span {
+  color: var(--a400);
+  font-family: var(--ds-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-dtUseCaseHead strong {
+  margin-top: 3px;
+  color: var(--t1);
+  font-size: 13px;
+}
+
+.ds-dtUseCaseHead small {
+  color: var(--t2);
+  font-family: var(--ds-mono);
+  font-size: 9px;
+}
+
+.ds-dtBoundary {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--night);
+}
+
+.ds-dtBoundaryHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ds-dtBoundaryHead strong {
+  color: var(--t1);
+  font-size: 11.5px;
+}
+
+.ds-dtBoundaryHead span {
+  color: var(--t2);
+  font-size: 9.5px;
+}
+
+.ds-dtBoundaryPrecision {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(112px, 0.7fr);
+  align-items: center;
+  gap: 10px;
+  color: var(--t2);
+  font-size: 10px;
+}
+
+.ds-dtBoundaryPrecision select {
+  min-height: 48px;
+  padding: 0 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface-raised);
+  color: var(--t1);
+  color-scheme: dark;
+  font: inherit;
+}
+
+.ds-dtDurationLine {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.ds-dtDurationLine span {
+  color: var(--t2);
+  font-size: 10px;
+}
+
+.ds-dtDurationLine strong {
+  max-width: 66%;
+  color: var(--a200);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-dtStateGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ds-dtState {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--app);
+}
+
+.ds-dtState > span,
+.ds-dtState > strong,
+.ds-dtState > small {
+  display: block;
+}
+
+.ds-dtState > span {
+  color: var(--a400);
+  font-family: var(--ds-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.ds-dtState > strong {
+  margin-top: 12px;
+  color: var(--t1);
+  font-size: 12px;
+}
+
+.ds-dtState > small {
+  min-height: 44px;
+  margin-top: 4px;
+  color: var(--t2);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.ds-dtState .ds-dtInput {
+  margin-top: 10px;
+  min-height: 48px;
+}
+
+.ds-dtState .ds-dtField .ds-dtInput {
+  margin-top: 0;
+}
+
+.ds-dtState .ds-dtError {
+  min-height: 0;
+  margin: 8px 0 0;
+}
+
+.ds-dtReadOnly {
+  margin-top: 10px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--night);
+}
+
+.ds-dtReadOnly time {
+  display: block;
+  color: var(--t1);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ds-dtReadOnly small {
+  display: block;
+  min-height: 0;
+  margin-top: 3px;
+  color: var(--t2);
+}
+
+.ds-dtLegacy {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--bad-d);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--bad-d), var(--app));
+}
+
+.ds-dtRules {
+  margin-top: 14px;
+}
+
+.ds-dtLegacy > span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--bad);
+  color: var(--canvas);
+  font-weight: 800;
+}
+
+.ds-dtLegacy strong,
+.ds-dtLegacy p {
+  display: block;
+}
+
+.ds-dtLegacy strong {
+  color: var(--t1);
+  font-size: 12px;
+}
+
+.ds-dtLegacy p {
+  margin: 3px 0 0;
+  color: var(--t2);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@media (max-width: 1100px) {
+  .ds-dtSurfaceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ds-dtUseCaseGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ds-dtStateGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .ds-dtDecision {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ds-dtDecision a {
+    grid-column: 2;
+    min-height: 48px;
+  }
+
+  .ds-dtSurfaceGrid,
+  .ds-dtUseCaseGrid,
+  .ds-dtStateGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ds-dtSurfaceHead {
+    display: grid;
+  }
+
+  .ds-dtSurfaceHead small {
+    text-align: left;
+  }
+
+  .ds-dtMobileStage,
+  .ds-dtDesktopStage {
+    min-height: auto;
+    padding-inline: 0;
+  }
+
+  .ds-dtDesktopStage {
+    padding-block: 24px;
+  }
+
+  .ds-dtDesktopStack {
+    width: calc(100% - 24px);
+  }
+
+  .ds-dtPhoneSheet {
+    max-height: 620px;
+  }
+
+  .ds-dtFields,
+  .ds-dtFields.is-even {
+    grid-template-columns: 1fr;
+  }
+
+  .ds-dtPresets,
+  .ds-dtPrecisionRow,
+  .ds-dtOffsetGroup > div {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-dtPreset,
+  .ds-dtPrecision,
+  .ds-dtSecondary,
+  .ds-dtPrimary,
+  .ds-dtDanger {
+    transition: none;
+  }
+}

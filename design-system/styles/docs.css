@@ -1,0 +1,707 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   DOCS CHROME — the design-system page itself.
+   Nothing here ships to the app. App component styles live in components.css.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --ds-nav-w: 244px;
+  --ds-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--t1);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+time,
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── sidebar ─────────────────────────────────────────────────────────── */
+
+.ds-nav {
+  position: fixed;
+  inset-block: 0;
+  left: 0;
+  width: var(--ds-nav-w);
+  background: var(--night);
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #2f3140 transparent;
+  z-index: 20;
+}
+
+.ds-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ds-brandMark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: rgba(145, 132, 217, 0.08);
+  flex: none;
+}
+
+.ds-brandText b {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.ds-brandText b span {
+  color: var(--accent);
+}
+
+.ds-brandText small {
+  display: block;
+  font-size: 10px;
+  color: var(--t2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.ds-navGroup {
+  padding: 16px 12px 4px;
+}
+
+.ds-navGroup > h4 {
+  margin: 0 0 6px 8px;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+.ds-navLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--t2);
+  font-size: 12.5px;
+  text-decoration: none;
+  transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.ds-navLink:hover {
+  color: var(--t1);
+  background: rgba(233, 233, 237, 0.04);
+}
+
+.ds-navLink em {
+  font-style: normal;
+  font-size: 10px;
+  color: var(--t2);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-navLink[aria-current='true'] {
+  color: var(--a200);
+  background: rgba(145, 132, 217, 0.1);
+}
+
+.ds-navLink[aria-current='true']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+}
+
+.ds-navFoot {
+  padding: 18px 20px 28px;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--t2);
+}
+
+/* ── shell ───────────────────────────────────────────────────────────── */
+
+.ds-main {
+  margin-left: var(--ds-nav-w);
+  min-height: 100vh;
+}
+
+.ds-hero {
+  padding: 68px 48px 44px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--night), var(--canvas));
+}
+
+.ds-hero h1 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.ds-hero h1 b {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.ds-hero p {
+  margin: 14px 0 0;
+  max-width: 62ch;
+  color: var(--t2);
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+.ds-heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.ds-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--edge);
+  font-size: 11px;
+  color: var(--t2);
+  font-family: var(--ds-mono);
+}
+
+.ds-pill b {
+  color: var(--a300);
+  font-weight: 500;
+}
+
+/* ── sections ────────────────────────────────────────────────────────── */
+
+.ds-section {
+  padding: 52px 48px 56px;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 0;
+}
+
+.ds-sectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.ds-sectionNum {
+  font-family: var(--ds-mono);
+  font-size: 11px;
+  color: var(--t2);
+  letter-spacing: 0.08em;
+  flex: none;
+}
+
+.ds-section h2 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+.ds-lede {
+  margin: 0 0 34px;
+  max-width: 68ch;
+  color: var(--t2);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.ds-eyebrow {
+  display: block;
+  margin: 40px 0 14px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--t2);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ds-eyebrow:first-of-type {
+  margin-top: 0;
+}
+
+/* ── spec block: label → preview → notes ─────────────────────────────── */
+
+.ds-spec {
+  margin-bottom: 26px;
+}
+
+.ds-specHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 9px;
+}
+
+.ds-specHead h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--t1);
+}
+
+.ds-specHead code {
+  font-family: var(--ds-mono);
+  font-size: 10.5px;
+  color: var(--t2);
+  white-space: nowrap;
+}
+
+.ds-specNote {
+  margin: 0 0 10px;
+  max-width: 74ch;
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.6;
+}
+
+.ds-preview {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--canvas);
+  background-image: radial-gradient(rgba(233, 233, 237, 0.045) 1px, transparent 0);
+  background-size: 16px 16px;
+  background-position: -1px -1px;
+}
+
+.ds-preview.is-flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.ds-preview.is-tight {
+  padding: 14px;
+}
+
+.ds-preview.on-app {
+  background: var(--app);
+  background-image: none;
+}
+
+.ds-previewInner {
+  max-width: 28rem;
+}
+
+.ds-previewInner.is-narrow {
+  max-width: 250px;
+}
+
+.ds-previewInner.is-panel {
+  max-width: 296px;
+}
+
+/* ── layout helpers ──────────────────────────────────────────────────── */
+
+.ds-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ds-row.is-center {
+  align-items: center;
+}
+
+.ds-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.ds-cols3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.ds-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── swatches ────────────────────────────────────────────────────────── */
+
+.ds-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 8px;
+}
+
+.ds-swatch {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--app);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  transition: border-color var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.ds-swatch:hover {
+  border-color: var(--a700);
+  transform: translateY(-1px);
+}
+
+.ds-swatchChip {
+  height: 54px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ds-swatchMeta {
+  padding: 8px 10px 9px;
+}
+
+.ds-swatchMeta b {
+  display: block;
+  font-family: var(--ds-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.ds-swatchMeta span {
+  display: block;
+  font-family: var(--ds-mono);
+  font-size: 10px;
+  color: var(--t2);
+  margin-top: 2px;
+}
+
+.ds-swatchMeta em {
+  display: block;
+  font-style: normal;
+  font-size: 10px;
+  color: var(--t2);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ── token / spec tables ─────────────────────────────────────────────── */
+
+.ds-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.ds-table th {
+  text-align: left;
+  padding: 0 12px 8px 0;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t2);
+  border-bottom: 1px solid var(--line);
+}
+
+.ds-table td {
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--t2);
+  vertical-align: middle;
+}
+
+.ds-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ds-table code {
+  font-family: var(--ds-mono);
+  font-size: 11px;
+  color: var(--a300);
+}
+
+.ds-table .ds-tdKey {
+  color: var(--t1);
+  white-space: nowrap;
+}
+
+.ds-tone {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.ds-tone i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+
+/* ── rules (do / don't) ──────────────────────────────────────────────── */
+
+.ds-rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.ds-rule {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--app);
+}
+
+.ds-rule h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  font-weight: 550;
+  color: var(--t1);
+}
+
+.ds-rule p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--t2);
+}
+
+.ds-rule code {
+  font-family: var(--ds-mono);
+  font-size: 11px;
+  color: var(--a300);
+}
+
+.ds-ruleTag {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  flex: none;
+}
+
+.ds-do .ds-ruleTag {
+  background: var(--ok-d);
+  color: var(--ok);
+}
+
+.ds-dont .ds-ruleTag {
+  background: var(--bad-d);
+  color: var(--bad);
+}
+
+.ds-note .ds-ruleTag {
+  background: var(--warn-d);
+  color: var(--warn);
+}
+
+/* ── icon grid ───────────────────────────────────────────────────────── */
+
+.ds-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 8px;
+}
+
+.ds-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 16px 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--app);
+  color: var(--t1);
+  transition: border-color var(--duration-fast), color var(--duration-fast);
+}
+
+.ds-icon:hover {
+  border-color: var(--a700);
+  color: var(--a300);
+}
+
+.ds-icon b {
+  font-family: var(--ds-mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--t2);
+}
+
+.ds-iconWide {
+  grid-column: span 2;
+}
+
+/* ── scale rulers (space / radius / type) ────────────────────────────── */
+
+.ds-ruler {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.ds-ruler:last-child {
+  border-bottom: none;
+}
+
+.ds-rulerKey {
+  width: 108px;
+  flex: none;
+  font-family: var(--ds-mono);
+  font-size: 11px;
+  color: var(--t2);
+}
+
+.ds-rulerVal {
+  width: 74px;
+  flex: none;
+  font-family: var(--ds-mono);
+  font-size: 10.5px;
+  color: var(--t2);
+}
+
+.ds-rulerBar {
+  height: 10px;
+  border-radius: 2px;
+  background: var(--a600);
+}
+
+.ds-radiusChip {
+  width: 74px;
+  height: 56px;
+  background: var(--a800);
+  border: 1px solid var(--a600);
+}
+
+.ds-typeSample {
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── copy toast ──────────────────────────────────────────────────────── */
+
+.ds-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translate(-50%, 12px);
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--surface-raised);
+  box-shadow: var(--sh-md);
+  font-size: 12.5px;
+  color: var(--t1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo);
+  z-index: 60;
+}
+
+.ds-toast.is-on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.ds-toast b {
+  color: var(--accent);
+  font-family: var(--ds-mono);
+  font-weight: 500;
+}
+
+/* ── responsive: the doc itself collapses under 900px ────────────────── */
+
+@media (max-width: 900px) {
+  .ds-nav {
+    position: static;
+    width: auto;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ds-navGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 10px;
+  }
+
+  .ds-navGroup > h4 {
+    width: 100%;
+    margin-left: 4px;
+  }
+
+  .ds-navLink em,
+  .ds-navFoot {
+    display: none;
+  }
+
+  .ds-main {
+    margin-left: 0;
+  }
+
+  .ds-hero {
+    padding: 36px 20px 28px;
+  }
+
+  .ds-hero h1 {
+    font-size: 28px;
+  }
+
+  .ds-section {
+    padding: 34px 20px 38px;
+  }
+}

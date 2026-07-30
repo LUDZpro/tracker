@@ -10,6 +10,14 @@
       ],
       "port": 3199,
       "autoPort": true
+    },
+    {
+      "name": "design-system",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "design-system/server.mjs"
+      ],
+      "port": 4319
     }
   ]
 }

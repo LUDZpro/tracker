@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tracker — Charts: goals, thresholds, warnings</title>
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/docs.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/handbook.css">
+<link rel="stylesheet" href="styles/charts-lab.css">
+</head>
+<body class="ds-catalog">
+
+<nav class="ds-nav" aria-label="Contents">
+  <div class="ds-brand">
+    <span class="ds-brandMark" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M4 18V9M9 18V5M14 18v-6M19 18v-3"></path>
+      </svg>
+    </span>
+    <span class="ds-brandText">
+      floor <b>.</b> logger
+      <small>Charts proposal</small>
+    </span>
+  </div>
+
+  <div class="ds-pageNav" aria-label="Design system pages">
+    <a href="index.html">UX contract</a>
+    <a href="components.html">Components</a>
+    <a href="charts-lab.html" aria-current="page">Charts</a>
+  </div>
+
+  <div class="ds-navGroup">
+    <h4>Diagnosis</h4>
+    <a class="ds-navLink" href="#findings">What is wrong <em>C1</em></a>
+    <a class="ds-navLink" href="#shapes">Goal shapes <em>C2</em></a>
+  </div>
+
+  <div class="ds-navGroup">
+    <h4>Proposed parts</h4>
+    <a class="ds-navLink" href="#rule">Reference rule <em>C3</em></a>
+    <a class="ds-navLink" href="#band">Target band <em>C4</em></a>
+    <a class="ds-navLink" href="#missing">Missing &amp; overshoot <em>C5</em></a>
+    <a class="ds-navLink" href="#breach">Breach scale <em>C6</em></a>
+    <a class="ds-navLink" href="#pace">Pace marker <em>C7</em></a>
+    <a class="ds-navLink" href="#cutoff">Cutoff track <em>C8</em></a>
+    <a class="ds-navLink" href="#coverage">Coverage foot <em>C9</em></a>
+  </div>
+
+  <div class="ds-navGroup">
+    <h4>New chart types</h4>
+    <a class="ds-navLink" href="#hours">Segmented hour bar <em>C10</em></a>
+    <a class="ds-navLink" href="#tooltip">Column tooltip <em>C11</em></a>
+    <a class="ds-navLink" href="#matrix">Week matrix <em>C12</em></a>
+  </div>
+
+  <div class="ds-navGroup">
+    <h4>Applied</h4>
+    <a class="ds-navLink" href="#rebuilt">Rebuilt charts <em>C13</em></a>
+    <a class="ds-navLink" href="#semantics">Color semantics <em>C14</em></a>
+    <a class="ds-navLink" href="#access">Data view <em>C15</em></a>
+    <a class="ds-navLink" href="#adoption">Adoption order <em>C16</em></a>
+  </div>
+
+  <p class="ds-navFoot">
+    Proposal only. <code>x-</code> classes are not in the app yet.
+    Written findings and sources live in <code>CHARTS.md</code>.
+  </p>
+</nav>
+
+<main class="ds-main">
+
+<header class="ds-hero">
+  <h1>Charts that say <b>where the line is</b></h1>
+  <p>
+    Today every chart in the app answers “how much?” and none of them answers “compared to what?”.
+    The goal is never drawn — it is implied by a fill color one step apart from the neutral fill,
+    on the same hue. This page proposes the missing vocabulary: a reference rule, a target band,
+    a real missing-data mark, a two-level breach scale, a pace marker, and a cutoff track —
+    then rebuilds all four production charts with it.
+  </p>
+  <div class="ds-heroMeta">
+    <span class="ds-pill">Chart types <b>5 → 8</b></span>
+    <span class="ds-pill">New tokens <b>0</b></span>
+    <span class="ds-pill">New deps <b>0</b></span>
+    <span class="ds-pill">Goal shapes <b>5</b></span>
+  </div>
+</header>
+
+<!-- ══ C1 FINDINGS ════════════════════════════════════════════════════ -->
+<section class="ds-section" id="findings">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C1</span><h2>What is wrong today</h2></div>
+  <p class="ds-lede">
+    Each row was read off the production components, not inferred. Several of these are already
+    forbidden by the app’s own chart release contract in the UI/UX manual — the contract exists,
+    the components predate it.
+  </p>
+
+  <table class="ds-table">
+    <thead>
+      <tr><th>Finding</th><th>Where</th><th>Severity</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="ds-tdKey">A missed night and an unlogged night render identically</td>
+        <td><code>WeekStats.tsx</code> — <code>v === null</code> takes the same <code>sparkLow</code> class as a genuinely low day, at 4% height. Breaks “missing data differs from zero”.</td>
+        <td><span class="x-sev is-block">Blocker</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey">“On target” is carried by hue alone</td>
+        <td><code>--a800</code> / <code>--a500</code> / <code>--a900</code> are three values of one purple. No line, no label, no shape. Breaks “pattern is not encoded by color alone”.</td>
+        <td><span class="x-sev is-block">Blocker</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey">Sleep target is 7h in one chart and 8h in another</td>
+        <td><code>SLEEP_ON_MIN = 7h</code> in <code>WeekStats.tsx</code>; <code>SLEEP_GOAL_MIN = 8h</code> in <code>GoalCards.tsx</code>. The same night reads “on target” and “87%” side by side.</td>
+        <td><span class="x-sev is-high">High</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey"><code>--accent</code> means three different things</td>
+        <td>Principle 02 says accent means <em>actionable</em>; the timeline uses it for <em>now</em>; the caffeine dot row uses it for <em>late</em> — “the chart’s only alarm”. A warning and the current day are the same purple.</td>
+        <td><span class="x-sev is-high">High</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey">Overshoot is silently clipped</td>
+        <td><code>WeekStats.tsx</code> scales protein to <code>scaleMax = PROTEIN_TARGET_G</code> and clamps to 100. A 232g day and a 160g day are the same bar. The nutrition console avoids this with <code>ceiling = target + 20</code> — the two surfaces disagree.</td>
+        <td><span class="x-sev is-high">High</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey">No chart states its coverage or denominator</td>
+        <td>“avg 141 g” never says over how many logged days. Required by the contract; implemented nowhere.</td>
+        <td><span class="x-sev is-high">High</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey">Charts are invisible to assistive tech</td>
+        <td>Bars are unlabeled <code>&lt;i&gt;</code> elements; the axis row is <code>aria-hidden</code>; the nutrition bars carry a hover-only <code>title</code>. No structured value view anywhere.</td>
+        <td><span class="x-sev is-block">Blocker</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey">Range metrics are drawn as “more is better”</td>
+        <td>Sleep is a band (roughly 7–9h) but the sparkline is monotonic: a 10h night draws taller than an 8h night and reads as a better one.</td>
+        <td><span class="x-sev is-high">High</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey">Pace exists but is text-only and buried</td>
+        <td><code>paceMessage()</code> in <code>lib/nutrition/stats.ts</code> already computes “ahead / behind for this time of day”, tested. It renders as a sentence on one nutrition panel and appears on no goal card.</td>
+        <td><span class="x-sev is-med">Medium</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey">Loss framing in a shipped label</td>
+        <td><code>WeekPanel.tsx</code> renders “Streak at target”. The manual’s goal-language table lists streak-restoration framing as the thing to avoid.</td>
+        <td><span class="x-sev is-med">Medium</span></td>
+      </tr>
+      <tr>
+        <td class="ds-tdKey">Specimen drift</td>
+        <td>The catalog’s dot-row specimen is labeled “cutoff 14:00”. Production is <code>CAFFEINE_CUTOFF_MIN = 16 * 60</code>.</td>
+        <td><span class="x-sev is-med">Medium</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ C2 GOAL SHAPES ═════════════════════════════════════════════════ -->
+<section class="ds-section" id="shapes">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C2</span><h2>Goal shapes</h2></div>
+  <p class="ds-lede">
+    The root cause of most of C1 is that the system has one idea of a goal — “bigger fill is better” —
+    and five kinds of goal. Name the shape first; the chart treatment then follows from it instead of
+    being improvised per tracker. Every new tracker declares its shape in the spec before any UI is chosen.
+  </p>
+
+  <div class="x-shapes">
+    <div class="x-shape">
+      <div class="x-shapeK"><b>Floor</b><span>at least</span></div>
+      <div class="x-shapeFig">
+        <div class="x-chart">
+          <div class="x-plot" style="height:46px">
+            <div class="x-rule" style="bottom:72%"></div>
+            <i style="height:52%"></i><i class="x-hit" style="height:84%"></i><i style="height:61%"></i><i class="x-hit" style="height:90%"></i>
+          </div>
+        </div>
+      </div>
+      <p class="x-shapeP">Protein, gym minutes. Reference rule at the floor; bars above it are <code>--a500</code>. Overshoot is fine and must stay visible.</p>
+    </div>
+
+    <div class="x-shape">
+      <div class="x-shapeK"><b>Ceiling</b><span>at most</span></div>
+      <div class="x-shapeFig">
+        <div class="x-chart">
+          <div class="x-plot" style="height:46px">
+            <div class="x-rule" style="bottom:72%"></div>
+            <i class="x-hit" style="height:44%"></i><i class="x-hit" style="height:60%"></i><i class="x-warn" style="height:88%"></i><i class="x-hit" style="height:35%"></i>
+          </div>
+        </div>
+      </div>
+      <p class="x-shapeP">Caffeine count, kcal. Same rule, inverted meaning: crossing it is the breach, so the bar takes <code>--warn</code> plus a hatch.</p>
+    </div>
+
+    <div class="x-shape">
+      <div class="x-shapeK"><b>Band</b><span>between</span></div>
+      <div class="x-shapeFig">
+        <div class="x-chart">
+          <div class="x-plot" style="height:46px">
+            <div class="x-band" style="bottom:55%;height:28%"></div>
+            <i class="x-hit" style="height:66%"></i><i class="x-warn" style="height:40%"></i><i class="x-hit" style="height:74%"></i><i class="x-warn" style="height:96%"></i>
+          </div>
+        </div>
+      </div>
+      <p class="x-shapeP">Sleep, weight, mood. Both directions are a miss. A band, never a line — this is the shape the app currently has no answer for.</p>
+    </div>
+
+    <div class="x-shape">
+      <div class="x-shapeK"><b>Cutoff</b><span>before</span></div>
+      <div class="x-shapeFig">
+        <div class="x-chart" style="padding-top:10px">
+          <div class="x-ct" style="border:none;padding:3px 0">
+            <span class="x-ctTrack">
+              <span class="x-ctAfter" style="left:62%"></span>
+              <span class="x-ctCut" style="left:62%"></span>
+              <span class="x-ctDot" style="left:20%"></span>
+              <span class="x-ctDot" style="left:44%"></span>
+            </span>
+          </div>
+          <div class="x-ct" style="border:none;padding:3px 0">
+            <span class="x-ctTrack">
+              <span class="x-ctAfter" style="left:62%"></span>
+              <span class="x-ctCut" style="left:62%"></span>
+              <span class="x-ctDot" style="left:26%"></span>
+              <span class="x-ctDot is-late" style="left:76%"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <p class="x-shapeP">Last caffeine, last meal. The axis is the clock, so lateness is a <em>position</em> past a line — legible before any color is read.</p>
+    </div>
+
+    <div class="x-shape">
+      <div class="x-shapeK"><b>Presence</b><span>any / none</span></div>
+      <div class="x-shapeFig">
+        <div class="x-chart">
+          <div class="x-plot" style="height:46px;align-items:center">
+            <i class="x-hit" style="height:14px;border-radius:3px"></i>
+            <i style="height:14px;border-radius:3px;background:var(--rail)"></i>
+            <i class="x-hit" style="height:14px;border-radius:3px"></i>
+            <i class="x-hit" style="height:14px;border-radius:3px"></i>
+          </div>
+        </div>
+      </div>
+      <p class="x-shapeP">Gym, CBT record. There is no magnitude, so there must be no bar height. Blocks, not columns — height would invent precision.</p>
+    </div>
+  </div>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Declare the shape in the tracker spec</h4><p>Add a <em>Goal shape</em> line to <code>NEW_TRACKER_SPEC.md</code> alongside metric and cadence. The chart type falls out of it; the reviewer can check one word instead of a screenshot.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don’t</span> Draw a band metric as a floor</h4><p>Sleep today draws taller for a 10h night than an 8h one. Height must mean “further from the goal”, not “more”.</p></div>
+  </div>
+</section>
+
+<!-- ══ C3 REFERENCE RULE ══════════════════════════════════════════════ -->
+<section class="ds-section" id="rule">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C3</span><h2>Reference rule</h2></div>
+  <p class="ds-lede">
+    One dashed hairline across the plot at the goal value, labeled once at the right edge.
+    It converts every bar from an absolute quantity into a comparison, and it lets the fill color
+    become <em>redundant reinforcement</em> rather than the only channel carrying the goal.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Anatomy</h3><code>.x-rule · .x-ruleK</code></div>
+      <p class="ds-specNote">
+        <code>1px dashed var(--t4)</code>, absolutely positioned by <code>bottom: (goal / scaleMax) × 100%</code>.
+        The label sits above the right end on a <code>--surface-raised</code> chip so it never sits on a bar.
+        The plot grows <strong>46px → 64px</strong>; below that the rule and the tallest bar crowd each other.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="x-card">
+            <div class="x-cardK"><span>Protein · 7d</span><b>avg 156 g</b></div>
+            <div class="x-chart">
+              <div class="x-plot">
+                <div class="x-rule" style="bottom:80%"><span class="x-ruleK">160 g goal</span></div>
+                <i style="height:74%"></i>
+                <i class="x-hit" style="height:86%"></i>
+                <i style="height:48%"></i>
+                <i class="x-miss"></i>
+                <i class="x-hit" style="height:89%"></i>
+                <i class="x-hit x-over" style="height:100%"><span class="x-overTag">232</span></i>
+                <i class="x-today" style="height:56%"></i>
+              </div>
+              <div class="x-ax">
+                <span>W</span><span>T</span><span>F</span><span class="x-axMiss">S</span><span>S</span><span>M</span><span class="x-axToday">T</span>
+              </div>
+              <div class="x-foot"><span>Reached the floor <b>3 of 6</b> logged days</span><span class="x-cov">6 / 7 logged</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Why a line, not a darker bar</h3><code>rationale</code></div>
+      <p class="ds-specNote">
+        Bar length is judged against a common baseline, which is the most accurate visual comparison
+        available; a second aligned baseline at the goal makes “how far short” readable directly,
+        with no legend. A fill-color step asks the reader to recall what the step means and cannot
+        express distance at all. The rule also lets round goal numbers act as the sub-target readers
+        naturally anchor to.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="x-ba" style="margin:0">
+            <div class="x-baCol is-now">
+              <h4>hue only</h4>
+              <div class="x-chart">
+                <div class="x-plot" style="height:52px">
+                  <i style="height:74%"></i><i class="x-hit" style="height:86%"></i><i style="height:64%"></i><i class="x-hit" style="height:82%"></i>
+                </div>
+                <div class="x-ax"><span>W</span><span>T</span><span>F</span><span>S</span></div>
+              </div>
+            </div>
+            <div class="x-baCol is-next">
+              <h4>hue + rule</h4>
+              <div class="x-chart">
+                <div class="x-plot" style="height:52px">
+                  <div class="x-rule" style="bottom:80%"><span class="x-ruleK">160</span></div>
+                  <i style="height:74%"></i><i class="x-hit" style="height:86%"></i><i style="height:64%"></i><i class="x-hit" style="height:82%"></i>
+                </div>
+                <div class="x-ax"><span>W</span><span>T</span><span>F</span><span>S</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="ds-specNote">Same four days. Only the right pair tells you Wednesday missed by a little and Friday missed by a lot.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ C4 TARGET BAND ═════════════════════════════════════════════════ -->
+<section class="ds-section" id="band">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C4</span><h2>Target band</h2></div>
+  <p class="ds-lede">
+    The band is the reference rule for two-sided goals: a tinted zone between the low and high bound,
+    dashed on both edges. It is the piece the app is missing entirely, and sleep — the tracker the
+    product is named after — is the metric that needs it most.
+  </p>
+
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Sleep, 7–9h band on a 10h scale</h3><code>.x-band · .x-bandK</code></div>
+    <p class="ds-specNote">
+      Fill is <code>color-mix(in srgb, var(--ok) 20%, transparent)</code> so it reads as a zone rather
+      than a series. Bars inside are <code>--a500</code>; bars outside take the breach scale in either
+      direction — a 9h30 night is flagged the same way a 6h10 night is, which is the entire point.
+      The zone survives grayscale, so the band is doing the work and the hue is confirming it.
+    </p>
+    <div class="ds-preview">
+      <div class="ds-previewInner is-panel">
+        <div class="x-card">
+          <div class="x-cardK"><span>Sleep · 7d</span><b>avg 7h 27m</b></div>
+          <div class="x-chart">
+            <div class="x-plot">
+              <div class="x-band" style="bottom:70%;height:20%"><span class="x-bandK">7–9h</span></div>
+              <i class="x-hit" style="height:77.5%"></i>
+              <i class="x-warn" style="height:61.7%"></i>
+              <i class="x-miss"></i>
+              <i class="x-hit" style="height:83.3%"></i>
+              <i class="x-bad" style="height:55.8%"></i>
+              <i class="x-warn" style="height:95%"></i>
+              <i class="x-hit x-today" style="height:73.3%"></i>
+            </div>
+            <div class="x-ax">
+              <span>W</span><span class="x-axFlag">T</span><span class="x-axMiss">F</span><span>S</span><span class="x-axFlag">S</span><span class="x-axFlag">M</span><span class="x-axToday">T</span>
+            </div>
+            <div class="x-foot"><span>In range <b>3 of 6</b> logged nights · 1 long, 2 short</span><span class="x-cov">6 / 7 logged</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="ds-specNote">
+      Note what the footer does not say. It does not say “you failed 3 nights”, and it does not
+      compute a streak. It states a count and a denominator, which is what the manual’s goal-language
+      table asks for.
+    </p>
+  </div>
+</section>
+
+<!-- ══ C5 MISSING & OVERSHOOT ═════════════════════════════════════════ -->
+<section class="ds-section" id="missing">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C5</span><h2>Missing data and overshoot</h2></div>
+  <p class="ds-lede">
+    Two ways the current charts quietly lie: an unlogged day is drawn as a very bad day, and a very
+    good day is drawn as an ordinary one. Both are cheap to fix and both change what the user concludes.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Missing mark</h3><code>.x-miss · .x-axMiss</code></div>
+      <p class="ds-specNote">
+        No fill. A full-height dotted gutter and a hollow ring on the baseline, with the day letter
+        dropped to <code>--t5</code>. Reads as “nothing here”, not as “nearly nothing”. Studies of
+        missing data in charts find that substituting a default value stops readers noticing the gap
+        at all, and that leaving the space empty <em>with an explanation</em> produces the highest
+        decision confidence — hence the ring plus the footer denominator, not just a blank.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="x-ba" style="margin:0">
+            <div class="x-baCol is-now">
+              <h4>4% stub</h4>
+              <div class="t-spark" style="height:52px">
+                <i style="height:86%"></i><i style="height:68%"></i><i class="t-sparkLow" style="height:4%"></i><i class="t-sparkLow" style="height:62%"></i>
+              </div>
+              <div class="t-sparkx"><span>W</span><span>T</span><span>F</span><span>S</span></div>
+              <p class="ds-specNote" style="margin-top:8px">Friday unlogged, Saturday 5h35. Same color, near-same story.</p>
+            </div>
+            <div class="x-baCol is-next">
+              <h4>absent</h4>
+              <div class="x-chart">
+                <div class="x-plot" style="height:52px">
+                  <i class="x-hit" style="height:86%"></i><i style="height:68%"></i><i class="x-miss"></i><i class="x-bad" style="height:62%"></i>
+                </div>
+                <div class="x-ax"><span>W</span><span>T</span><span class="x-axMiss">F</span><span class="x-axFlag">S</span></div>
+              </div>
+              <p class="ds-specNote" style="margin-top:8px">Friday is a gap. Saturday is a short night. Two different facts.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Overshoot cap</h3><code>.x-over · .x-overTag</code></div>
+      <p class="ds-specNote">
+        Scale to <code>max(goal × 1.25, observed max)</code> so a normal week never touches the ceiling.
+        When a value still exceeds the scale, square off the bar’s top corners, inset a 3px
+        <code>--a200</code> cap, and print the real number above it. The cap says “this bar is truncated”;
+        the number says by how much. Never clamp to 100 with no mark, which is what
+        <code>WeekStats.tsx</code> does today.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="x-chart">
+            <div class="x-plot" style="height:56px">
+              <div class="x-rule" style="bottom:80%"><span class="x-ruleK">160 g</span></div>
+              <i class="x-hit" style="height:86%"></i>
+              <i style="height:52%"></i>
+              <i class="x-hit x-over" style="height:100%"><span class="x-overTag">232</span></i>
+              <i class="x-hit x-today" style="height:82%"></i>
+            </div>
+            <div class="x-ax"><span>W</span><span>T</span><span>F</span><span class="x-axToday">S</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ C6 BREACH SCALE ════════════════════════════════════════════════ -->
+<section class="ds-section" id="breach">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C6</span><h2>Breach scale</h2></div>
+  <p class="ds-lede">
+    Warnings currently have no vocabulary at all: the semantic tokens <code>--ok</code>,
+    <code>--warn</code> and <code>--bad</code> exist, are used by the goal-card status dot and the SUDS
+    dial, and appear in <em>zero</em> charts. The chart system’s only alarm is a purple dot that is also
+    the color of “today” and of “actionable”. Two levels, each with a non-color partner, fix both problems.
+  </p>
+
+  <table class="ds-table">
+    <thead><tr><th>Level</th><th>Fill</th><th>Redundant channel</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey">In goal</td><td><code>--a500</code></td><td>Inside the band / above the rule</td><td>Met the shape’s condition.</td></tr>
+      <tr><td class="ds-tdKey">Neutral</td><td><code>--a800</code></td><td>Position relative to the rule</td><td>Logged, no goal set, or goal not applicable.</td></tr>
+      <tr><td class="ds-tdKey">Soft breach</td><td><code>--warn</code></td><td>Sparse 135° hatch + axis letter in <code>--warn</code></td><td>Outside the goal by a normal margin. Context, not alarm.</td></tr>
+      <tr><td class="ds-tdKey">Hard breach</td><td><code>--bad</code></td><td>Dense hatch + axis letter in <code>--warn</code></td><td>Outside by a margin the tracker declares material.</td></tr>
+      <tr><td class="ds-tdKey">Today</td><td><em>keeps its state fill</em></td><td>3px <code>--accent</code> underline below the baseline + accent axis letter</td><td>Which column is now. Never competes with state.</td></tr>
+      <tr><td class="ds-tdKey">Missing</td><td><em>none</em></td><td>Dotted gutter + hollow ring + <code>--t5</code> letter</td><td>Not logged. Excluded from every denominator.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>All six states in one plot</h3><code>.x-hit · .x-warn · .x-bad · .x-today · .x-miss</code></div>
+    <p class="ds-specNote">
+      The hatch is the accessibility load-bearer: WCAG 1.4.1 requires a second channel wherever color
+      carries meaning, and roughly one in twelve men has a color-vision deficiency. Squint at this and
+      the two breach bars still separate from the rest — that is the test.
+    </p>
+    <div class="ds-preview">
+      <div class="ds-previewInner is-panel">
+        <div class="x-chart">
+          <div class="x-plot">
+            <div class="x-band" style="bottom:62%;height:24%"><span class="x-bandK">goal</span></div>
+            <i class="x-hit" style="height:70%"></i>
+            <i style="height:56%"></i>
+            <i class="x-warn" style="height:46%"></i>
+            <i class="x-bad" style="height:26%"></i>
+            <i class="x-miss"></i>
+            <i class="x-warn" style="height:96%"></i>
+            <i class="x-hit x-today" style="height:74%"></i>
+          </div>
+          <div class="x-ax">
+            <span>in goal</span><span>neutral</span><span class="x-axFlag">soft</span><span class="x-axFlag">hard</span><span class="x-axMiss">none</span><span class="x-axFlag">over</span><span class="x-axToday">today</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Reserve <code>--accent</code> for now</h4><p>Today, the live marker, the primary action. One meaning. Everything that was accent-because-it-is-bad becomes <code>--warn</code> or <code>--bad</code>.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don’t</span> Add a third breach level</h4><p>Two is what a personal tracker can honestly distinguish. Bullet-graph practice caps qualitative ranges at three and recommends fewer; more states cost more reasoning than a glance affords.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> Breach is not judgment</h4><p><code>--bad</code> describes the measurement’s distance from a user-set goal, never the person. Copy stays factual: “2h below your range”, not “bad night”.</p></div>
+  </div>
+</section>
+
+<!-- ══ C7 PACE MARKER ═════════════════════════════════════════════════ -->
+<section class="ds-section" id="pace">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C7</span><h2>Pace marker</h2></div>
+  <p class="ds-lede">
+    A goal card at 08:00 and the same card at 20:00 currently look identical: “112 / 160 g · 48 g to go”.
+    But 112g is ahead in the morning and behind at night. The math for this already ships and is unit
+    tested — <code>paceMessage()</code> in <code>lib/nutrition/stats.ts</code>. It just needs a mark on the bar.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Ahead of pace</h3><code>.x-bar · .x-pace</code></div>
+      <p class="ds-specNote">
+        Track grows 3px → 4px to seat the marker. A 1px <code>--t2</code> tick with a small caret sits at
+        <code>expected / goal</code>; the fill takes <code>--a500</code> when it is past the tick and
+        <code>--warn</code> when it is behind. This is the bullet-graph move: a featured measure, a
+        comparative marker, and a qualitative range in one row.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="x-card">
+            <div class="x-cardK"><span>Protein</span><b>14:30</b></div>
+            <div style="font-size:26px;font-weight:300;font-variant-numeric:tabular-nums;color:var(--t1)">112<span style="font-size:11.5px;color:var(--t2)"> / 160 g</span></div>
+            <div class="x-bar">
+              <i class="is-ahead" style="width:70%"></i>
+              <span class="x-pace" style="left:53%"></span>
+            </div>
+            <div class="x-paceK"><span>27 g ahead of pace</span><b>48 g to go</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Behind pace</h3><code>.x-bar &gt; i.is-behind</code></div>
+      <p class="ds-specNote">
+        Same card six hours later. The status changes without the number changing much, because the
+        remaining window shrank. This is the “clear idea about goals” the current <code>open</code>
+        status cannot express — <code>GoalCards.tsx</code> only ever resolves protein to
+        <em>done</em> or <em>open</em>, never <em>at risk</em>.
+      </p>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="x-card">
+            <div class="x-cardK"><span>Protein</span><b>20:00</b></div>
+            <div style="font-size:26px;font-weight:300;font-variant-numeric:tabular-nums;color:var(--t1)">96<span style="font-size:11.5px;color:var(--t2)"> / 160 g</span></div>
+            <div class="x-bar">
+              <i class="is-behind" style="width:60%"></i>
+              <span class="x-pace" style="left:87.5%"></span>
+            </div>
+            <div class="x-paceK"><span>44 g behind pace</span><b>one meal closes it</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="ds-specNote">
+    Pace applies only to goals that accumulate within a day: protein, kcal, gym minutes, water.
+    It is meaningless for sleep (measured once, at the end) and for cutoff goals — those cards keep
+    a plain bar. The tracker’s goal shape decides.
+  </p>
+</section>
+
+<!-- ══ C8 CUTOFF TRACK ════════════════════════════════════════════════ -->
+<section class="ds-section" id="cutoff">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C8</span><h2>Cutoff track</h2></div>
+  <p class="ds-lede">
+    The single biggest legibility win available. The caffeine dot row today packs intakes left-to-right
+    in log order and encodes lateness as a color swap — so the dots carry no time information at all,
+    and the one thing you want to see is the one thing you have to decode. Put the dots on a clock axis
+    and lateness becomes a position past a line.
+  </p>
+
+  <div class="ds-ba x-ba">
+    <div class="x-baCol is-now">
+      <h4>dot row</h4>
+      <div class="x-card">
+        <div class="x-cardK"><span>Caffeine timing</span><b>cutoff 16:00</b></div>
+        <div class="t-crow"><span class="t-crowD">Tue</span><span class="t-dots"><i></i><i></i></span><span class="t-lastt">10:45</span></div>
+        <div class="t-crow"><span class="t-crowD">Mon</span><span class="t-dots"><i></i><i></i><i class="t-dotLate"></i></span><span class="t-lastt">17:40</span></div>
+        <div class="t-crow"><span class="t-crowD">Sun</span><span class="t-dots"><i></i></span><span class="t-lastt">09:10</span></div>
+        <div class="t-crow"><span class="t-crowD">Sat</span><span class="t-dots"><i></i><i></i><i class="t-dotLate"></i><i class="t-dotLate"></i></span><span class="t-lastt">19:05</span></div>
+        <p class="ds-specNote" style="margin-top:10px">
+          Dot 2 on Monday could be 09:00 or 15:59 — nothing says. The purple is also the “today” purple.
+        </p>
+      </div>
+    </div>
+
+    <div class="x-baCol is-next">
+      <h4>cutoff track</h4>
+      <div class="x-card">
+        <div class="x-cardK"><span>Caffeine timing</span><b>cutoff 16:00</b></div>
+
+        <div class="x-ct">
+          <span class="x-ctD">Tue</span>
+          <span class="x-ctTrack">
+            <span class="x-ctAfter" style="left:60%"></span>
+            <span class="x-ctCut" style="left:60%"></span>
+            <span class="x-ctDot" style="left:15.8%"></span>
+            <span class="x-ctDot" style="left:33.8%"></span>
+          </span>
+          <span class="x-ctLast">10:45</span>
+        </div>
+
+        <div class="x-ct">
+          <span class="x-ctD">Mon</span>
+          <span class="x-ctTrack">
+            <span class="x-ctAfter" style="left:60%"></span>
+            <span class="x-ctCut" style="left:60%"></span>
+            <span class="x-ctDot" style="left:20%"></span>
+            <span class="x-ctDot" style="left:46.7%"></span>
+            <span class="x-ctDot is-late" style="left:68.3%"></span>
+          </span>
+          <span class="x-ctLast is-late">17:40</span>
+        </div>
+
+        <div class="x-ct">
+          <span class="x-ctD">Sun</span>
+          <span class="x-ctTrack">
+            <span class="x-ctAfter" style="left:60%"></span>
+            <span class="x-ctCut" style="left:60%"></span>
+            <span class="x-ctDot" style="left:25.8%"></span>
+          </span>
+          <span class="x-ctLast">09:10</span>
+        </div>
+
+        <div class="x-ct">
+          <span class="x-ctD">Sat</span>
+          <span class="x-ctTrack">
+            <span class="x-ctAfter" style="left:60%"></span>
+            <span class="x-ctCut" style="left:60%"></span>
+            <span class="x-ctDot" style="left:17.5%"></span>
+            <span class="x-ctDot" style="left:40%"></span>
+            <span class="x-ctDot is-late" style="left:64.2%"></span>
+            <span class="x-ctDot is-late" style="left:75.4%"></span>
+          </span>
+          <span class="x-ctLast is-late">19:05</span>
+        </div>
+
+        <div class="x-ctAx">
+          <span style="left:0">04</span>
+          <span style="left:20%">08</span>
+          <span style="left:40%">12</span>
+          <span class="is-cut" style="left:60.5%">16:00 cutoff</span>
+          <span style="left:100%">24</span>
+        </div>
+
+        <div class="x-foot"><span>Past cutoff on <b>2 of 4</b> days</span><span class="x-cov">4 / 4 logged</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="ds-specNote">
+    The tinted zone right of the rule is drawn even on clean days, so the cutoff is visible before any
+    intake is. Axis 04:00 → 24:00 rather than 00:00 → 24:00: nothing is ever logged at 02:00, and the
+    dead quarter costs the resolution that matters around the line. Same reasoning as the sleep band’s
+    18-hour axis.
+  </p>
+</section>
+
+<!-- ══ C9 COVERAGE FOOT ═══════════════════════════════════════════════ -->
+<section class="ds-section" id="coverage">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C9</span><h2>Coverage foot</h2></div>
+  <p class="ds-lede">
+    One row under every chart, mandatory, carrying the two things the manual already requires and no
+    chart currently prints: a factual summary with its denominator, and how much of the period was
+    actually logged. An average over 3 of 7 days is a different claim from an average over 7.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Full coverage</h3><code>.x-foot · .x-cov</code></div>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="x-chart">
+            <div class="x-foot"><span>In range <b>5 of 7</b> nights</span><span class="x-cov">7 / 7 logged</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="ds-specNote">Denominator is logged days, never calendar days. The pill states which.</p>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Thin coverage</h3><code>.x-cov.is-thin</code></div>
+      <div class="ds-preview">
+        <div class="ds-previewInner is-panel">
+          <div class="x-chart">
+            <div class="x-foot"><span>In range <b>2 of 3</b> logged nights</span><span class="x-cov is-thin">3 / 7 logged</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="ds-specNote">
+        Below half the period the pill turns <code>--warn</code> and the summary names the denominator
+        inline. Below two logged days the chart shows the bars but suppresses the summary entirely
+        rather than averaging two points — insufficient evidence qualifies or suppresses the claim.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ C10 SEGMENTED HOUR BAR ═════════════════════════════════════════ -->
+<section class="ds-section" id="hours">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C10</span><h2>Segmented hour bar</h2></div>
+  <p class="ds-lede">
+    A sixth chart type, and the right one for sleep. A continuous bar makes you estimate “that looks
+    like about seven hours”; a stack of one-hour blocks makes you <em>count</em>. It is the same
+    argument the mood grid already wins — discrete units stay countable in a way a height never is —
+    applied to the metric where the exact number is the whole point.
+  </p>
+
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Sleep · one block per hour · goal 7h, band 7–9h</h3><code>.x-hours · .x-hourCol</code></div>
+    <p class="ds-specNote">
+      Ten blocks per column on a 0–10h scale, 2px gaps, empty blocks left as <code>--rail</code> so the
+      scale stays visible on a short night. Hours below the goal are <code>--a800</code>; hours inside
+      the band above it are <code>--a500</code>; hours past the band top are <code>--warn</code>. A day
+      that finished short recolors <em>all</em> its blocks to the breach tone, because the verdict is on
+      the night, not on the individual hour. The final part-hour renders at 45% opacity.
+    </p>
+    <div class="ds-preview">
+      <div class="ds-previewInner is-panel">
+        <div class="x-card">
+          <div class="x-cardK"><span>Sleep · 7d</span><b>goal 7h · avg 7h 27m</b></div>
+          <div class="x-chart" style="padding-left:22px">
+            <div class="x-hours">
+              <div class="x-hourScale">
+                <span style="bottom:0">0</span>
+                <span style="bottom:20%">2</span>
+                <span style="bottom:40%">4</span>
+                <span style="bottom:60%">6</span>
+                <span style="bottom:80%">8</span>
+                <span style="bottom:100%">10</span>
+              </div>
+              <div class="x-rule" style="bottom:70%"></div>
+
+              <div class="x-hourCol">
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-goal is-part"></i><i></i><i></i>
+              </div>
+
+              <div class="x-hourCol is-short">
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base is-part"></i>
+                <i></i><i></i><i></i>
+              </div>
+
+              <div class="x-hourCol is-miss">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+
+              <div class="x-hourCol">
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-goal"></i><i class="is-goal is-part"></i><i></i>
+              </div>
+
+              <div class="x-hourCol is-bad">
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-base"></i><i class="is-base is-part"></i>
+                <i></i><i></i><i></i><i></i>
+              </div>
+
+              <div class="x-hourCol">
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-goal"></i><i class="is-goal"></i><i class="is-over is-part"></i>
+              </div>
+
+              <div class="x-hourCol is-today">
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-base"></i><i class="is-base"></i><i class="is-base"></i>
+                <i class="is-goal is-part"></i><i></i><i></i>
+              </div>
+            </div>
+            <div class="x-ax" style="margin-left:22px">
+              <span>W</span><span class="x-axFlag">T</span><span class="x-axMiss">F</span><span>S</span><span class="x-axFlag">S</span><span class="x-axFlag">M</span><span class="x-axToday">T</span>
+            </div>
+            <div class="x-foot" style="margin-left:22px"><span>In range <b>3 of 6</b> logged nights · 1 long, 2 short</span><span class="x-cov">6 / 7</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="ds-specNote">
+      Read it without a legend: Thursday is six blocks and change, Sunday is five and a half, Monday
+      runs past the band. The goal line is at a block boundary, which is what makes the count and the
+      rule agree instead of competing.
+    </p>
+  </div>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Use it where the unit is the point</h4><p>Sleep hours, gym sets, meals, cups. If a user would say the number out loud — “I got six hours” — the blocks should be countable.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don’t</span> Segment a continuous quantity</h4><p>Protein grams keep the plain bar. Chopping 160g into blocks invents a unit the user does not think in and costs the resolution the rule needs.</p></div>
+  </div>
+</section>
+
+<!-- ══ C11 TOOLTIP ════════════════════════════════════════════════════ -->
+<section class="ds-section" id="tooltip">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C11</span><h2>Column tooltip</h2></div>
+  <p class="ds-lede">
+    The chart should answer the follow-up question in place. Today, seeing that Sunday was short means
+    opening the ledger to find out when you went to bed. The tooltip carries the date, the value, the
+    verdict against the goal, and <em>what made the number up</em> — so a week review never leaves the
+    chart.
+  </p>
+
+  <div class="ds-cols">
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Anatomy</h3><code>.x-tip · .x-tipD · .x-tipV · .x-tipS · .x-tipRow</code></div>
+      <p class="ds-specNote">
+        Date eyebrow, value at 15px, one verdict line in the state color, then composition rows under a
+        hairline. On <code>--sheet</code> with <code>--sh-md</code>, matching the timeline tooltip
+        already in the app rather than inventing a second popover style.
+      </p>
+      <div class="ds-preview" style="padding-top:186px">
+        <div class="ds-previewInner is-panel">
+          <div class="x-chart">
+            <div class="x-plot">
+              <div class="x-band" style="bottom:70%;height:20%"><span class="x-bandK">7–9h</span></div>
+              <i class="x-hit" style="height:77.5%"></i>
+              <i class="x-warn" style="height:61.7%"></i>
+              <i class="x-miss"></i>
+              <i class="x-hit" style="height:83.3%"></i>
+              <i class="x-bad x-tipCol is-open" style="height:55.8%">
+                <span class="x-tip">
+                  <span class="x-tipD">Sun 24 Jul</span>
+                  <span class="x-tipV">5h 35m</span>
+                  <span class="x-tipS is-bad">1h 25m below your range</span>
+                  <span class="x-tipRow"><span>Asleep</span><b>23:50</b></span>
+                  <span class="x-tipRow"><span>Woke</span><b>05:25</b></span>
+                  <span class="x-tipRow"><span>Last caffeine</span><b>16:50</b></span>
+                </span>
+              </i>
+              <i class="x-warn" style="height:95%"></i>
+              <i class="x-hit x-today" style="height:73.3%"></i>
+            </div>
+            <div class="x-ax">
+              <span>W</span><span class="x-axFlag">T</span><span class="x-axMiss">F</span><span>S</span><span class="x-axFlag">S</span><span class="x-axFlag">M</span><span class="x-axToday">T</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="ds-specNote">
+        The third row is the cross-domain one: the late coffee that probably shortened that night is
+        right there, stated as an aligned observation and never as a cause.
+      </p>
+    </div>
+
+    <div class="ds-spec">
+      <div class="ds-specHead"><h3>Three ways in</h3><code>.x-hit-area · :focus-visible · .is-open</code></div>
+      <p class="ds-specNote">
+        A tooltip that only answers to a mouse fails half this app’s usage. Each column gets a
+        transparent <code>button</code> covering the bar and its axis label — a real hit target, not a
+        <code>title</code> attribute.
+      </p>
+      <table class="ds-table">
+        <thead><tr><th>Input</th><th>Behavior</th></tr></thead>
+        <tbody>
+          <tr><td class="ds-tdKey">Hover</td><td>Opens on the column, 150ms fade with a 3px rise.</td></tr>
+          <tr><td class="ds-tdKey">Keyboard</td><td>Each column is one tab stop; <code>:focus-visible</code> opens the tooltip and draws an accent outline. Escape closes without moving focus.</td></tr>
+          <tr><td class="ds-tdKey">Tap</td><td>Toggles <code>.is-open</code>; tapping elsewhere or the same column closes. This is the mobile path, so it is the one that must not regress.</td></tr>
+          <tr><td class="ds-tdKey">Screen reader</td><td>The button’s accessible name is the whole sentence — “Sunday 24 July, 5 hours 35 minutes, 1 hour 25 below your range” — so the tooltip is never the only route to the value.</td></tr>
+          <tr><td class="ds-tdKey">Reduced motion</td><td>Opens with no transition. The tooltip still appears; only the fade and rise are dropped.</td></tr>
+        </tbody>
+      </table>
+      <p class="ds-specNote">
+        Edge columns clamp horizontally so the popover never leaves the card. The tooltip is
+        supplementary by contract: everything in it is also reachable from the chart’s data table.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ C12 WEEK MATRIX ════════════════════════════════════════════════ -->
+<section class="ds-section" id="matrix">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C12</span><h2>Week matrix</h2></div>
+  <p class="ds-lede">
+    “How is my week going?” is a question no current screen answers. Four separate charts each answer
+    one metric, and nothing shows them together. The matrix is one row per tracker, one column per day,
+    one glyph per cell — the whole week across every domain, in about a second.
+  </p>
+
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Five trackers · seven days</h3><code>.x-matrix · .x-cell</code></div>
+    <p class="ds-specNote">
+      Each cell is a 26px chip carrying a <strong>shape</strong>, not just a color: check for in goal,
+      caret up for over, caret down for under, hollow for not logged, split fill for in progress.
+      The glyph is what makes it readable in grayscale and to a colorblind reader — the fill is
+      reinforcement. Today is a tinted <em>column rail</em>, never a different chip color, so “which day
+      is now” and “how did that day go” stay on separate channels.
+    </p>
+    <div class="ds-preview">
+      <div class="ds-previewInner is-panel">
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+          <defs>
+            <symbol id="s-ok" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+            <symbol id="s-over" viewBox="0 0 24 24"><path d="m5 15 7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+            <symbol id="s-under" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+            <symbol id="s-none" viewBox="0 0 24 24"><path d="M7 12h10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path></symbol>
+            <symbol id="s-part" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2.2"></circle><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"></path></symbol>
+          </defs>
+        </svg>
+
+        <div class="x-card">
+          <div class="x-cardK"><span>Week of 20 Jul</span><b>4 of 5 trackers on plan</b></div>
+          <table class="x-matrix">
+            <thead>
+              <tr>
+                <th scope="col"><span class="ds-srOnly">Tracker</span></th>
+                <th scope="col">W</th><th scope="col">T</th><th scope="col">F</th>
+                <th scope="col">S</th><th scope="col">S</th><th scope="col">M</th>
+                <th scope="col" class="is-today">T</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Sleep</th>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-under"><svg aria-hidden="true"><use href="#s-under"></use></svg></span></td>
+                <td><span class="x-cell is-none"><svg aria-hidden="true"><use href="#s-none"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-bad"><svg aria-hidden="true"><use href="#s-under"></use></svg></span></td>
+                <td><span class="x-cell is-over"><svg aria-hidden="true"><use href="#s-over"></use></svg></span></td>
+                <td class="is-todayCol"><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+              </tr>
+              <tr>
+                <th scope="row">Protein</th>
+                <td><span class="x-cell is-under"><svg aria-hidden="true"><use href="#s-under"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-bad"><svg aria-hidden="true"><use href="#s-under"></use></svg></span></td>
+                <td><span class="x-cell is-none"><svg aria-hidden="true"><use href="#s-none"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td class="is-todayCol"><span class="x-cell is-partial"><svg aria-hidden="true"><use href="#s-part"></use></svg></span></td>
+              </tr>
+              <tr>
+                <th scope="row">Caffeine</th>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-over"><svg aria-hidden="true"><use href="#s-over"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-over"><svg aria-hidden="true"><use href="#s-over"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td class="is-todayCol"><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+              </tr>
+              <tr>
+                <th scope="row">Gym</th>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-none"><svg aria-hidden="true"><use href="#s-none"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-none"><svg aria-hidden="true"><use href="#s-none"></use></svg></span></td>
+                <td><span class="x-cell is-none"><svg aria-hidden="true"><use href="#s-none"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td class="is-todayCol"><span class="x-cell is-none"><svg aria-hidden="true"><use href="#s-none"></use></svg></span></td>
+              </tr>
+              <tr>
+                <th scope="row">Mood</th>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-under"><svg aria-hidden="true"><use href="#s-under"></use></svg></span></td>
+                <td><span class="x-cell is-none"><svg aria-hidden="true"><use href="#s-none"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+                <td class="is-todayCol"><span class="x-cell is-goal"><svg aria-hidden="true"><use href="#s-ok"></use></svg></span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="x-legend">
+            <span><i></i>in goal</span>
+            <span><i class="is-warn"></i>over / under</span>
+            <span><i class="is-bad"></i>well outside</span>
+            <span><i class="is-none"></i>not logged</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="ds-specNote">
+      The vertical read is the one you cannot get today: Saturday is a hole across four trackers, and
+      Sunday’s short night sits directly under Sunday’s second late coffee. That column-wise
+      juxtaposition is the “clear image of how my week is going” — and it stays an <em>observation</em>,
+      with no arrow drawn between the two rows.
+    </p>
+  </div>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-do"><h4><span class="ds-ruleTag">Do</span> Ship it as a real table</h4><p><code>&lt;table&gt;</code> with <code>scope</code> on both header axes. The matrix is simultaneously the glanceable view and the structured data view C15 asks for — one component satisfies both.</p></div>
+    <div class="ds-rule ds-dont"><h4><span class="ds-ruleTag">Don’t</span> Score the week</h4><p>No percentage, no grade, no streak. The header states a count over a denominator and stops there.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> This is the mobile answer</h4><p>Mobile has no week view at all today. The matrix is compact enough for a 28rem column, which makes it the natural first week surface on the phone.</p></div>
+  </div>
+</section>
+
+<!-- ══ C13 REBUILT ════════════════════════════════════════════════════ -->
+<section class="ds-section" id="rebuilt">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C13</span><h2>The week column, rebuilt</h2></div>
+  <p class="ds-lede">
+    Every part above, applied to the real right-hand column of the desktop console. Same four metrics,
+    same data, same tokens, no new dependency — the difference is that each chart now states its goal.
+  </p>
+
+  <div class="x-ba">
+    <div class="x-baCol is-now">
+      <h4>WeekStats.tsx</h4>
+      <div class="x-card">
+        <div class="x-cardK"><span>Sleep</span><b>avg 7h 27m</b></div>
+        <div class="t-spark">
+          <i class="t-sparkOn" style="height:86%"></i><i style="height:68.5%"></i><i class="t-sparkLow" style="height:4%"></i><i class="t-sparkOn" style="height:92.6%"></i><i class="t-sparkLow" style="height:62%"></i><i class="t-sparkOn" style="height:100%"></i><i class="t-sparkToday" style="height:81.5%"></i>
+        </div>
+        <div class="t-sparkx"><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span>M</span><span>T</span></div>
+      </div>
+
+      <div class="x-card" style="margin-top:12px">
+        <div class="x-cardK"><span>Protein</span><b>target 160 g</b></div>
+        <div class="t-spark">
+          <i style="height:92.5%"></i><i class="t-sparkOn" style="height:100%"></i><i class="t-sparkLow" style="height:60%"></i><i class="t-sparkLow" style="height:4%"></i><i class="t-sparkOn" style="height:100%"></i><i class="t-sparkOn" style="height:100%"></i><i class="t-sparkToday" style="height:70%"></i>
+        </div>
+        <div class="t-sparkx"><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span>M</span><span>T</span></div>
+      </div>
+
+      <p class="ds-specNote" style="margin-top:12px">
+        Sleep: 5h35 and “unlogged” share a color; a 9h30 night is the tallest bar on the chart.
+        Protein: three days pin at 100% — 172g, 178g and 232g are indistinguishable. Neither chart
+        draws its goal. No denominators.
+      </p>
+    </div>
+
+    <div class="x-baCol is-next">
+      <h4>same data</h4>
+      <div class="x-card">
+        <div class="x-cardK"><span>Sleep · band 7–9h</span><b>avg 7h 27m</b></div>
+        <div class="x-chart">
+          <div class="x-plot">
+            <div class="x-band" style="bottom:70%;height:20%"><span class="x-bandK">7–9h</span></div>
+            <i class="x-hit" style="height:77.5%"></i>
+            <i class="x-warn" style="height:61.7%"></i>
+            <i class="x-miss"></i>
+            <i class="x-hit" style="height:83.3%"></i>
+            <i class="x-bad" style="height:55.8%"></i>
+            <i class="x-warn" style="height:95%"></i>
+            <i class="x-hit x-today" style="height:73.3%"></i>
+          </div>
+          <div class="x-ax"><span>W</span><span class="x-axFlag">T</span><span class="x-axMiss">F</span><span>S</span><span class="x-axFlag">S</span><span class="x-axFlag">M</span><span class="x-axToday">T</span></div>
+          <div class="x-foot"><span>In range <b>3 of 6</b> logged nights</span><span class="x-cov">6 / 7</span></div>
+        </div>
+      </div>
+
+      <div class="x-card" style="margin-top:12px">
+        <div class="x-cardK"><span>Protein · floor 160 g</span><b>avg 156 g</b></div>
+        <div class="x-chart">
+          <div class="x-plot">
+            <div class="x-rule" style="bottom:80%"><span class="x-ruleK">160 g</span></div>
+            <i style="height:74%"></i>
+            <i class="x-hit" style="height:86%"></i>
+            <i class="x-warn" style="height:48%"></i>
+            <i class="x-miss"></i>
+            <i class="x-hit" style="height:89%"></i>
+            <i class="x-hit x-over" style="height:100%"><span class="x-overTag">232</span></i>
+            <i class="x-today" style="height:56%"></i>
+          </div>
+          <div class="x-ax"><span>W</span><span>T</span><span class="x-axFlag">F</span><span class="x-axMiss">S</span><span>S</span><span>M</span><span class="x-axToday">T</span></div>
+          <div class="x-foot"><span>Reached the floor <b>3 of 6</b> logged days</span><span class="x-cov">6 / 7</span></div>
+        </div>
+      </div>
+
+      <p class="ds-specNote" style="margin-top:12px">
+        Sleep: the band is the subject, Friday is a hole, Monday’s long night is flagged as a
+        deviation rather than rewarded as the tallest bar. Protein: the floor is drawn, the 232g
+        day is labeled, Friday’s shortfall has a visible size.
+      </p>
+    </div>
+  </div>
+
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Mood keeps its grid</h3><code>.mgrid — unchanged</code></div>
+    <p class="ds-specNote">
+      Worth saying explicitly: the stacked count grid is the one chart in the app that is already
+      right. Mood is a 1–5 ordinal, the grid keeps the units countable, and it has no goal — so it
+      takes no rule, no band, and no breach color. It gains only the missing-day treatment (an empty
+      column reads as absent already) and a coverage foot. Do not add a target to a metric the user
+      has not set one for.
+    </p>
+  </div>
+</section>
+
+<!-- ══ C11 SEMANTICS ══════════════════════════════════════════════════ -->
+<section class="ds-section" id="semantics">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C14</span><h2>Color semantics after the change</h2></div>
+  <p class="ds-lede">
+    No new tokens. The change is that the semantic trio finally reaches the charts, and the accent
+    ramp goes back to meaning one thing.
+  </p>
+
+  <table class="ds-table">
+    <thead><tr><th>Token</th><th>Meant, in charts</th><th>Now means</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey"><code>--accent</code></td><td>Today, <em>and</em> a late caffeine intake</td><td>Now / today only — as an underline below the baseline, never as a fill.</td></tr>
+      <tr><td class="ds-tdKey"><code>--a500</code></td><td>Hit the target</td><td>Unchanged: satisfies the goal shape.</td></tr>
+      <tr><td class="ds-tdKey"><code>--a800</code></td><td>Ordinary bar</td><td>Unchanged: logged, no goal verdict.</td></tr>
+      <tr><td class="ds-tdKey"><code>--a900</code></td><td>Low <em>and</em> missing</td><td>Retired from charts. Low is <code>--warn</code>; missing has no fill.</td></tr>
+      <tr><td class="ds-tdKey"><code>--warn</code></td><td>Unused in charts</td><td>Soft breach, plus the cutoff rule and its zone.</td></tr>
+      <tr><td class="ds-tdKey"><code>--bad</code></td><td>Unused in charts</td><td>Hard breach.</td></tr>
+      <tr><td class="ds-tdKey"><code>--ok</code></td><td>Unused in charts</td><td>The target band tint and its dashed edges, at low alpha.</td></tr>
+      <tr><td class="ds-tdKey"><code>--t4</code></td><td>Axis ticks</td><td>Also the reference rule.</td></tr>
+      <tr><td class="ds-tdKey"><code>--t5</code></td><td>Axis ticks, disabled meta</td><td>Also the missing-day gutter, ring and letter.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="ds-specNote">
+    The one judgment call: <code>--warn</code> and <code>--bad</code> arrive in charts carrying
+    connotations the goal-language rules push back on. They are acceptable because they describe
+    the <em>measurement’s</em> relation to a goal the user set, and because every one of them is
+    paired with factual copy and a denominator. If a tracker has no goal, it gets no breach color —
+    that is the guard.
+  </p>
+</section>
+
+<!-- ══ C12 DATA VIEW ══════════════════════════════════════════════════ -->
+<section class="ds-section" id="access">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C15</span><h2>The structured data view</h2></div>
+  <p class="ds-lede">
+    The manual has required an equivalent way to read every chart since it was written; no chart has
+    one. The cheapest conformant answer that fits this app: each chart renders a real table as its
+    accessible sibling, visually hidden, plus a visible toggle on desktop.
+  </p>
+
+  <div class="ds-spec">
+    <div class="ds-specHead"><h3>Shape</h3><code>proposed</code></div>
+    <p class="ds-specNote">
+      The plot becomes <code>role="img"</code> with an <code>aria-label</code> carrying the summary
+      sentence — “Sleep, last 7 days. In range 3 of 6 logged nights. Friday not logged.” — and the
+      decorative bars stay hidden. The table below is the real record and is what a screen reader,
+      a keyboard user, and anyone who wants the number reads. Bars stay non-interactive: they are not
+      buttons today, and making seven <code>&lt;i&gt;</code> elements focusable to expose values a table
+      already lists would add a tab stop per day for nothing.
+    </p>
+    <div class="ds-preview">
+      <div class="ds-previewInner is-panel">
+        <table class="ds-table" style="margin:0">
+          <caption style="text-align:left;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);padding-bottom:9px">Sleep · 20 Jul – 26 Jul · Africa/Casablanca · goal 7–9h</caption>
+          <thead><tr><th>Day</th><th>Duration</th><th>Vs. goal</th></tr></thead>
+          <tbody>
+            <tr><td class="ds-tdKey">Wed 20</td><td>7h 45m</td><td>In range</td></tr>
+            <tr><td class="ds-tdKey">Thu 21</td><td>6h 10m</td><td>50m below range</td></tr>
+            <tr><td class="ds-tdKey">Fri 22</td><td>Not logged</td><td>—</td></tr>
+            <tr><td class="ds-tdKey">Sat 23</td><td>8h 20m</td><td>In range</td></tr>
+            <tr><td class="ds-tdKey">Sun 24</td><td>5h 35m</td><td>1h 25m below range</td></tr>
+            <tr><td class="ds-tdKey">Mon 25</td><td>9h 30m</td><td>30m above range</td></tr>
+            <tr><td class="ds-tdKey">Tue 26</td><td>7h 20m</td><td>In range · today</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="ds-specNote">
+      Note the caption carries period, timezone and goal — three of the eight items on the chart
+      release checklist that currently appear on no chart at all. The “Vs. goal” column is the
+      breach scale in words, which is what makes the hatch redundant rather than essential.
+    </p>
+  </div>
+</section>
+
+<!-- ══ C13 ADOPTION ═══════════════════════════════════════════════════ -->
+<section class="ds-section" id="adoption">
+  <div class="ds-sectionHead"><span class="ds-sectionNum">C16</span><h2>Adoption order</h2></div>
+  <p class="ds-lede">
+    Ordered by truthfulness-per-diff. The first three are small and fix things that are currently
+    misleading; the rest are additive.
+  </p>
+
+  <table class="ds-table">
+    <thead><tr><th>#</th><th>Change</th><th>Touches</th></tr></thead>
+    <tbody>
+      <tr><td class="ds-tdKey">1</td><td>Single source for every threshold. One <code>GOALS</code> record with metric, shape, bounds and scale, replacing <code>SLEEP_ON_MIN</code> / <code>SLEEP_GOAL_MIN</code> / <code>PROTEIN_TARGET_G</code> / <code>CAFFEINE_CUTOFF_MIN</code> scattered across two components and one lib.</td><td><code>lib/goals.ts</code> (new, tested), <code>WeekStats</code>, <code>GoalCards</code>, <code>MobileGoalCards</code>, <code>WeekPanel</code></td></tr>
+      <tr><td class="ds-tdKey">2</td><td>Missing mark. Stop mapping <code>null</code> to a short low bar.</td><td><code>WeekStats</code>, <code>WeekPanel</code>, CSS</td></tr>
+      <tr><td class="ds-tdKey">3</td><td>Overshoot: scale to <code>max(goal × 1.25, observed)</code>, cap and label anything beyond.</td><td><code>WeekStats</code>, <code>lib/nutrition/stats.ts</code></td></tr>
+      <tr><td class="ds-tdKey">4</td><td>Reference rule and target band; sleep becomes a band metric.</td><td>CSS + the two spark call sites</td></tr>
+      <tr><td class="ds-tdKey">5</td><td>Breach scale; retire <code>--accent</code> as an alarm; today moves to an underline.</td><td>CSS, <code>WeekStats</code></td></tr>
+      <tr><td class="ds-tdKey">6</td><td>Coverage foot on all charts; “Streak at target” becomes “Days at target”.</td><td>All four chart sites, <code>lib/nutrition/stats.ts</code></td></tr>
+      <tr><td class="ds-tdKey">7</td><td>Cutoff track replaces the dot row, and caffeine gains a <em>count</em> ceiling alongside its time cutoff — “more than 3 in a day” is flagged as well as “later than 16:00”.</td><td><code>WeekStats</code>, <code>lib/goals.ts</code>, CSS</td></tr>
+      <tr><td class="ds-tdKey">8</td><td>Segmented hour bar for sleep (C10).</td><td><code>WeekStats</code>, CSS</td></tr>
+      <tr><td class="ds-tdKey">9</td><td>Column tooltip on every chart (C11), with hover, focus and tap paths.</td><td>Shared chart component, CSS</td></tr>
+      <tr><td class="ds-tdKey">10</td><td>Week matrix (C12) on both surfaces — and mobile’s first week view.</td><td>New component, <code>DesktopHome</code>, <code>MobileHome</code></td></tr>
+      <tr><td class="ds-tdKey">11</td><td>Pace marker on accumulating goal cards, reusing the existing pace math.</td><td><code>GoalCards</code>, <code>MobileGoalCards</code>, <code>lib/nutrition/stats.ts</code></td></tr>
+      <tr><td class="ds-tdKey">12</td><td><code>role="img"</code> + summary label + structured table per chart. The matrix already is one.</td><td>All chart sites</td></tr>
+      <tr><td class="ds-tdKey">13</td><td>Goal shape becomes a required field in the new-tracker spec; fold this page into the catalog’s §16 and close the charts row in the conformance register.</td><td>Design system</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ds-rules">
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> Still no chart library</h4><p>Everything here is divs, one dashed border, one <code>color-mix</code> and percentage positioning. The runtime dependency cap holds.</p></div>
+    <div class="ds-rule ds-note"><h4><span class="ds-ruleTag">Note</span> Sources</h4><p>Reasoning and citations for the reference rule, missing-data mark, breach scale and bullet-graph pace marker are in <a href="CHARTS.md" style="color:var(--a300)">CHARTS.md</a>.</p></div>
+  </div>
+</section>
+
+</main>
+</body>
+</html>
