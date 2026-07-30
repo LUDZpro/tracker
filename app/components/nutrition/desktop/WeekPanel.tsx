@@ -1,6 +1,12 @@
 'use client';
 
+import { PROTEIN_GOAL, coverage, evaluate, scaleFor } from '@/lib/goals';
+import { dayLabel } from '@/lib/weekStats';
 import type { NutritionStats } from '@/lib/nutrition/stats';
+import ChartAxis from '@/components/charts/ChartAxis';
+import ChartFoot from '@/components/charts/ChartFoot';
+import Spark from '@/components/charts/Spark';
+import type { ChartPoint } from '@/components/charts/types';
 import styles from './nutrition-console.module.css';
 
 interface Props {
@@ -9,9 +15,35 @@ interface Props {
 }
 
 export default function WeekPanel({ stats, proteinTarget }: Props) {
-  // Bars scale against a ceiling slightly above target so a hit day reads tall
-  // without maxing the chart.
-  const ceiling = Math.max(170, proteinTarget + 20);
+  const goal = { ...PROTEIN_GOAL, min: proteinTarget };
+  const days = stats?.days ?? [];
+
+  const points: ChartPoint[] = days.map((d) => {
+    // An unlogged day is a gap, never a very bad day.
+    const value = d.logged ? d.protein : null;
+    const state = evaluate(goal, value);
+    return {
+      key: d.key,
+      label: d.label,
+      value,
+      state,
+      isToday: d.isToday,
+      tip: {
+        day: dayLabel(d.key),
+        value: value === null ? 'Not logged' : `${value}g`,
+        verdict:
+          value === null
+            ? 'No meals recorded'
+            : state === 'goal'
+              ? `Reached ${proteinTarget}g`
+              : `${proteinTarget - value}g short of ${proteinTarget}g`,
+      },
+    };
+  });
+
+  const values = points.map((p) => p.value);
+  const cov = coverage(values);
+  const scale = scaleFor(goal, values);
 
   return (
     <div className={styles.col}>
@@ -19,44 +51,41 @@ export default function WeekPanel({ stats, proteinTarget }: Props) {
         Protein · 7 days
       </span>
       <div className={styles.panelCard}>
-        <div className={styles.bars}>
-          {(stats?.days ?? Array.from({ length: 7 }, () => null)).map((d, i) =>
-            d === null ? (
-              <i key={i} className={styles.bar} style={{ height: '8%' }} />
-            ) : (
-              <i
-                key={d.key}
-                className={`${styles.bar} ${d.isToday ? styles.barToday : d.hit ? styles.barHit : ''}`}
-                style={{
-                  height: `${Math.max(8, Math.round((d.protein / ceiling) * 100))}%`,
-                }}
-                title={`${d.key}: ${d.protein}g`}
-              />
-            ),
-          )}
-        </div>
-        <div className={styles.barLabels}>
-          {(stats?.days ?? []).map((d) => (
-            <span key={d.key} className={styles.barLabel}>
-              {d.label}
-            </span>
-          ))}
-        </div>
-        <div className={styles.chartFoot}>
-          <span>7-day average</span>
-          <span>{stats ? `${stats.weekAvg}g` : '—'}</span>
-        </div>
-        <div className={styles.chartFootRow}>
-          <span>Target hit</span>
-          <span>{stats ? `${stats.weekHits} of 7 days` : '—'}</span>
-        </div>
+        {stats === null ? (
+          <div className={styles.paceText}>Loading the week…</div>
+        ) : (
+          <>
+            <Spark
+              points={points}
+              scaleMax={scale}
+              rule={{ value: proteinTarget, label: `${proteinTarget} g` }}
+              capAbove={Math.max(goal.scaleMax, proteinTarget + 40)}
+              formatCap={(v) => `${v}`}
+            />
+            <ChartAxis points={points} />
+            <ChartFoot
+              summary="Reached the floor"
+              count={`${stats.weekHits} of ${stats.daysLogged} logged days`}
+              coverage={cov}
+            />
+            <div className={styles.chartFootRow}>
+              <span>Average per logged day</span>
+              <span>{`${stats.weekAvg}g`}</span>
+            </div>
+          </>
+        )}
       </div>
 
       <span className={`${styles.sectionLabel} ${styles.panelGap}`}>This week</span>
       <div className={`${styles.panelCard} ${styles.panelCardRows}`}>
         <div className={styles.panelRow}>
-          <span>Streak at target</span>
-          <span className={styles.panelVal}>{stats ? `${stats.streak} days` : '—'}</span>
+          {/* Not "streak": the manual's goal-language table lists streak
+              framing as the thing to avoid, since a gap should not erase
+              the days that did go well. */}
+          <span>Days at target</span>
+          <span className={styles.panelVal}>
+            {stats ? `${stats.weekHits} of ${stats.daysLogged}` : '—'}
+          </span>
         </div>
         <div className={styles.panelRow}>
           <span>Avg per meal</span>

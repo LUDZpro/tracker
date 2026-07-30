@@ -6,6 +6,7 @@ import HistoryPager from '@/components/home/HistoryPager';
 import LastLine from '@/components/home/LastLine';
 import MobileGoalCards from '@/components/home/MobileGoalCards';
 import MobileTopbar from '@/components/home/MobileTopbar';
+import MobileWeek from '@/components/home/MobileWeek';
 import QueueBanner from '@/components/home/QueueBanner';
 import ScaleQuickLog from '@/components/home/ScaleQuickLog';
 import TodayList from '@/components/home/TodayList';
@@ -253,6 +254,7 @@ export default function MobileHome() {
           )}
           {live && <ScaleQuickLog events={stripEvents} onLog={log} />}
           {live && <MobileGoalCards today={today} todayEvents={todayEvents} />}
+          {live && todayKey && <MobileWeek week={week} todayKey={todayKey} error={null} />}
           {live && duplicate && (
             <DuplicateCard
               attempt={duplicate}

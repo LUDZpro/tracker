@@ -1,12 +1,19 @@
 'use client';
 
 import { Icon } from './presentation';
-import { CAFFEINE_CUTOFF_MIN, PROTEIN_TARGET_G } from '@/lib/weekStats';
-import { minutesBetween, wallHHMM, wallMinutes } from '@/lib/time';
+import {
+  CAFFEINE_COUNT_GOAL,
+  CAFFEINE_TIME_GOAL,
+  PROTEIN_GOAL,
+  SLEEP_GOAL,
+  evaluate,
+  isBreach,
+} from '@/lib/goals';
+import { formatDuration } from '@/lib/weekStats';
+import { minutesBetween, wallHHMM, wallMinutes, wallParts } from '@/lib/time';
+import PaceBar, { paceState } from '../charts/PaceBar';
 import type { AppEvent, TodayResponse } from '@/lib/types';
 import styles from './desktop.module.css';
-
-const SLEEP_GOAL_MIN = 8 * 60;
 
 type Status = 'done' | 'warn' | 'open';
 
@@ -33,10 +40,12 @@ interface CardProps {
   n: React.ReactNode;
   small?: boolean;
   bar?: number; // 0–100
+  /** Renders a pace-marked bar instead of a plain one. */
+  pace?: { value: number; goal: number; hourOfDay: number };
   s: string;
 }
 
-function Card({ title, icon, status, n, small, bar, s }: CardProps) {
+function Card({ title, icon, status, n, small, bar, pace, s }: CardProps) {
   return (
     <div className={styles.card}>
       <StatusDot status={status} />
@@ -45,10 +54,14 @@ function Card({ title, icon, status, n, small, bar, s }: CardProps) {
         {title}
       </div>
       <div className={`${styles.cardN} ${small ? styles.cardNsm : ''}`}>{n}</div>
-      {bar !== undefined && (
-        <div className={styles.bar}>
-          <i style={{ width: `${Math.min(100, Math.max(0, bar))}%` }} />
-        </div>
+      {pace !== undefined ? (
+        <PaceBar value={pace.value} goal={pace.goal} hourOfDay={pace.hourOfDay} />
+      ) : (
+        bar !== undefined && (
+          <div className={styles.bar}>
+            <i style={{ width: `${Math.min(100, Math.max(0, bar))}%` }} />
+          </div>
+        )
       )}
       <div className={styles.cardS}>{s}</div>
     </div>
@@ -78,7 +91,18 @@ export default function GoalCards({ today, todayEvents }: Props) {
     .filter((e) => e.type === 'caffeine')
     .sort((a, b) => Date.parse(a.occurredAt) - Date.parse(b.occurredAt));
   const lastCaf = caffeine[caffeine.length - 1];
-  const late = lastCaf !== undefined && wallMinutes(lastCaf.occurredAt) >= CAFFEINE_CUTOFF_MIN;
+  const timeState = lastCaf ? evaluate(CAFFEINE_TIME_GOAL, wallMinutes(lastCaf.occurredAt)) : 'goal';
+  const countState = evaluate(CAFFEINE_COUNT_GOAL, caffeine.length);
+  const late = isBreach(timeState);
+  const tooMany = isBreach(countState);
+
+  // Sleep is a band: a long night is a deviation, not a better score.
+  const sleepState = evaluate(SLEEP_GOAL, night);
+
+  // Protein accumulates through the day, so its verdict depends on the hour.
+  const nowParts = wallParts(new Date().toISOString());
+  const hourOfDay = nowParts ? nowParts.hour + nowParts.minute / 60 : 12;
+  const pace = paceState(protein, PROTEIN_GOAL.min, hourOfDay);
 
   return (
     <div className={styles.sec}>
@@ -87,20 +111,26 @@ export default function GoalCards({ today, todayEvents }: Props) {
         <Card
           title="Protein"
           icon="meal"
-          status={protein >= PROTEIN_TARGET_G ? 'done' : 'open'}
+          status={protein >= PROTEIN_GOAL.min ? 'done' : pace.behind ? 'warn' : 'open'}
           n={
             <>
               {protein}
-              <small>/ {PROTEIN_TARGET_G} g</small>
+              <small>/ {PROTEIN_GOAL.min} g</small>
             </>
           }
-          bar={(protein / PROTEIN_TARGET_G) * 100}
-          s={protein >= PROTEIN_TARGET_G ? 'Target met' : `${PROTEIN_TARGET_G - protein} g to go`}
+          pace={{ value: protein, goal: PROTEIN_GOAL.min, hourOfDay }}
+          s={
+            protein >= PROTEIN_GOAL.min
+              ? 'Target met'
+              : pace.behind
+                ? `${pace.diff} g behind pace · ${PROTEIN_GOAL.min - protein} g to go`
+                : `${pace.diff} g ahead of pace · ${PROTEIN_GOAL.min - protein} g to go`
+          }
         />
         <Card
           title="Sleep"
           icon="sleep"
-          status={night !== null && night >= 7 * 60 ? 'done' : night !== null ? 'warn' : 'open'}
+          status={sleepState === 'goal' ? 'done' : sleepState === 'none' ? 'open' : 'warn'}
           n={
             night !== null ? (
               <>
@@ -113,10 +143,16 @@ export default function GoalCards({ today, todayEvents }: Props) {
               </>
             )
           }
-          bar={night !== null ? (night / SLEEP_GOAL_MIN) * 100 : 0}
+          bar={night !== null ? (night / SLEEP_GOAL.max) * 100 : 0}
           s={
-            start && end
-              ? `${wallHHMM(start.occurredAt)} → ${wallHHMM(end.occurredAt)}${night !== null && night >= 7 * 60 ? ' · in range' : ''}`
+            start && end && night !== null
+              ? `${wallHHMM(start.occurredAt)} → ${wallHHMM(end.occurredAt)} · ${
+                  sleepState === 'goal'
+                    ? 'in range'
+                    : night < SLEEP_GOAL.min
+                      ? `${formatDuration(SLEEP_GOAL.min - night)} below range`
+                      : `${formatDuration(night - SLEEP_GOAL.max)} above range`
+                }`
               : 'No night logged yet'
           }
         />
@@ -141,13 +177,15 @@ export default function GoalCards({ today, todayEvents }: Props) {
         <Card
           title="Caffeine"
           icon="coffee"
-          status={lastCaf === undefined ? 'done' : late ? 'warn' : 'done'}
+          status={late || tooMany ? 'warn' : 'done'}
           small
           n={
             lastCaf ? (
               <>
                 {wallHHMM(lastCaf.occurredAt)}
-                <small>last</small>
+                <small>
+                  ×{caffeine.length}
+                </small>
               </>
             ) : (
               <>
@@ -158,9 +196,13 @@ export default function GoalCards({ today, todayEvents }: Props) {
           s={
             lastCaf === undefined
               ? 'None today'
-              : late
-                ? "After 16:00 · don't take more"
-                : 'Before cutoff · clear'
+              : tooMany && late
+                ? `${caffeine.length} today and past 16:00`
+                : tooMany
+                  ? `${caffeine.length} today · over ${CAFFEINE_COUNT_GOAL.max}`
+                  : late
+                    ? "After 16:00 · don't take more"
+                    : 'Before cutoff · clear'
           }
         />
       </div>

@@ -1,60 +1,24 @@
 'use client';
 
 import {
-  CAFFEINE_CUTOFF_MIN,
-  PROTEIN_TARGET_G,
-  caffeineByDay,
-  dayLetter,
-  formatHhMm,
-  intensityAvgByDay,
-  lastNDayKeys,
-  proteinByDay,
-  sleepMinutesByDay,
-} from '@/lib/weekStats';
+  CAFFEINE_COUNT_GOAL,
+  PROTEIN_GOAL,
+  SLEEP_GOAL,
+  coverage,
+  evaluate,
+  hitCount,
+  scaleFor,
+} from '@/lib/goals';
+import { formatDuration } from '@/lib/weekStats';
+import { buildWeekCharts } from '@/lib/weekCharts';
 import type { WeekResponse } from '@/lib/types';
+import ChartAxis from '../charts/ChartAxis';
+import ChartFoot from '../charts/ChartFoot';
+import CutoffTrack from '../charts/CutoffTrack';
+import HourBar from '../charts/HourBar';
+import Spark from '../charts/Spark';
+import chart from '../charts/charts.module.css';
 import styles from './desktop.module.css';
-
-const DAYS = 7;
-const SLEEP_SCALE_MIN = 9 * 60; // a 9h night fills the spark
-const SLEEP_LOW_MIN = 6 * 60;
-const SLEEP_ON_MIN = 7 * 60;
-
-function SparkLabels({ dayKeys }: { dayKeys: string[] }) {
-  return (
-    <div className={styles.sparkx} aria-hidden>
-      {dayKeys.map((k) => (
-        <span key={k}>{dayLetter(k)}</span>
-      ))}
-    </div>
-  );
-}
-
-interface SparkProps {
-  dayKeys: string[];
-  values: (number | null)[];
-  scaleMax: number;
-  lowBelow: number;
-  onAtOrAbove: number;
-}
-
-function Spark({ dayKeys, values, scaleMax, lowBelow, onAtOrAbove }: SparkProps) {
-  return (
-    <div className={styles.spark}>
-      {values.map((v, i) => {
-        const isToday = i === values.length - 1;
-        const h = v === null ? 4 : Math.max(6, Math.min(100, (v / scaleMax) * 100));
-        const cls = isToday
-          ? styles.sparkToday
-          : v === null || v < lowBelow
-            ? styles.sparkLow
-            : v >= onAtOrAbove
-              ? styles.sparkOn
-              : '';
-        return <i key={dayKeys[i]} className={cls} style={{ height: `${h}%` }} />;
-      })}
-    </div>
-  );
-}
 
 interface Props {
   week: WeekResponse | null;
@@ -62,10 +26,13 @@ interface Props {
   error: string | null;
 }
 
-/** Right column: sleep, mood, caffeine, and protein over the last 7 days. */
+/**
+ * Right column: sleep, mood, caffeine and protein over the last 7 days.
+ *
+ * Every chart here now draws its goal, leaves a gap where a day was not
+ * logged, and states the denominator behind its summary.
+ */
 export default function WeekStats({ week, todayKey, error }: Props) {
-  const dayKeys = lastNDayKeys(todayKey, DAYS);
-
   if (!week) {
     return (
       <div className={styles.sec}>
@@ -75,52 +42,107 @@ export default function WeekStats({ week, todayKey, error }: Props) {
     );
   }
 
-  const sleep = sleepMinutesByDay(week.events, dayKeys);
-  const sleepLogged = sleep.filter((v): v is number => v !== null);
+  const w = buildWeekCharts(week.events, todayKey);
+
+  const sleepValues = w.sleep.map((p) => p.value);
+  const sleepCov = coverage(sleepValues);
+  const sleepHits = hitCount(SLEEP_GOAL, sleepValues);
+  const sleepLogged = sleepValues.filter((v): v is number => v !== null);
   const sleepAvg =
     sleepLogged.length > 0
-      ? formatHhMm(sleepLogged.reduce((a, b) => a + b, 0) / sleepLogged.length)
+      ? formatDuration(sleepLogged.reduce((a, b) => a + b, 0) / sleepLogged.length)
       : '—';
 
-  const mood = intensityAvgByDay(week.events, dayKeys, 'mood');
-  const moodLogged = mood.filter((v): v is number => v !== null);
+  const proteinValues = w.protein.map((p) => p.value);
+  const proteinCov = coverage(proteinValues);
+  const proteinHits = hitCount(PROTEIN_GOAL, proteinValues);
+  const proteinScale = scaleFor(PROTEIN_GOAL, proteinValues);
+
+  const moodValues = w.mood.map((p) => p.value);
+  const moodCov = coverage(moodValues);
+  const moodLogged = moodValues.filter((v): v is number => v !== null);
   const moodAvg =
     moodLogged.length > 0
       ? (moodLogged.reduce((a, b) => a + b, 0) / moodLogged.length).toFixed(1)
       : '—';
 
-  const caffeine = caffeineByDay(week.events, dayKeys);
-  const protein = proteinByDay(week.events, dayKeys);
+  const caffeineOver = w.caffeine.filter(
+    (d) =>
+      d.minutes.length > 0 &&
+      (evaluate(CAFFEINE_COUNT_GOAL, d.minutes.length) !== 'goal' ||
+        d.minutes.some((m) => m > 16 * 60)),
+  ).length;
 
   return (
     <div className={styles.sec}>
       <span className={styles.eyebrow}>Last 7 days</span>
 
       <div className={styles.stat}>
-        <div className={styles.statK}>
+        <div className={chart.key}>
           <span>Sleep</span>
-          <b>avg {sleepAvg}</b>
+          <b>goal 7–9h · avg {sleepAvg}</b>
         </div>
-        <Spark
-          dayKeys={dayKeys}
-          values={sleep}
-          scaleMax={SLEEP_SCALE_MIN}
-          lowBelow={SLEEP_LOW_MIN}
-          onAtOrAbove={SLEEP_ON_MIN}
-        />
-        <SparkLabels dayKeys={dayKeys} />
+        <div className={chart.hourInset}>
+          <HourBar
+            points={w.sleep}
+            scaleHours={10}
+            goalHours={SLEEP_GOAL.min / 60}
+            overHours={SLEEP_GOAL.max / 60}
+          />
+          <ChartAxis points={w.sleep} />
+          <ChartFoot
+            summary="In range"
+            count={`${sleepHits.hits} of ${sleepHits.logged} logged nights`}
+            coverage={sleepCov}
+          />
+        </div>
       </div>
 
       <div className={styles.stat}>
-        <div className={styles.statK}>
-          <span>Mood</span>
-          <b>avg {moodAvg}</b>
+        <div className={chart.key}>
+          <span>Protein</span>
+          <b>floor {PROTEIN_GOAL.min} g</b>
         </div>
-        <div className={styles.mgrid}>
-          {mood.map((v, i) => {
-            const filled = v === null ? 0 : Math.round(v);
+        <Spark
+          points={w.protein}
+          scaleMax={proteinScale}
+          rule={{ value: PROTEIN_GOAL.min, label: `${PROTEIN_GOAL.min} g` }}
+          capAbove={PROTEIN_GOAL.scaleMax}
+          formatCap={(v) => `${v}`}
+        />
+        <ChartAxis points={w.protein} />
+        <ChartFoot
+          summary="Reached the floor"
+          count={`${proteinHits.hits} of ${proteinHits.logged} logged days`}
+          coverage={proteinCov}
+        />
+      </div>
+
+      <div className={styles.stat}>
+        <div className={chart.key}>
+          <span>Caffeine</span>
+          <b>
+            cutoff 16:00 · max {CAFFEINE_COUNT_GOAL.max}/day
+          </b>
+        </div>
+        <CutoffTrack days={w.caffeine} />
+        <ChartFoot
+          summary="Outside a caffeine goal on"
+          count={`${caffeineOver} of 7 days`}
+          coverage={{ logged: 7, total: 7, thin: false, insufficient: false }}
+        />
+      </div>
+
+      <div className={styles.stat}>
+        <div className={chart.key}>
+          <span>Mood</span>
+          <b>no goal set · avg {moodAvg}</b>
+        </div>
+        <div className={styles.mgrid} aria-hidden>
+          {w.mood.map((p) => {
+            const filled = p.value === null ? 0 : Math.round(p.value);
             return (
-              <div key={dayKeys[i]}>
+              <div key={p.key}>
                 {[1, 2, 3, 4, 5].map((n) => (
                   <i key={n} className={n <= filled ? styles.mgridF : ''} />
                 ))}
@@ -128,44 +150,8 @@ export default function WeekStats({ week, todayKey, error }: Props) {
             );
           })}
         </div>
-        <SparkLabels dayKeys={dayKeys} />
-      </div>
-
-      <div className={styles.stat}>
-        <div className={styles.statK}>
-          <span>Caffeine</span>
-          <b>accent dot = after 16:00</b>
-        </div>
-        {caffeine.map((day, i) => (
-          <div key={dayKeys[i]} className={styles.crow}>
-            <span className={styles.crowD}>
-              {new Date(`${dayKeys[i]}T12:00:00`).toLocaleDateString('en-US', {
-                weekday: 'short',
-              })}
-            </span>
-            <span className={styles.dots}>
-              {day.minutes.map((m, j) => (
-                <i key={j} className={m >= CAFFEINE_CUTOFF_MIN ? styles.dotLate : ''} />
-              ))}
-            </span>
-            <span className={styles.lastt}>{day.last ?? '—'}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className={styles.stat}>
-        <div className={styles.statK}>
-          <span>Protein</span>
-          <b>target {PROTEIN_TARGET_G} g</b>
-        </div>
-        <Spark
-          dayKeys={dayKeys}
-          values={protein.map((g) => (g > 0 ? g : null))}
-          scaleMax={PROTEIN_TARGET_G}
-          lowBelow={PROTEIN_TARGET_G / 2}
-          onAtOrAbove={PROTEIN_TARGET_G}
-        />
-        <SparkLabels dayKeys={dayKeys} />
+        <ChartAxis points={w.mood} />
+        <ChartFoot summary="Logged on" count={`${moodCov.logged} of 7 days`} coverage={moodCov} />
       </div>
     </div>
   );

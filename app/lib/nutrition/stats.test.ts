@@ -48,26 +48,36 @@ describe('computeNutritionStats', () => {
     expect(s.days[5].hit).toBe(true);
     expect(s.days[4].hit).toBe(false);
     expect(s.weekHits).toBe(2);
-    expect(s.weekAvg).toBe(Math.round((160 + 155 + 100) / 7));
+    // Averaged over the three logged days, not over seven calendar days:
+    // dividing by 7 silently understates a partly-logged week.
+    expect(s.weekAvg).toBe(Math.round((160 + 155 + 100) / 3));
+    expect(s.daysLogged).toBe(3);
   });
 
-  it('counts the streak of consecutive target days ending today', () => {
-    const events = [
-      meal('2026-07-14T08:00:00+01:00', 160),
-      meal('2026-07-13T08:00:00+01:00', 155),
-      meal('2026-07-12T08:00:00+01:00', 40), // breaks the streak
-      meal('2026-07-11T08:00:00+01:00', 200),
-    ];
+  it('marks days with no meals as unlogged rather than zero', () => {
+    const events = [meal('2026-07-14T08:00:00+01:00', 160)];
     const s = computeNutritionStats(events, NOW, 150);
-    expect(s.streak).toBe(2);
+    expect(s.days[6].logged).toBe(true);
+    expect(s.days[5].logged).toBe(false);
+    expect(s.days[5].protein).toBe(0);
+    expect(s.daysLogged).toBe(1);
   });
 
-  it('breaks the streak when today has not hit target', () => {
+  it('does not let unlogged days drag the average down', () => {
     const events = [
-      meal('2026-07-14T08:00:00+01:00', 20),
+      meal('2026-07-14T08:00:00+01:00', 200),
       meal('2026-07-13T08:00:00+01:00', 200),
     ];
-    expect(computeNutritionStats(events, NOW, 150).streak).toBe(0);
+    const s = computeNutritionStats(events, NOW, 150);
+    expect(s.weekAvg).toBe(200);
+  });
+
+  it('counts a real zero-protein day as logged', () => {
+    const events = [meal('2026-07-14T08:00:00+01:00', 0)];
+    const s = computeNutritionStats(events, NOW, 150);
+    expect(s.days[6].logged).toBe(true);
+    expect(s.days[6].hit).toBe(false);
+    expect(s.daysLogged).toBe(1);
   });
 
   it('computes avg per meal, avg kcal, and most-logged name', () => {
@@ -78,7 +88,7 @@ describe('computeNutritionStats', () => {
     ];
     const s = computeNutritionStats(events, NOW, 150);
     expect(s.avgPerMeal).toBe(Math.round((30 + 60 + 30) / 3));
-    expect(s.avgKcal).toBe(Math.round((1200 + 400) / 7));
+    expect(s.avgKcal).toBe(Math.round((1200 + 400) / 2));
     expect(s.mostLogged).toBe('Oats');
   });
 
@@ -86,7 +96,7 @@ describe('computeNutritionStats', () => {
     const s = computeNutritionStats([], NOW, 150);
     expect(s.weekAvg).toBe(0);
     expect(s.weekHits).toBe(0);
-    expect(s.streak).toBe(0);
+    expect(s.daysLogged).toBe(0);
     expect(s.avgPerMeal).toBe(0);
     expect(s.mostLogged).toBeNull();
     expect(s.paceMessage).toContain('behind pace');

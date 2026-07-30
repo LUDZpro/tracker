@@ -722,6 +722,30 @@
   width: 100%;
 }
 
+/* ── week view ── */
+
+.weekToggle {
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--t2);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+.weekToggle:active {
+  background: var(--surface);
+}
+
+.weekDetail {
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+}
+
 @media (min-width: 1024px) {
   /* Tracker pages breathe on desktop: 42rem reading column right of the rail
      (matches the CBT section) instead of the mobile 28rem strip. */

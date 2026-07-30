@@ -6,6 +6,7 @@ import GoalCards from './GoalCards';
 import Ledger from './Ledger';
 import Topbar from './Topbar';
 import WeekStats from './WeekStats';
+import WeekOverview from '../charts/WeekOverview';
 import QueueBanner from '@/components/home/QueueBanner';
 import CaffeineSheet from '@/components/sheets/CaffeineSheet';
 import EditEventSheet from '@/components/sheets/EditEventSheet';
@@ -281,6 +282,10 @@ export default function DesktopHome() {
           {today && todayKey ? (
             <>
               <GoalCards today={today} todayEvents={todayEvents} />
+              <div className={styles.sec}>
+                <span className={styles.eyebrow}>This week</span>
+                <WeekOverview week={week} todayKey={todayKey} error={weekError} />
+              </div>
               <Ledger
                 todayKey={todayKey}
                 todayEvents={todayEvents}

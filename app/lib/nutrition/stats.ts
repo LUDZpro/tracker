@@ -6,14 +6,15 @@ export interface DayProtein {
   label: string; // single-letter weekday
   protein: number;
   hit: boolean; // reached the protein target
+  logged: boolean; // any meal recorded — a gap is not a zero
   isToday: boolean;
 }
 
 export interface NutritionStats {
   days: DayProtein[]; // 7 days ending today, ascending (oldest → today)
-  weekAvg: number; // mean protein across the 7 days
-  weekHits: number; // days that hit target, of 7
-  streak: number; // consecutive target days ending today
+  weekAvg: number; // mean protein across *logged* days
+  weekHits: number; // days that hit target, of the logged days
+  daysLogged: number; // days with at least one meal, of 7
   avgPerMeal: number; // mean protein per logged meal across the window
   avgKcal: number; // mean daily calories across the 7 days
   mostLogged: string | null; // most frequently logged meal name
@@ -51,15 +52,18 @@ export function computeNutritionStats(
 
   const proteinByDay = new Map<string, number>();
   const kcalByDay = new Map<string, number>();
+  const mealCountByDay = new Map<string, number>();
   for (const k of keys) {
     proteinByDay.set(k, 0);
     kcalByDay.set(k, 0);
+    mealCountByDay.set(k, 0);
   }
   for (const m of meals) {
     const k = wallDateKey(m.occurredAt);
     if (!proteinByDay.has(k)) continue;
     proteinByDay.set(k, (proteinByDay.get(k) ?? 0) + (m.proteinG ?? 0));
     kcalByDay.set(k, (kcalByDay.get(k) ?? 0) + (m.calories ?? 0));
+    mealCountByDay.set(k, (mealCountByDay.get(k) ?? 0) + 1);
   }
 
   const days: DayProtein[] = keys.map((key) => {
@@ -69,20 +73,22 @@ export function computeNutritionStats(
       label: weekdayLetter(key),
       protein,
       hit: protein >= proteinTarget,
+      logged: (mealCountByDay.get(key) ?? 0) > 0,
       isToday: key === todayKey,
     };
   });
 
-  const weekAvg = Math.round(days.reduce((a, d) => a + d.protein, 0) / 7);
-  const weekHits = days.filter((d) => d.hit).length;
-  const avgKcal = Math.round(keys.reduce((a, k) => a + (kcalByDay.get(k) ?? 0), 0) / 7);
-
-  // Streak: consecutive target-hitting days counting back from today.
-  let streak = 0;
-  for (let i = days.length - 1; i >= 0; i--) {
-    if (days[i].hit) streak++;
-    else break;
-  }
+  // Averages run over logged days: a mean over 3 of 7 days is a different
+  // claim from a mean over 7, and dividing by 7 quietly understates it.
+  const loggedDays = days.filter((d) => d.logged);
+  const daysLogged = loggedDays.length;
+  const weekAvg = daysLogged
+    ? Math.round(loggedDays.reduce((a, d) => a + d.protein, 0) / daysLogged)
+    : 0;
+  const weekHits = loggedDays.filter((d) => d.hit).length;
+  const avgKcal = daysLogged
+    ? Math.round(loggedDays.reduce((a, d) => a + (kcalByDay.get(d.key) ?? 0), 0) / daysLogged)
+    : 0;
 
   const windowMeals = meals.filter((m) => proteinByDay.has(wallDateKey(m.occurredAt)));
   const totalProtein = windowMeals.reduce((a, m) => a + (m.proteinG ?? 0), 0);
@@ -106,7 +112,7 @@ export function computeNutritionStats(
     days,
     weekAvg,
     weekHits,
-    streak,
+    daysLogged,
     avgPerMeal,
     avgKcal,
     mostLogged,

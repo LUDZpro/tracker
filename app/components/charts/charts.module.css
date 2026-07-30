@@ -1,0 +1,767 @@
+/* Shared chart primitives — used by both surfaces.
+   Spec: design-system/charts-lab.html §C3–C12. */
+
+.chart {
+  position: relative;
+}
+
+.key {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 11px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+.key b {
+  font-weight: 400;
+  font-size: 10.5px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--t3);
+}
+
+/* ── plot ── */
+
+.plot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 64px;
+}
+
+.col {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  background: var(--a800);
+}
+
+.bar[data-state='goal'] {
+  background: var(--a500);
+}
+
+.bar[data-state='under'],
+.bar[data-state='over'] {
+  background: var(--warn);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.34) 0 2px,
+    transparent 2px 5px
+  );
+}
+
+.bar[data-state='bad'] {
+  background: var(--bad);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.4) 0 2px,
+    transparent 2px 4px
+  );
+}
+
+/* Missing: absent, never a short bar. */
+.missing {
+  align-self: stretch;
+  width: 100%;
+  border-left: 1px dotted var(--t5);
+  border-right: 1px dotted var(--t5);
+  opacity: 0.55;
+}
+
+.missingRing {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border: 1px solid var(--t5);
+  border-radius: 50%;
+}
+
+/* Overshoot: square the cap and print the real number. */
+.over {
+  border-radius: 0;
+  box-shadow: inset 0 3px 0 var(--a200);
+}
+
+.overTag {
+  position: absolute;
+  top: -13px;
+  right: 0;
+  left: 0;
+  text-align: center;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--a300);
+}
+
+/* Today: below the baseline, so it never competes with state. */
+.today::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -5px;
+  left: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+/* ── reference rule and band ── */
+
+.rule {
+  position: absolute;
+  right: 0;
+  left: 0;
+  border-top: 1px dashed var(--t4);
+  pointer-events: none;
+}
+
+.ruleKey {
+  position: absolute;
+  top: -13px;
+  right: 0;
+  padding: 0 3px;
+  background: var(--surface-raised);
+  font-size: 9px;
+  color: var(--t2);
+}
+
+.band {
+  position: absolute;
+  right: 0;
+  left: 0;
+  background: color-mix(in srgb, var(--ok) 20%, transparent);
+  border-top: 1px dashed color-mix(in srgb, var(--ok) 70%, transparent);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ok) 70%, transparent);
+  pointer-events: none;
+}
+
+.bandKey {
+  position: absolute;
+  top: -6px;
+  right: 0;
+  padding: 0 3px;
+  background: var(--surface-raised);
+  font-size: 9px;
+  color: color-mix(in srgb, var(--ok) 75%, var(--t1));
+}
+
+/* ── axis ── */
+
+.axis {
+  display: flex;
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.axis span {
+  flex: 1;
+  text-align: center;
+  font-size: 9.5px;
+  color: var(--t3);
+}
+
+.axToday {
+  color: var(--accent);
+}
+
+.axMissing {
+  color: var(--t5);
+}
+
+.axFlag {
+  color: var(--warn);
+}
+
+/* ── segmented hour bar ── */
+
+.hours {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 124px;
+}
+
+.hourCol {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  gap: 2px;
+  height: 100%;
+}
+
+.hourBlock {
+  flex: 1;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--rail) 42%, transparent);
+}
+
+.hourBlock[data-fill='base'] {
+  background: var(--a800);
+}
+
+.hourBlock[data-fill='goal'] {
+  background: var(--a500);
+}
+
+.hourBlock[data-fill='over'] {
+  background: var(--warn);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.34) 0 2px,
+    transparent 2px 5px
+  );
+}
+
+/* A night that finished short recolors every filled block: the verdict is on
+   the night, not on the individual hour. */
+.hourCol[data-state='under'] .hourBlock[data-fill='base'] {
+  background: var(--warn);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.34) 0 2px,
+    transparent 2px 5px
+  );
+}
+
+.hourCol[data-state='bad'] .hourBlock[data-fill='base'] {
+  background: var(--bad);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.4) 0 2px,
+    transparent 2px 4px
+  );
+}
+
+.hourPart {
+  opacity: 0.45;
+}
+
+.hourCol[data-state='none'] .hourBlock {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--t5);
+  opacity: 0.4;
+}
+
+.hourCol[data-today='true']::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -6px;
+  left: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.hourScale {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -20px;
+  width: 18px;
+}
+
+.hourScale span {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--t3);
+}
+
+.hourInset {
+  padding-left: 22px;
+}
+
+/* ── tooltip ── */
+
+.hit {
+  position: absolute;
+  inset: -6px -2px -20px -2px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.hit:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.tip {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  z-index: 20;
+  min-width: 138px;
+  padding: 8px 10px;
+  transform: translateX(-50%) translateY(3px);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: var(--sheet);
+  box-shadow: var(--sh-md);
+  font-style: normal;
+  text-align: left;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--duration-fast) var(--ease-out-expo),
+    transform var(--duration-fast) var(--ease-out-expo);
+}
+
+.col:hover .tip,
+.hit:focus-visible .tip,
+.tipOpen .tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Edge columns clamp so the popover never leaves the card. */
+.tipStart {
+  left: 0;
+  transform: translateX(0) translateY(3px);
+}
+
+.col:hover .tipStart,
+.hit:focus-visible .tipStart,
+.tipOpen .tipStart {
+  transform: translateX(0) translateY(0);
+}
+
+.tipEnd {
+  right: 0;
+  left: auto;
+  transform: translateX(0) translateY(3px);
+}
+
+.col:hover .tipEnd,
+.hit:focus-visible .tipEnd,
+.tipOpen .tipEnd {
+  transform: translateX(0) translateY(0);
+}
+
+.tipDay {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+.tipValue {
+  display: block;
+  font-size: 15px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  color: var(--t1);
+}
+
+.tipVerdict {
+  display: block;
+  margin-top: 3px;
+  font-size: 10.5px;
+  color: var(--t2);
+}
+
+.tipVerdict[data-state='goal'] {
+  color: var(--ok);
+}
+
+.tipVerdict[data-state='under'],
+.tipVerdict[data-state='over'] {
+  color: var(--warn);
+}
+
+.tipVerdict[data-state='bad'] {
+  color: var(--bad);
+}
+
+.tipRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid var(--line);
+  font-size: 10.5px;
+  color: var(--t2);
+}
+
+.tipRow b {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--t1);
+}
+
+/* ── cutoff track ── */
+
+.ctRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+}
+
+.ctRow:last-of-type {
+  border-bottom: none;
+}
+
+.ctDay {
+  width: 26px;
+  color: var(--t2);
+}
+
+.ctTrack {
+  position: relative;
+  flex: 1;
+  height: 16px;
+}
+
+.ctTrack::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--rail);
+}
+
+.ctCut {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--warn);
+}
+
+/* The zone past the cutoff renders on clean days too, so the line is visible
+   before any intake is. */
+.ctAfter {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: color-mix(in srgb, var(--warn) 8%, transparent);
+}
+
+.ctDot {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--t3);
+}
+
+.ctDotLate {
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  background: var(--warn);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--warn) 30%, transparent);
+}
+
+.ctDotBad {
+  background: var(--bad);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bad) 30%, transparent);
+}
+
+.ctLast {
+  width: 42px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--t2);
+}
+
+.ctLastLate {
+  color: var(--warn);
+}
+
+.ctLastBad {
+  color: var(--bad);
+}
+
+/* Count ceiling: too many in one day, regardless of when. */
+.ctCount {
+  width: 18px;
+  text-align: right;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--t3);
+}
+
+.ctCountOver {
+  color: var(--warn);
+}
+
+.ctAxis {
+  position: relative;
+  height: 13px;
+  margin: 5px 0 0 35px;
+}
+
+.ctAxis span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: var(--t3);
+}
+
+.ctAxisCut {
+  color: var(--warn);
+  transform: none;
+}
+
+/* ── coverage foot ── */
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 11px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+  font-size: 10.5px;
+  color: var(--t2);
+}
+
+.foot b {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--t1);
+}
+
+.cov {
+  flex: none;
+  padding: 2px 6px;
+  border: 1px solid var(--edge);
+  border-radius: 20px;
+  font-size: 9.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--t2);
+}
+
+.covThin {
+  border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+  color: var(--warn);
+}
+
+/* ── goal bar with pace marker ──
+   A goal card at 08:00 and at 20:00 used to look identical. The marker is
+   where a steady day would have you by now. Spec: charts-lab.html §C7. */
+
+.paceBar {
+  position: relative;
+  height: 4px;
+  margin-top: 10px;
+  border-radius: 2px;
+  background: var(--rail);
+}
+
+.paceFill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--a600);
+}
+
+.paceFill[data-pace='ahead'] {
+  background: var(--a500);
+}
+
+.paceFill[data-pace='behind'] {
+  background: var(--warn);
+}
+
+.paceMark {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 1px;
+  background: var(--t2);
+}
+
+.paceMark::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -2px;
+  border-right: 2.5px solid transparent;
+  border-bottom: 4px solid var(--t2);
+  border-left: 2.5px solid transparent;
+  transform: rotate(180deg);
+}
+
+/* ── week matrix ── */
+
+.matrix {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.matrix th,
+.matrix td {
+  padding: 0;
+  text-align: center;
+}
+
+.matrix thead th {
+  padding-bottom: 9px;
+  font-size: 9.5px;
+  font-weight: 400;
+  color: var(--t3);
+}
+
+.matrix thead th.mToday {
+  border-radius: 8px 8px 0 0;
+  color: var(--accent);
+}
+
+.matrix tbody th {
+  width: 74px;
+  padding-right: 10px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--t2);
+}
+
+.matrix tbody tr + tr td,
+.matrix tbody tr + tr th {
+  padding-top: 6px;
+}
+
+.matrix td.mToday,
+.matrix thead th.mToday {
+  background: color-mix(in srgb, var(--accent) 17%, transparent);
+}
+
+.matrix tbody tr:last-child td.mToday {
+  border-radius: 0 0 8px 8px;
+}
+
+.cell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--a900);
+  color: var(--a200);
+}
+
+.cell svg {
+  width: 13px;
+  height: 13px;
+}
+
+.cell[data-state='goal'] {
+  background: var(--a600);
+}
+
+.cell[data-state='over'],
+.cell[data-state='under'] {
+  background: color-mix(in srgb, var(--warn) 26%, var(--app));
+  color: var(--warn);
+}
+
+.cell[data-state='bad'] {
+  background: color-mix(in srgb, var(--bad) 26%, var(--app));
+  color: var(--bad);
+}
+
+.cell[data-state='none'] {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--edge);
+  color: var(--t4);
+}
+
+.cell[data-state='partial'] {
+  background: var(--a800);
+  color: var(--a300);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 15px;
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
+  color: var(--t2);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend i {
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  background: var(--a600);
+}
+
+.legend i.lWarn {
+  background: color-mix(in srgb, var(--warn) 45%, var(--app));
+}
+
+.legend i.lBad {
+  background: color-mix(in srgb, var(--bad) 45%, var(--app));
+}
+
+.legend i.lNone {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--edge);
+}
+
+/* ── accessible-only data view ── */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tip {
+    transition: none;
+  }
+}
