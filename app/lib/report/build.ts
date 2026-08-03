@@ -192,16 +192,10 @@ export function buildReport(events: readonly AppEvent[], generatedIso: string): 
     intake: summariseIntake(caffeinePoints, mealPoints, mealWindowKeys),
     confidence: summariseConfidence(episodes),
     regularity: sleepRegularityIndex(episodes, coveredKeys, rangeKeys),
-    mealsPerDay: countByDay(
-      mealPoints.map((p) => ({ dayKey: wallDateKey(p.atIso) })),
-      mealWindowKeys,
-      coveredKeys,
-    ),
-    caffeinePerDay: countByDay(
-      caffeinePoints.map((p) => ({ dayKey: wallDateKey(p.atIso) })),
-      caffeineWindowKeys,
-      coveredKeys,
-    ),
+    // Intake points already carry their calendar day, so the bars and the
+    // timing scatter below them can never disagree about which day is which.
+    mealsPerDay: countByDay(mealPoints, mealWindowKeys, coveredKeys),
+    caffeinePerDay: countByDay(caffeinePoints, caffeineWindowKeys, coveredKeys),
     mealPoints,
     caffeinePoints,
     mood: buildRatings(events, 'mood'),

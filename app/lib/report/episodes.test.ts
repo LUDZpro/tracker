@@ -170,6 +170,26 @@ describe('buildTimedPoints / buildRatings', () => {
     ]);
   });
 
+  it('files a pre-noon intake on its own calendar day, not the night before', () => {
+    // The noon anchor is for sleep only. An 11:39 coffee belongs to the 8th;
+    // filing it against the 7th also desynced the scatter from the per-day bars.
+    const pts = buildTimedPoints(
+      [ev('caffeine', '2026-07-08T11:39:00+01:00', { kind: 'coffee' })],
+      'caffeine',
+      () => 'coffee',
+    );
+    expect(pts[0].dayKey).toBe('2026-07-08');
+    expect(reportDayKey('2026-07-08T11:39:00+01:00')).toBe('2026-07-07');
+  });
+
+  it('files a pre-noon rating on its own calendar day', () => {
+    const ratings = buildRatings(
+      [ev('mood', '2026-07-08T05:16:00+01:00', { intensity: 1 })],
+      'mood',
+    );
+    expect(ratings[0].dayKey).toBe('2026-07-08');
+  });
+
   it('keeps only ratings that carry an intensity', () => {
     const ratings = buildRatings(
       [

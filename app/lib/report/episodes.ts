@@ -107,7 +107,15 @@ export function buildNaps(events: readonly AppEvent[]): NapRecord[] {
     }));
 }
 
-/** Point events of one type, placed on the clock. */
+/**
+ * Point events of one type, placed on the clock.
+ *
+ * These sit on the **calendar** day, not the noon-anchored reporting day.
+ * The noon anchor exists so a night is not cut in half, which is the right
+ * call for sleep and nothing else: under it an 11:39 coffee would be filed
+ * against the previous date, and the timing chart would disagree with the
+ * per-day bars drawn directly above it.
+ */
 export function buildTimedPoints(
   events: readonly AppEvent[],
   type: AppEvent['type'],
@@ -117,13 +125,13 @@ export function buildTimedPoints(
     .filter((e) => e.type === type)
     .map((e) => ({
       atIso: e.occurredAt,
-      dayKey: reportDayKey(e.occurredAt),
+      dayKey: wallDateKey(e.occurredAt),
       minutes: wallMinutes(e.occurredAt),
       label: label(e),
     }));
 }
 
-/** 1–5 self-ratings of one type, in order. */
+/** 1–5 self-ratings of one type, in order. Calendar day, as for intake. */
 export function buildRatings(
   events: readonly AppEvent[],
   type: 'mood' | 'energy',
@@ -132,7 +140,7 @@ export function buildRatings(
     .filter((e) => e.type === type && typeof e.intensity === 'number')
     .map((e) => ({
       atIso: e.occurredAt,
-      dayKey: reportDayKey(e.occurredAt),
+      dayKey: wallDateKey(e.occurredAt),
       minutes: wallMinutes(e.occurredAt),
       value: e.intensity as number,
     }));
