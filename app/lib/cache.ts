@@ -38,9 +38,25 @@ export function setCachedWeek<T>(data: T, now = Date.now()): void {
   weekSlot = { data, at: now };
 }
 
+// Report (clinical export): the entire event log. Expensive to build and
+// read rarely, so it gets a longer TTL — but it is derived from the same
+// log as today/week, so it must die with them on every write.
+const REPORT_TTL_MS = 300_000;
+let reportSlot: Slot<unknown> | null = null;
+
+export function getCachedReport<T>(now = Date.now()): T | null {
+  if (reportSlot && now - reportSlot.at < REPORT_TTL_MS) return reportSlot.data as T;
+  return null;
+}
+
+export function setCachedReport<T>(data: T, now = Date.now()): void {
+  reportSlot = { data, at: now };
+}
+
 export function invalidateToday(): void {
   todaySlot = null;
   weekSlot = null;
+  reportSlot = null;
 }
 
 // Recipes: the pre-planned meal list, edited in Notion and read on every

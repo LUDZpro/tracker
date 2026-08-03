@@ -47,6 +47,25 @@ export function minutesBetween(fromIso: string, toIso: string): number {
   return Math.round((Date.parse(toIso) - Date.parse(fromIso)) / 60000);
 }
 
+/**
+ * Distance in minutes between the *wall-clock* readings of two timestamps,
+ * ignoring their offsets entirely.
+ *
+ * `minutesBetween` is the right function whenever both ends carry a truthful
+ * offset. They do not always: rows imported from Notion are stamped +00:00
+ * while the same moments in later rows are stamped +01:00, so a span crossing
+ * that seam measures an hour short. Morocco has no DST, so differencing the
+ * wall clock is exact for this data and immune to the mislabelling.
+ */
+export function wallMinutesBetween(fromIso: string, toIso: string): number {
+  const a = wallParts(fromIso);
+  const b = wallParts(toIso);
+  if (!a || !b) return 0;
+  const toUtc = (p: WallParts) =>
+    Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute);
+  return Math.round((toUtc(b) - toUtc(a)) / 60000);
+}
+
 /** Add minutes to an ISO timestamp while preserving its explicit timezone offset. */
 export function addMinutes(iso: string, minutes: number): string {
   const tz = iso.match(TZ_RE)?.[1];

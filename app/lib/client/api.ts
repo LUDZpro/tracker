@@ -68,6 +68,17 @@ export async function fetchWeek(): Promise<WeekResponse> {
   return res.json();
 }
 
+/** The complete event log, for the clinical report. Not a window. */
+export async function fetchReport(): Promise<WeekResponse> {
+  const res = await fetch('/api/report');
+  if (res.status === 401) {
+    window.location.href = '/login';
+    throw new Error('Unauthorized');
+  }
+  if (!res.ok) throw new Error(await readError(res));
+  return res.json();
+}
+
 /** One calendar-day-paged page of Nutrition/Gym history; `before` is the
  *  previous page's `nextCursor` (an ISO timestamp), omitted for the first page. */
 export async function fetchHistory(type: EventType, before?: string): Promise<HistoryResponse> {

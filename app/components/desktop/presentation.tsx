@@ -42,6 +42,7 @@ type IconName =
   | 'clock'
   | 'list'
   | 'trigger'
+  | 'report'
   | 'mind';
 
 const ICON_BODY: Record<IconName, React.ReactNode> = {
@@ -88,6 +89,12 @@ const ICON_BODY: Record<IconName, React.ReactNode> = {
     </>
   ),
   list: <path d="M4 6h16M4 12h16M4 18h10" />,
+  report: (
+    <>
+      <path d="M4 20V4h11l5 5v11z" />
+      <path d="M8 17v-4M12 17v-7M16 17v-2" />
+    </>
+  ),
   trigger: (
     <>
       <path d="M5 21V4" />

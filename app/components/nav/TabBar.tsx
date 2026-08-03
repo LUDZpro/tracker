@@ -11,6 +11,7 @@ const TABS = [
   { href: '/nutrition', label: 'Nutrition', icon: 'meal' },
   { href: '/gym', label: 'Gym', icon: 'gym' },
   { href: '/cbt', label: 'Mind', icon: 'mind' },
+  { href: '/report', label: 'Report', icon: 'report' },
 ] as const;
 
 /** Bottom-fixed tab bar for the three trackers; hidden on the PIN screen. */

@@ -1,0 +1,384 @@
+/*
+ * The report is a document, not an app surface. It deliberately ignores the
+ * dark app theme: it gets printed, exported and handed to a clinician, so it
+ * commits to a light page with its own local palette.
+ */
+
+.page {
+  --doc-bg: #eef1f4;
+  --doc-card: #ffffff;
+  --doc-ink: #1e2a32;
+  --doc-mute: #64748b;
+  --doc-line: #dbe2e8;
+  --doc-head: #0f4c4c;
+  --doc-head-soft: #d6e6e4;
+  --doc-accent: #0d7c74;
+  --doc-sleep: #4c5fd7;
+  --doc-sleep-soft: #aab3ec;
+  --doc-frag: #d97757;
+  --doc-nap: #b48ead;
+  --doc-meal: #2f8f5b;
+  --doc-caff: #b58121;
+  --doc-void: #e6eaee;
+
+  min-height: 100vh;
+  padding: 24px 16px 96px;
+  background: var(--doc-bg);
+  color: var(--doc-ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding-left: calc(var(--rail-w, 56px) + 24px);
+  }
+}
+
+.sheet {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+/* ---- header ---------------------------------------------------------- */
+
+.head {
+  background: var(--doc-head);
+  color: #fff;
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.kicker {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #7fd4c8;
+  margin-bottom: 6px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 6px;
+}
+
+.headStats {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+}
+
+.headStats b {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ---- month filter ---------------------------------------------------- */
+
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.filterLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--doc-mute);
+  margin-right: 4px;
+}
+
+.chip {
+  appearance: none;
+  border: 1px solid var(--doc-line);
+  background: var(--doc-card);
+  color: var(--doc-ink);
+  border-radius: 999px;
+  padding: 5px 13px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.chip:hover {
+  border-color: var(--doc-accent);
+  color: var(--doc-accent);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--doc-accent);
+  outline-offset: 2px;
+}
+
+.chipOn {
+  background: var(--doc-head);
+  border-color: var(--doc-head);
+  color: #fff;
+}
+
+.chipOn:hover {
+  color: #fff;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.printBtn {
+  appearance: none;
+  border: 1px solid var(--doc-accent);
+  background: transparent;
+  color: var(--doc-accent);
+  border-radius: 6px;
+  padding: 5px 13px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.printBtn:hover {
+  background: var(--doc-accent);
+  color: #fff;
+}
+
+/* ---- cards ----------------------------------------------------------- */
+
+.card {
+  background: var(--doc-card);
+  border: 1px solid var(--doc-line);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  break-inside: avoid;
+}
+
+.cardHead {
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid #eff3f6;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.cardNote {
+  font-size: 12.5px;
+  color: var(--doc-mute);
+  margin-top: 3px;
+}
+
+.cardBody {
+  padding: 14px 18px 18px;
+  overflow-x: auto;
+}
+
+.method {
+  background: var(--doc-head-soft);
+  border: 1px solid #bcd8d4;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: #33555a;
+  margin-bottom: 16px;
+}
+
+.method b {
+  color: #123f3f;
+}
+
+/* ---- stat grid ------------------------------------------------------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--doc-line);
+  border-top: 1px solid var(--doc-line);
+}
+
+.stat {
+  background: var(--doc-card);
+  padding: 12px 16px;
+}
+
+.statLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--doc-mute);
+}
+
+.statValue {
+  font-size: 21px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-top: 3px;
+}
+
+.statSub {
+  font-size: 12px;
+  color: var(--doc-mute);
+  margin-top: 1px;
+}
+
+/* ---- generic chart chrome -------------------------------------------- */
+
+.chart {
+  width: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.axisText {
+  font-size: 9.5px;
+  fill: var(--doc-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.rowLabel {
+  font-size: 9px;
+  fill: var(--doc-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.gridLine {
+  stroke: #e9eef2;
+  stroke-width: 1;
+}
+
+.refLine {
+  stroke: #b9c4cd;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--doc-mute);
+  align-items: center;
+}
+
+.swatch {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  margin-right: 5px;
+  vertical-align: -1px;
+}
+
+.empty {
+  padding: 26px 4px;
+  text-align: center;
+  color: var(--doc-mute);
+  font-size: 13px;
+}
+
+/* ---- nightly table --------------------------------------------------- */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th {
+  text-align: left;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--doc-mute);
+  font-weight: 600;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--doc-line);
+  position: sticky;
+  top: 0;
+  background: var(--doc-card);
+}
+
+.table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #f1f5f8;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.num {
+  text-align: right;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #eef2f5;
+  color: var(--doc-mute);
+}
+
+.tagRecon {
+  background: #fdf0e6;
+  color: #a4551f;
+}
+
+.scroll {
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+/* ---- print ----------------------------------------------------------- */
+
+@media print {
+  .page {
+    padding: 0;
+    background: #fff;
+  }
+
+  .filter,
+  .printBtn {
+    display: none;
+  }
+
+  .card {
+    box-shadow: none;
+    border-color: #ccc;
+    page-break-inside: avoid;
+  }
+
+  .scroll {
+    max-height: none;
+    overflow: visible;
+  }
+}

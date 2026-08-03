@@ -5,10 +5,44 @@ import {
   shiftDateKey,
   wallHHMM,
   wallMinutes,
+  wallMinutesBetween,
   wallParts,
   withWallDate,
   withWallTime,
 } from './time';
+
+describe('wallMinutesBetween', () => {
+  it('measures a plain overnight span', () => {
+    expect(
+      wallMinutesBetween('2026-07-30T00:31:00+01:00', '2026-07-30T06:02:00+01:00'),
+    ).toBe(331);
+  });
+
+  it('crosses midnight', () => {
+    expect(
+      wallMinutesBetween('2026-07-28T23:30:00+01:00', '2026-07-29T07:30:00+01:00'),
+    ).toBe(480);
+  });
+
+  it('ignores a mislabelled offset seam that minutesBetween trips over', () => {
+    // Imported rows are stamped +00:00, later rows +01:00, for the same
+    // real-world offset. The wall reading is the trustworthy one.
+    const from = '2026-06-02T23:00:00+00:00';
+    const to = '2026-06-03T07:00:00+01:00';
+    expect(minutesBetween(from, to)).toBe(420);
+    expect(wallMinutesBetween(from, to)).toBe(480);
+  });
+
+  it('returns a negative span when the arguments are reversed', () => {
+    expect(
+      wallMinutesBetween('2026-07-30T06:00:00+01:00', '2026-07-30T05:00:00+01:00'),
+    ).toBe(-60);
+  });
+
+  it('returns 0 for an unparseable timestamp', () => {
+    expect(wallMinutesBetween('nonsense', '2026-07-30T06:00:00+01:00')).toBe(0);
+  });
+});
 
 describe('wall-clock helpers', () => {
   it('parses the wall part regardless of offset', () => {

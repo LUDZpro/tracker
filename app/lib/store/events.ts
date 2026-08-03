@@ -151,6 +151,22 @@ export async function queryEventsSince(sinceIso: string): Promise<AppEvent[]> {
   return rows.map(fromEventRow).filter((e): e is AppEvent => e !== null);
 }
 
+/**
+ * Every live event, oldest first — the whole record, not a window.
+ *
+ * Only the clinical report calls this. It is deliberately unpaginated
+ * because the report's whole point is the full span; the row count is in
+ * the hundreds and the route caches the result.
+ */
+export async function queryAllEvents(): Promise<AppEvent[]> {
+  const rows = await query<EventRow>(
+    `SELECT ${EVENT_COLUMNS} FROM events
+     WHERE archived_at IS NULL
+     ORDER BY occurred_ts ASC`,
+  );
+  return rows.map(fromEventRow).filter((e): e is AppEvent => e !== null);
+}
+
 /** One page of a single event type, newest first. `before` is a plain ISO
  *  timestamp (the previous page's oldest event), keeping the client-facing
  *  cursor simple. Fetches one extra row to answer hasMore without a count. */
