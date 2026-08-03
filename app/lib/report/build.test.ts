@@ -34,8 +34,8 @@ describe('buildReport', () => {
   it('returns an empty document for no events', () => {
     const r = buildReport([], NOW);
     expect(r.meta.generatedIso).toBe(NOW);
-    expect(r.nights).toEqual([]);
-    expect(r.sleep.nights).toBe(0);
+    expect(r.days).toEqual([]);
+    expect(r.sleep.days).toBe(0);
   });
 
   it('spans first to last calendar day including untracked gaps', () => {
@@ -82,9 +82,10 @@ describe('buildReport', () => {
       ],
       NOW,
     );
-    expect(r.nights).toHaveLength(1);
-    expect(r.nights[0].durationMinutes).toBe(331);
-    expect(r.nights[0].fragments).toBe(1);
+    expect(r.days).toHaveLength(1);
+    expect(r.days[0].main.minutes).toBe(331);
+    expect(r.days[0].extras).toHaveLength(1);
+    expect(r.days[0].totalMinutes).toBe(331 + 159);
   });
 
   it('averages meals only over days after meal tracking began', () => {

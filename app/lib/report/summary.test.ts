@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { formatClock } from './clockStats';
+import { buildDayRows } from './days';
 import { buildEpisodes, dayRange } from './episodes';
 import {
   recordRange,
@@ -48,47 +49,62 @@ describe('summariseSleep', () => {
   ]);
 
   it('counts one night per main sleep', () => {
-    expect(summariseSleep(episodes).nights).toBe(2);
+    expect(summariseSleep(buildDayRows(episodes, 'night')).days).toBe(2);
   });
 
   it('averages onsets across midnight', () => {
-    const onset = summariseSleep(episodes).onset;
+    const onset = summariseSleep(buildDayRows(episodes, 'night')).onset;
     expect(formatClock((onset as NonNullable<typeof onset>).meanMinutes)).toBe('00:00');
   });
 
   it('averages duration in minutes', () => {
-    expect(summariseSleep(episodes).meanDurationMinutes).toBe(420);
+    expect(summariseSleep(buildDayRows(episodes, 'night')).meanTotalMinutes).toBe(420);
   });
 
   it('reports the longest and shortest night', () => {
-    const s = summariseSleep(episodes);
-    expect(s.longestNightMinutes).toBe(480);
-    expect(s.shortestNightMinutes).toBe(360);
+    const s = summariseSleep(buildDayRows(episodes, 'night'));
+    expect(s.longestTotalMinutes).toBe(480);
+    expect(s.shortestTotalMinutes).toBe(360);
   });
 
   it('counts onsets at or after 03:00 as late', () => {
     const late = buildEpisodes(night('2026-07-30T04:00:00+01:00', '2026-07-30T10:00:00+01:00'));
-    expect(summariseSleep(late).lateOnsetNights).toBe(1);
+    expect(summariseSleep(buildDayRows(late, 'night')).lateOnsetDays).toBe(1);
   });
 
   it('does not count a pre-midnight onset as late', () => {
     const early = buildEpisodes(night('2026-07-30T22:00:00+01:00', '2026-07-31T06:00:00+01:00'));
-    expect(summariseSleep(early).lateOnsetNights).toBe(0);
+    expect(summariseSleep(buildDayRows(early, 'night')).lateOnsetDays).toBe(0);
   });
 
   it('handles an empty record', () => {
     const s = summariseSleep([]);
-    expect(s.nights).toBe(0);
+    expect(s.days).toBe(0);
     expect(s.onset).toBeNull();
-    expect(s.meanDurationMinutes).toBeNull();
+    expect(s.meanTotalMinutes).toBeNull();
   });
 
-  it('ignores fragments when averaging', () => {
+  it('counts fragments in the total but not in the main-episode average', () => {
     const withFragment = buildEpisodes([
       ...night('2026-07-30T00:00:00+01:00', '2026-07-30T08:00:00+01:00'), // main 8h
       ...night('2026-07-30T09:00:00+01:00', '2026-07-30T10:00:00+01:00'), // fragment 1h
     ]);
-    expect(summariseSleep(withFragment).meanDurationMinutes).toBe(480);
+    const s = summariseSleep(buildDayRows(withFragment, 'night'));
+    expect(s.meanTotalMinutes).toBe(540);
+    expect(s.meanMainMinutes).toBe(480);
+  });
+
+  /** The exact shape that made the report look like it invented a night. */
+  it('keeps a small-hours onset on the night it began, and counts the whole night', () => {
+    const fragmentedNight = buildEpisodes([
+      ...night('2026-08-02T00:07:00+01:00', '2026-08-02T05:01:00+01:00'), // 4h54
+      ...night('2026-08-02T05:34:00+01:00', '2026-08-02T12:11:00+01:00'), // 6h37
+    ]);
+    const rows = buildDayRows(fragmentedNight, 'night');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].dayKey).toBe('2026-08-01');
+    expect(summariseSleep(rows).meanTotalMinutes).toBe(294 + 397);
+    expect(summariseSleep(rows).meanMainMinutes).toBe(397);
   });
 });
 
@@ -98,17 +114,17 @@ describe('summariseFragmentation', () => {
       ...night('2026-07-30T00:31:00+01:00', '2026-07-30T06:02:00+01:00'),
       ...night('2026-07-30T07:31:00+01:00', '2026-07-30T12:10:00+01:00'),
     ]);
-    expect(summariseFragmentation(episodes, []).fragmentedNights).toBe(1);
+    expect(summariseFragmentation(buildDayRows(episodes, 'night'), episodes, []).fragmentedDays).toBe(1);
   });
 
   it('flags a short evening sleep', () => {
     const episodes = buildEpisodes(night('2026-07-28T19:00:00+01:00', '2026-07-28T22:00:00+01:00'));
-    expect(summariseFragmentation(episodes, []).eveningEpisodes).toBe(1);
+    expect(summariseFragmentation(buildDayRows(episodes, 'night'), episodes, []).eveningEpisodes).toBe(1);
   });
 
   it('does not flag a full night that starts in the evening', () => {
     const episodes = buildEpisodes(night('2026-07-28T21:00:00+01:00', '2026-07-29T06:00:00+01:00'));
-    expect(summariseFragmentation(episodes, []).eveningEpisodes).toBe(0);
+    expect(summariseFragmentation(buildDayRows(episodes, 'night'), episodes, []).eveningEpisodes).toBe(0);
   });
 
   it('averages nap length over naps that have one', () => {
@@ -117,7 +133,7 @@ describe('summariseFragmentation', () => {
       { atIso: '', dayKey: '2026-07-11', startMinutes: 0, durationMinutes: 80, confidence: 'logged' },
       { atIso: '', dayKey: '2026-07-12', startMinutes: 0, durationMinutes: null, confidence: 'logged' },
     ];
-    const f = summariseFragmentation([], naps);
+    const f = summariseFragmentation([], [], naps);
     expect(f.naps).toBe(3);
     expect(f.meanNapMinutes).toBe(60);
   });

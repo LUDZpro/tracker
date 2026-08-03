@@ -10,7 +10,7 @@
  */
 import { actogramTicks, type ActogramRow } from '@/lib/report/actogram';
 import { formatClock, formatSpan, nightAxisMinutes } from '@/lib/report/clockStats';
-import type { NightRow } from '@/lib/report/build';
+import { dayRowEndKey, type DayMode, type DayRow } from '@/lib/report/days';
 import type { DayCount, RatingPoint, TimedPoint } from '@/lib/report/types';
 import { ChartFrame, useTip } from './tip';
 import styles from './report.module.css';
@@ -30,6 +30,25 @@ function fullDay(key: string): string {
   return `${weekday} ${d} ${MONTHS[m - 1]} ${y}`;
 }
 
+/**
+ * A row's name in the active mode.
+ *
+ * In night mode this must say both dates. The row keyed 2026-08-01 holds
+ * sleep that happened in the small hours of the 2nd, and labelling it "1 Aug"
+ * alone is exactly what made the report look like it had invented a night.
+ */
+export function dayLabel(key: string, mode: DayMode): string {
+  if (mode === 'calendar') return fullDay(key);
+
+  const [y1, m1, d1] = key.split('-').map(Number);
+  const [, m2, d2] = dayRowEndKey(key, mode).split('-').map(Number);
+  const weekday = WEEKDAYS[new Date(Date.UTC(y1, m1 - 1, d1)).getUTCDay()];
+  // Name both months only when the night crosses one, so the common case
+  // stays short.
+  const from = m1 === m2 ? `${d1}` : `${d1} ${MONTHS[m1 - 1]}`;
+  return `Night of ${weekday} ${from} → ${d2} ${MONTHS[m2 - 1]} ${y1}`;
+}
+
 const CONFIDENCE_WORD: Record<string, string> = {
   logged: 'Logged live',
   approximate: 'Approximate',
@@ -47,10 +66,13 @@ function hourTicks(every = 1): number[] {
 
 interface ActogramProps {
   rows: readonly ActogramRow[];
+  mode: DayMode;
+  /** Hour each row starts at — 12 in night mode, 0 in calendar mode. */
+  anchorHour: number;
 }
 
-/** Noon-to-noon actogram: one row per day, sleep painted across the night. */
-export function Actogram({ rows }: ActogramProps) {
+/** One row per day, sleep painted across it from the mode's anchor hour. */
+export function Actogram({ rows, mode, anchorHour }: ActogramProps) {
   const { hostRef, tip, bind, hide } = useTip();
   if (rows.length === 0) return <p className={styles.empty}>No days in range.</p>;
 
@@ -61,7 +83,9 @@ export function Actogram({ rows }: ActogramProps) {
   const plotW = width - labelW - 10;
   const height = rows.length * (rowH + gap) + 30;
   const x = (min: number) => labelW + (min / DAY) * plotW;
-  const ticks = actogramTicks(1);
+  const ticks = actogramTicks(1, anchorHour);
+  /** Row-relative minutes back to a clock reading. */
+  const clockAt = (min: number) => formatClock(min + anchorHour * 60);
 
   return (
     <ChartFrame hostRef={hostRef} tip={tip} onLeave={hide}>
@@ -69,7 +93,11 @@ export function Actogram({ rows }: ActogramProps) {
         className={styles.chart}
         viewBox={`0 0 ${width} ${height}`}
         role="group"
-        aria-label="Sleep actogram, noon to noon, one row per day"
+        aria-label={
+          mode === 'night'
+            ? 'Sleep actogram, noon to noon, one row per night'
+            : 'Sleep actogram, midnight to midnight, one row per calendar day'
+        }
       >
         {ticks.map((t, i) => (
           <g key={t.atMinutes}>
@@ -104,7 +132,7 @@ export function Actogram({ rows }: ActogramProps) {
                 height={rowH}
                 fill={row.covered ? 'var(--doc-track)' : 'var(--doc-void)'}
                 {...bind(
-                  fullDay(row.dayKey),
+                  dayLabel(row.dayKey, mode),
                   row.covered
                     ? [
                         { k: 'Episodes', v: String(row.spans.length) },
@@ -122,10 +150,10 @@ export function Actogram({ rows }: ActogramProps) {
                   height={rowH}
                   fill={s.kind === 'main' ? 'var(--doc-sleep)' : 'var(--doc-frag)'}
                   opacity={s.confidence === 'reconstructed' ? 0.45 : 1}
-                  {...bind(fullDay(row.dayKey), [
+                  {...bind(dayLabel(row.dayKey, mode), [
                     { k: s.kind === 'main' ? 'Main sleep' : 'Extra episode', v: '' },
-                    { k: 'Asleep', v: formatClock((s.from + 12 * 60) % DAY) },
-                    { k: 'Awake', v: formatClock((s.to + 12 * 60) % DAY) },
+                    { k: 'Asleep', v: clockAt(s.from) },
+                    { k: 'Awake', v: clockAt(s.to) },
                     { k: 'Duration', v: formatSpan(s.to - s.from) },
                     { k: 'Source', v: CONFIDENCE_WORD[s.confidence] },
                   ])}
@@ -141,14 +169,23 @@ export function Actogram({ rows }: ActogramProps) {
 
 /* ------------------------------------------------------- duration per night */
 
-interface NightChartProps {
-  nights: readonly NightRow[];
+interface DayChartProps {
+  days: readonly DayRow[];
+  mode: DayMode;
 }
 
-/** Main-sleep duration per night, with 7h and 9h reference lines. */
-export function DurationChart({ nights }: NightChartProps) {
+/**
+ * Total sleep per day, with the longest episode drawn as the base of each bar
+ * and the rest of the day's sleep stacked above it.
+ *
+ * The bar used to show the longest episode alone, which on a fragmented day
+ * hid most of the sleep: 2 Aug 2026 drew 6 h 37 against an actual 16 h 27.
+ * Stacking keeps the main-sleep-period reading visible while making the bar's
+ * height mean what a reader assumes it means.
+ */
+export function DurationChart({ days, mode }: DayChartProps) {
   const { hostRef, tip, bind, hide } = useTip();
-  if (nights.length === 0) return <p className={styles.empty}>No nights in range.</p>;
+  if (days.length === 0) return <p className={styles.empty}>No days in range.</p>;
 
   const width = 900;
   const height = 230;
@@ -156,10 +193,10 @@ export function DurationChart({ nights }: NightChartProps) {
   const padB = 24;
   const plotW = width - padL - 10;
   const plotH = height - padB - 10;
-  const maxH = Math.max(12, Math.ceil(Math.max(...nights.map((n) => n.durationMinutes)) / 60) + 1);
-  const barW = Math.max(2, plotW / nights.length - 1.5);
+  const maxH = Math.max(12, Math.ceil(Math.max(...days.map((d) => d.totalMinutes)) / 60) + 1);
+  const barW = Math.max(2, plotW / days.length - 1.5);
   const y = (min: number) => 10 + plotH - (min / (maxH * 60)) * plotH;
-  const labelEvery = Math.ceil(nights.length / 14);
+  const labelEvery = Math.ceil(days.length / 14);
 
   return (
     <ChartFrame hostRef={hostRef} tip={tip} onLeave={hide}>
@@ -167,7 +204,7 @@ export function DurationChart({ nights }: NightChartProps) {
         className={styles.chart}
         viewBox={`0 0 ${width} ${height}`}
         role="group"
-        aria-label="Main sleep duration per night in hours"
+        aria-label="Total sleep per day in hours, split into main sleep and additional episodes"
       >
         {Array.from({ length: maxH + 1 }, (_, h) => h).map((h) => (
           <g key={h}>
@@ -182,41 +219,59 @@ export function DurationChart({ nights }: NightChartProps) {
         <line className={styles.refLine} x1={padL} x2={width - 10} y1={y(420)} y2={y(420)} />
         <line className={styles.refLine} x1={padL} x2={width - 10} y1={y(540)} y2={y(540)} />
 
-        {nights.map((n, i) => {
-          const bx = padL + (i * plotW) / nights.length;
-          const top = y(n.durationMinutes);
-          const short = n.durationMinutes < 420;
+        {days.map((d, i) => {
+          const bx = padL + (i * plotW) / days.length;
+          const short = d.totalMinutes < 420;
+          const extraMinutes = d.totalMinutes - d.main.minutes;
+          const base = 10 + plotH;
+          const mainTop = y(d.main.minutes);
+          const totalTop = y(d.totalMinutes);
+          const rows = [
+            { k: 'Total asleep', v: formatSpan(d.totalMinutes) },
+            { k: 'Longest episode', v: formatSpan(d.main.minutes) },
+            { k: 'Episodes', v: String(d.segments.length) },
+            {
+              k: 'Vs 7h target',
+              v: `${short ? '−' : '+'}${formatSpan(Math.abs(d.totalMinutes - 420))}`,
+            },
+            { k: 'Source', v: CONFIDENCE_WORD[d.main.confidence] },
+          ];
           return (
-            <rect
-              key={n.dayKey}
-              x={bx}
-              y={top}
-              width={barW}
-              height={Math.max(1, 10 + plotH - top)}
-              rx={1}
-              fill={short ? 'var(--doc-frag)' : 'var(--doc-sleep)'}
-              opacity={n.confidence === 'reconstructed' ? 0.45 : 1}
-              {...bind(fullDay(n.dayKey), [
-                { k: 'Duration', v: formatSpan(n.durationMinutes) },
-                { k: 'Asleep', v: formatClock(n.onsetMinutes) },
-                { k: 'Awake', v: formatClock(n.wakeMinutes) },
-                { k: 'Vs 7h target', v: `${short ? '−' : '+'}${formatSpan(Math.abs(n.durationMinutes - 420))}` },
-                { k: 'Source', v: CONFIDENCE_WORD[n.confidence] },
-              ])}
-            />
+            <g key={d.dayKey} opacity={d.main.confidence === 'reconstructed' ? 0.45 : 1}>
+              {extraMinutes > 0 && (
+                <rect
+                  x={bx}
+                  y={totalTop}
+                  width={barW}
+                  height={Math.max(1, mainTop - totalTop)}
+                  rx={1}
+                  fill="var(--doc-sleep-soft)"
+                  {...bind(dayLabel(d.dayKey, mode), rows)}
+                />
+              )}
+              <rect
+                x={bx}
+                y={mainTop}
+                width={barW}
+                height={Math.max(1, base - mainTop)}
+                rx={1}
+                fill={short ? 'var(--doc-frag)' : 'var(--doc-sleep)'}
+                {...bind(dayLabel(d.dayKey, mode), rows)}
+              />
+            </g>
           );
         })}
 
-        {nights.map((n, i) =>
+        {days.map((d, i) =>
           i % labelEvery === 0 ? (
             <text
-              key={`l${n.dayKey}`}
+              key={`l${d.dayKey}`}
               className={styles.axisText}
-              x={padL + (i * plotW) / nights.length + barW / 2}
+              x={padL + (i * plotW) / days.length + barW / 2}
               y={height - 7}
               textAnchor="middle"
             >
-              {shortDay(n.dayKey)}
+              {shortDay(d.dayKey)}
             </text>
           ) : null,
         )}
@@ -225,10 +280,10 @@ export function DurationChart({ nights }: NightChartProps) {
   );
 }
 
-/** Onset and wake clock times per night on a night-centred axis. */
-export function OnsetWakeChart({ nights }: NightChartProps) {
+/** Onset and wake clock times per day on a night-centred axis. */
+export function OnsetWakeChart({ days, mode }: DayChartProps) {
   const { hostRef, tip, bind, hide } = useTip();
-  if (nights.length === 0) return <p className={styles.empty}>No nights in range.</p>;
+  if (days.length === 0) return <p className={styles.empty}>No days in range.</p>;
 
   const width = 900;
   const height = 500;
@@ -238,7 +293,7 @@ export function OnsetWakeChart({ nights }: NightChartProps) {
   const plotH = height - padB - 12;
   // Axis runs 12:00 -> 12:00 so an onset at 01:00 sits below one at 23:00.
   const y = (min: number) => 12 + ((nightAxisMinutes(min) - 720) / DAY) * plotH;
-  const labelEvery = Math.ceil(nights.length / 14);
+  const labelEvery = Math.ceil(days.length / 14);
 
   return (
     <ChartFrame hostRef={hostRef} tip={tip} onLeave={hide}>
@@ -261,19 +316,27 @@ export function OnsetWakeChart({ nights }: NightChartProps) {
           );
         })}
 
-        {nights.map((n, i) => {
-          const x = padL + ((i + 0.5) * plotW) / nights.length;
-          const yOnset = y(n.onsetMinutes);
-          const yWake = y(n.wakeMinutes);
-          const dim = n.confidence === 'reconstructed' ? 0.45 : 1;
+        {days.map((d, i) => {
+          const s = d.main;
+          const x = padL + ((i + 0.5) * plotW) / days.length;
+          const yOnset = y(s.startMinutes);
+          const yWake = y(s.endMinutes);
+          const dim = s.confidence === 'reconstructed' ? 0.45 : 1;
           const rows = [
-            { k: 'Asleep', v: formatClock(n.onsetMinutes) },
-            { k: 'Awake', v: formatClock(n.wakeMinutes) },
-            { k: 'Duration', v: formatSpan(n.durationMinutes) },
-            { k: 'Source', v: CONFIDENCE_WORD[n.confidence] },
+            {
+              k: 'Asleep',
+              v: s.clippedStart ? `${formatClock(s.startMinutes)} (ran over from the day before)` : formatClock(s.startMinutes),
+            },
+            {
+              k: 'Awake',
+              v: s.clippedEnd ? `${formatClock(s.endMinutes)} (ran into the next day)` : formatClock(s.endMinutes),
+            },
+            { k: 'Longest episode', v: formatSpan(s.minutes) },
+            { k: 'Total asleep', v: formatSpan(d.totalMinutes) },
+            { k: 'Source', v: CONFIDENCE_WORD[s.confidence] },
           ];
           return (
-            <g key={n.dayKey} opacity={dim}>
+            <g key={d.dayKey} opacity={dim}>
               <line
                 x1={x}
                 x2={x}
@@ -281,24 +344,29 @@ export function OnsetWakeChart({ nights }: NightChartProps) {
                 y2={yWake}
                 stroke="var(--doc-sleep-soft)"
                 strokeWidth={3}
-                {...bind(fullDay(n.dayKey), rows)}
+                {...bind(dayLabel(d.dayKey, mode), rows)}
               />
-              <circle cx={x} cy={yOnset} r={2.8} fill="var(--doc-sleep)" {...bind(fullDay(n.dayKey), rows)} />
-              <circle cx={x} cy={yWake} r={2.8} fill="var(--doc-mood)" {...bind(fullDay(n.dayKey), rows)} />
+              {/* A midnight cut is not an onset, so it gets no marker. */}
+              {!s.clippedStart && (
+                <circle cx={x} cy={yOnset} r={2.8} fill="var(--doc-sleep)" {...bind(dayLabel(d.dayKey, mode), rows)} />
+              )}
+              {!s.clippedEnd && (
+                <circle cx={x} cy={yWake} r={2.8} fill="var(--doc-mood)" {...bind(dayLabel(d.dayKey, mode), rows)} />
+              )}
             </g>
           );
         })}
 
-        {nights.map((n, i) =>
+        {days.map((d, i) =>
           i % labelEvery === 0 ? (
             <text
-              key={`l${n.dayKey}`}
+              key={`l${d.dayKey}`}
               className={styles.axisText}
-              x={padL + ((i + 0.5) * plotW) / nights.length}
+              x={padL + ((i + 0.5) * plotW) / days.length}
               y={height - 7}
               textAnchor="middle"
             >
-              {shortDay(n.dayKey)}
+              {shortDay(d.dayKey)}
             </text>
           ) : null,
         )}
@@ -420,8 +488,12 @@ export function TimeOfDayScatter({ points, dayKeys, color, label, cutoffHour }: 
   const plotH = height - padB - 12;
   const index = new Map(dayKeys.map((k, i) => [k, i]));
   const y = (min: number) => 12 + (min / DAY) * plotH;
-  const x = (key: string) =>
-    padL + (((index.get(key) ?? 0) + 0.5) * plotW) / Math.max(1, dayKeys.length);
+  // A point off this axis is dropped, not clamped: the old `?? 0` fallback
+  // silently drew it on the first column, months from where it belonged.
+  const x = (key: string) => {
+    const i = index.get(key);
+    return i === undefined ? null : padL + ((i + 0.5) * plotW) / Math.max(1, dayKeys.length);
+  };
   const labelEvery = Math.ceil(dayKeys.length / 14);
 
   return (
@@ -450,19 +522,23 @@ export function TimeOfDayScatter({ points, dayKeys, color, label, cutoffHour }: 
           />
         )}
 
-        {points.map((p, i) => (
-          <circle
-            key={`${p.atIso}-${i}`}
-            cx={x(p.dayKey)}
-            cy={y(p.minutes)}
-            r={3.2}
-            fill={color}
-            {...bind(fullDay(p.dayKey), [
-              { k: 'Time', v: formatClock(p.minutes) },
-              { k: label, v: p.label || '—' },
-            ])}
-          />
-        ))}
+        {points.map((p, i) => {
+          const cx = x(p.dayKey);
+          if (cx === null) return null;
+          return (
+            <circle
+              key={`${p.atIso}-${i}`}
+              cx={cx}
+              cy={y(p.minutes)}
+              r={3.2}
+              fill={color}
+              {...bind(fullDay(p.dayKey), [
+                { k: 'Time', v: formatClock(p.minutes) },
+                { k: label, v: p.label || '—' },
+              ])}
+            />
+          );
+        })}
 
         {dayKeys.map((k, i) =>
           i % labelEvery === 0 ? (
@@ -505,8 +581,11 @@ export function RatingChart({ mood, energy, dayKeys }: RatingChartProps) {
   const plotH = height - padB - 10;
   const index = new Map(dayKeys.map((k, i) => [k, i]));
   const y = (v: number) => 10 + plotH - ((v - 1) / 4) * plotH;
-  const x = (key: string) =>
-    padL + (((index.get(key) ?? 0) + 0.5) * plotW) / Math.max(1, dayKeys.length);
+  // Dropped rather than clamped — see TimeOfDayScatter.
+  const x = (key: string) => {
+    const i = index.get(key);
+    return i === undefined ? null : padL + ((i + 0.5) * plotW) / Math.max(1, dayKeys.length);
+  };
   const labelEvery = Math.ceil(dayKeys.length / 14);
 
   const series = [
@@ -533,19 +612,23 @@ export function RatingChart({ mood, energy, dayKeys }: RatingChartProps) {
 
         {series.map((s, si) => (
           <g key={si}>
-            {s.points.map((p, i) => (
-              <circle
-                key={`${si}-${i}`}
-                cx={x(p.dayKey)}
-                cy={y(p.value)}
-                r={3.2}
-                fill={s.color}
-                {...bind(fullDay(p.dayKey), [
-                  { k: s.name, v: `${p.value} / 5` },
-                  { k: 'Time', v: formatClock(p.minutes) },
-                ])}
-              />
-            ))}
+            {s.points.map((p, i) => {
+              const cx = x(p.dayKey);
+              if (cx === null) return null;
+              return (
+                <circle
+                  key={`${si}-${i}`}
+                  cx={cx}
+                  cy={y(p.value)}
+                  r={3.2}
+                  fill={s.color}
+                  {...bind(fullDay(p.dayKey), [
+                    { k: s.name, v: `${p.value} / 5` },
+                    { k: 'Time', v: formatClock(p.minutes) },
+                  ])}
+                />
+              );
+            })}
           </g>
         ))}
 

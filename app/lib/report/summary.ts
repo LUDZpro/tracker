@@ -12,6 +12,7 @@ import {
   nightAxisMinutes,
   type ClockStat,
 } from './clockStats';
+import type { DayRow } from './days';
 import { dayRange } from './episodes';
 import type { Confidence, NapRecord, SleepEpisode, TimedPoint } from './types';
 
@@ -27,18 +28,24 @@ const EVENING_WINDOW = { fromHour: 17, toHour: 24, maxMinutes: 6 * 60 };
 const SRI_STEP_MINUTES = 5;
 
 export interface SleepSummary {
-  nights: number;
+  /** Rows that carry sleep — nights or calendar days, per the active mode. */
+  days: number;
   onset: ClockStat | null;
   wake: ClockStat | null;
-  meanDurationMinutes: number | null;
-  lateOnsetNights: number;
-  longestNightMinutes: number | null;
-  shortestNightMinutes: number | null;
+  /** Mean of each day's *total* sleep, fragments included. */
+  meanTotalMinutes: number | null;
+  /** Mean of each day's longest single episode. */
+  meanMainMinutes: number | null;
+  lateOnsetDays: number;
+  /** Days contributing a real onset — the denominator for `lateOnsetDays`. */
+  onsetDays: number;
+  longestTotalMinutes: number | null;
+  shortestTotalMinutes: number | null;
 }
 
 export interface FragmentationSummary {
   totalEpisodes: number;
-  fragmentedNights: number;
+  fragmentedDays: number;
   eveningEpisodes: number;
   naps: number;
   meanNapMinutes: number | null;
@@ -59,41 +66,58 @@ export interface ConfidenceSummary {
   reconstructed: number;
 }
 
-/** Main-sleep statistics. Fragments and naps are deliberately excluded. */
-export function summariseSleep(episodes: readonly SleepEpisode[]): SleepSummary {
-  const mains = episodes.filter((e) => e.kind === 'main');
-  const durations = mains.map((e) => e.durationMinutes);
+/**
+ * Per-day sleep statistics.
+ *
+ * Durations are reported twice on purpose. `meanMainMinutes` is the classic
+ * main-sleep-period figure; `meanTotalMinutes` counts every episode of the
+ * day. On a fragmented record the two diverge sharply — 2 Aug 2026 held 16 h
+ * of sleep across three episodes, of which the longest was 6 h 37 — and
+ * showing only the first understates the record badly.
+ *
+ * Onset and wake stats skip edges that a calendar-mode midnight cut created:
+ * a segment starting at 00:00 because the sleep began the evening before is
+ * not an onset, and averaging it in would drag every clock statistic toward
+ * midnight.
+ */
+export function summariseSleep(rows: readonly DayRow[]): SleepSummary {
+  const totals = rows.map((r) => r.totalMinutes);
+  const mains = rows.map((r) => r.main);
+  const realOnsets = mains.filter((s) => !s.clippedStart);
+  const realWakes = mains.filter((s) => !s.clippedEnd);
 
   return {
-    nights: mains.length,
-    onset: circularClockStat(mains.map((e) => e.startMinutes)),
-    wake: circularClockStat(mains.map((e) => e.endMinutes)),
-    meanDurationMinutes: mean(durations),
-    lateOnsetNights: mains.filter(
-      (e) => nightAxisMinutes(e.startMinutes) >= (24 + LATE_ONSET_HOUR) * 60,
+    days: rows.length,
+    onset: circularClockStat(realOnsets.map((s) => s.startMinutes)),
+    wake: circularClockStat(realWakes.map((s) => s.endMinutes)),
+    meanTotalMinutes: mean(totals),
+    meanMainMinutes: mean(mains.map((s) => s.minutes)),
+    lateOnsetDays: realOnsets.filter(
+      (s) => nightAxisMinutes(s.startMinutes) >= (24 + LATE_ONSET_HOUR) * 60,
     ).length,
-    longestNightMinutes: durations.length ? Math.max(...durations) : null,
-    shortestNightMinutes: durations.length ? Math.min(...durations) : null,
+    onsetDays: realOnsets.length,
+    longestTotalMinutes: totals.length ? Math.max(...totals) : null,
+    shortestTotalMinutes: totals.length ? Math.min(...totals) : null,
   };
 }
 
-/** How broken up the sleep is, across episodes and explicit naps. */
+/**
+ * How broken up the sleep is. Episode-level figures come from the episodes
+ * themselves rather than day segments, so a sleep split across midnight in
+ * calendar mode still counts once.
+ */
 export function summariseFragmentation(
+  rows: readonly DayRow[],
   episodes: readonly SleepEpisode[],
   naps: readonly NapRecord[],
 ): FragmentationSummary {
-  const perDay = new Map<string, number>();
-  for (const e of episodes) {
-    perDay.set(e.dayKey, (perDay.get(e.dayKey) ?? 0) + 1);
-  }
-
   const napDurations = naps
     .map((n) => n.durationMinutes)
     .filter((d): d is number => d !== null);
 
   return {
     totalEpisodes: episodes.length,
-    fragmentedNights: [...perDay.values()].filter((n) => n > 1).length,
+    fragmentedDays: rows.filter((r) => r.segments.length > 1).length,
     eveningEpisodes: episodes.filter(
       (e) =>
         e.startMinutes >= EVENING_WINDOW.fromHour * 60 &&

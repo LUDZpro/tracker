@@ -4,11 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { useReport } from '@/hooks/useReport';
 import { buildReport, emptyReport } from '@/lib/report/build';
 import { formatClock, formatSpan } from '@/lib/report/clockStats';
+import { DAY_MODE_ANCHOR_HOUR, type DayMode } from '@/lib/report/days';
 import { CAFFEINE_LATE_HOUR } from '@/lib/report/summary';
 import { wallDateKey } from '@/lib/time';
 import {
   Actogram,
   CountChart,
+  dayLabel,
   DurationChart,
   OnsetWakeChart,
   RatingChart,
@@ -26,6 +28,37 @@ const ALL = 'all';
 type DocTheme = 'dark' | 'light';
 
 const THEME_KEY = 'report-theme';
+const DAY_MODE_KEY = 'report-day-mode';
+
+const DAY_MODE_COPY: Record<DayMode, { chip: string; blurb: string }> = {
+  night: {
+    chip: 'Night (noon → noon)',
+    blurb:
+      'A day runs noon to noon, so a night and the morning it ends in stay on one row and no sleep is ever cut in half. The row is named for the evening the night began — “Night of Sat 1 → 2 Aug” holds the sleep you started at 00:07 on the 2nd. This is the convention sleep clinics use.',
+  },
+  calendar: {
+    chip: 'Calendar (midnight → midnight)',
+    blurb:
+      'A day runs midnight to midnight, so each row holds exactly the sleep that happened on that date — 2 Aug reads 16 h 27, all of it. The cost is that a sleep crossing midnight is split between two rows, and the halves show a 00:00 edge that is a cut rather than a real onset or wake.',
+  },
+};
+
+/** Remembers the reader's day convention across visits. */
+function useDayMode(): [DayMode, (next: DayMode) => void] {
+  const [mode, setMode] = useState<DayMode>('night');
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(DAY_MODE_KEY);
+    if (saved === 'night' || saved === 'calendar') setMode(saved);
+  }, []);
+
+  const choose = (next: DayMode) => {
+    window.localStorage.setItem(DAY_MODE_KEY, next);
+    setMode(next);
+  };
+
+  return [mode, choose];
+}
 
 /**
  * Dark matches the rest of the console and is the default. Light is the
@@ -128,6 +161,7 @@ export default function ReportView() {
   const { report: payload, error } = useReport();
   const [month, setMonth] = useState<string>(ALL);
   const [theme, toggleTheme] = useDocTheme();
+  const [dayMode, setDayMode] = useDayMode();
 
   // Every month that carries data, for the filter chips.
   const months = useMemo(() => {
@@ -138,13 +172,13 @@ export default function ReportView() {
   // Filtering re-derives every statistic from the filtered log, so the
   // summary always describes exactly what the charts below it show.
   const data = useMemo(() => {
-    if (!payload) return emptyReport();
+    if (!payload) return emptyReport(dayMode);
     const events =
       month === ALL
         ? payload.events
         : payload.events.filter((e) => wallDateKey(e.occurredAt).startsWith(month));
-    return buildReport(events, payload.now);
-  }, [payload, month]);
+    return buildReport(events, payload.now, dayMode);
+  }, [payload, month, dayMode]);
 
   if (error) {
     return (
@@ -189,7 +223,7 @@ export default function ReportView() {
           </div>
           <div className={styles.headStats}>
             <div>
-              Nights recorded: <b>{sleep.nights}</b>
+              {dayMode === 'night' ? 'Nights' : 'Days'} recorded: <b>{sleep.days}</b>
             </div>
             <div>
               Avg onset: <b>{sleep.onset ? formatClock(sleep.onset.meanMinutes) : '—'}</b>
@@ -240,6 +274,23 @@ export default function ReportView() {
           </button>
         </div>
 
+        <div className={styles.filter}>
+          <span className={styles.filterLabel}>Day runs</span>
+          {(['night', 'calendar'] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              className={`${styles.chip} ${dayMode === m ? styles.chipOn : ''}`}
+              onClick={() => setDayMode(m)}
+              aria-pressed={dayMode === m}
+            >
+              {DAY_MODE_COPY[m].chip}
+            </button>
+          ))}
+        </div>
+
+        <p className={styles.modeNote}>{DAY_MODE_COPY[dayMode].blurb}</p>
+
         <div className={styles.method}>
           <b>How to read this.</b> Every entry is self-logged in a personal tracking app.
           {confidence.reconstructed > 0 ? (
@@ -250,8 +301,9 @@ export default function ReportView() {
               are drawn faded throughout and carry roughly ±1 h of uncertainty.
             </>
           ) : null}{' '}
-          Main sleep is the longest episode of each noon-to-noon day; shorter episodes on the same
-          day are counted as fragments, and explicitly logged naps are counted separately.
+          Durations are given as the day&rsquo;s <b>total</b> time asleep, with the longest single
+          episode shown beside it; shorter episodes on the same day are listed individually rather
+          than collapsed into a count, and explicitly logged naps are counted separately.
           {meta.blocks.length > 1
             ? ` Tracking was interrupted — the record splits into ${meta.blocks.length} periods, shown as gaps rather than interpolated.`
             : ''}
@@ -269,18 +321,23 @@ export default function ReportView() {
           </div>
           <div className={styles.stats}>
             <Stat
-              label="Nights recorded"
-              value={String(sleep.nights)}
+              label={dayMode === 'night' ? 'Nights recorded' : 'Days recorded'}
+              value={String(sleep.days)}
               sub={`${fragmentation.totalEpisodes} sleep episodes total`}
             />
             <Stat
-              label="Avg main sleep"
-              value={sleep.meanDurationMinutes ? formatSpan(sleep.meanDurationMinutes) : '—'}
+              label="Avg total sleep"
+              value={sleep.meanTotalMinutes ? formatSpan(sleep.meanTotalMinutes) : '—'}
               sub={
-                sleep.shortestNightMinutes !== null && sleep.longestNightMinutes !== null
-                  ? `range ${formatSpan(sleep.shortestNightMinutes)} – ${formatSpan(sleep.longestNightMinutes)}`
+                sleep.shortestTotalMinutes !== null && sleep.longestTotalMinutes !== null
+                  ? `range ${formatSpan(sleep.shortestTotalMinutes)} – ${formatSpan(sleep.longestTotalMinutes)}`
                   : undefined
               }
+            />
+            <Stat
+              label="Avg longest episode"
+              value={sleep.meanMainMinutes ? formatSpan(sleep.meanMainMinutes) : '—'}
+              sub="the classic main-sleep figure"
             />
             <Stat
               label="Avg onset"
@@ -295,19 +352,19 @@ export default function ReportView() {
             <Stat
               label="Onset after 03:00"
               value={
-                sleep.nights > 0
-                  ? `${sleep.lateOnsetNights} / ${sleep.nights}`
+                sleep.onsetDays > 0
+                  ? `${sleep.lateOnsetDays} / ${sleep.onsetDays}`
                   : '—'
               }
               sub={
-                sleep.nights > 0
-                  ? `${Math.round((sleep.lateOnsetNights / sleep.nights) * 100)}% of nights`
+                sleep.onsetDays > 0
+                  ? `${Math.round((sleep.lateOnsetDays / sleep.onsetDays) * 100)}% of recorded onsets`
                   : undefined
               }
             />
             <Stat
-              label="Nights split in two+"
-              value={String(fragmentation.fragmentedNights)}
+              label={dayMode === 'night' ? 'Nights split in two+' : 'Days split in two+'}
+              value={String(fragmentation.fragmentedDays)}
               sub={`${fragmentation.eveningEpisodes} evening sleeps`}
             />
             <Stat
@@ -347,9 +404,15 @@ export default function ReportView() {
 
         <Card
           title="Sleep actogram"
-          note="One row per day, noon to noon. Blue is main sleep, orange a second episode in the same day; faded blocks are reconstructed. Grey rows are days with no tracking at all."
+          note={`One row per day, ${
+            dayMode === 'night' ? 'noon to noon' : 'midnight to midnight'
+          }. Blue is main sleep, orange a second episode in the same day; faded blocks are reconstructed. Grey rows are days with no tracking at all.`}
         >
-          <Actogram rows={data.actogram} />
+          <Actogram
+            rows={data.actogram}
+            mode={dayMode}
+            anchorHour={DAY_MODE_ANCHOR_HOUR[dayMode]}
+          />
           <div className={styles.legend}>
             <span>
               <i className={styles.swatch} style={{ background: 'var(--doc-sleep)' }} />
@@ -367,17 +430,37 @@ export default function ReportView() {
         </Card>
 
         <Card
-          title="Main sleep duration per night"
-          note="Dashed lines mark 7 h and 9 h. Orange bars fall below 7 h."
+          title={`Total sleep per ${dayMode === 'night' ? 'night' : 'day'}`}
+          note="Bar height is the whole day's sleep. The solid base is the longest episode; the lighter block above it is everything else logged that day. Dashed lines mark 7 h and 9 h; a bar whose total falls below 7 h turns orange."
         >
-          <DurationChart nights={data.nights} />
+          <DurationChart days={data.days} mode={dayMode} />
+          <div className={styles.legend}>
+            <span>
+              <i className={styles.swatch} style={{ background: 'var(--doc-sleep)' }} />
+              Longest episode
+            </span>
+            <span>
+              <i className={styles.swatch} style={{ background: 'var(--doc-sleep-soft)' }} />
+              Additional episodes
+            </span>
+            <span>
+              <i className={styles.swatch} style={{ background: 'var(--doc-frag)' }} />
+              Total under 7 h
+            </span>
+          </div>
         </Card>
 
         <Card
-          title="Onset and wake per night"
-          note="Axis runs noon to noon, so a 01:00 onset sits below a 23:00 one instead of jumping the chart. Each vertical line is one night."
+          title={`Onset and wake per ${dayMode === 'night' ? 'night' : 'day'}`}
+          note={`Axis runs noon to noon, so a 01:00 onset sits below a 23:00 one instead of jumping the chart. Each vertical line is that ${
+            dayMode === 'night' ? 'night' : 'day'
+          }'s longest episode.${
+            dayMode === 'calendar'
+              ? ' An end without a dot is a midnight cut rather than a real onset or wake.'
+              : ''
+          }`}
         >
-          <OnsetWakeChart nights={data.nights} />
+          <OnsetWakeChart days={data.days} mode={dayMode} />
           <div className={styles.legend}>
             <span>
               <i className={styles.swatch} style={{ background: 'var(--doc-sleep)' }} />
@@ -444,54 +527,91 @@ export default function ReportView() {
 
         <section className={styles.card}>
           <div className={styles.cardHead}>
-            <h2 className={styles.cardTitle}>Night-by-night detail</h2>
-            <p className={styles.cardNote}>Main sleep of each day, most recent first.</p>
+            <h2 className={styles.cardTitle}>
+              {dayMode === 'night' ? 'Night-by-night detail' : 'Day-by-day detail'}
+            </h2>
+            <p className={styles.cardNote}>
+              Every sleep episode, most recent first, grouped under the{' '}
+              {dayMode === 'night' ? 'night' : 'day'} it belongs to. The longest episode of each is
+              marked <b>main</b>.
+            </p>
           </div>
           <div className={`${styles.cardBody} ${styles.scroll}`}>
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Day</th>
+                  <th>{dayMode === 'night' ? 'Night' : 'Day'}</th>
+                  <th className={styles.num}>Total</th>
                   <th>Asleep</th>
                   <th>Awake</th>
                   <th className={styles.num}>Duration</th>
-                  <th className={styles.num}>Extra episodes</th>
+                  <th>Episode</th>
                   <th>Source</th>
                 </tr>
               </thead>
               <tbody>
-                {[...data.nights].reverse().map((n) => (
-                  <tr key={n.dayKey}>
-                    <td>{longDate(n.dayKey)}</td>
-                    <td>{formatClock(n.onsetMinutes)}</td>
-                    <td>{formatClock(n.wakeMinutes)}</td>
-                    <td className={styles.num}>{formatSpan(n.durationMinutes)}</td>
-                    <td className={styles.num}>{n.fragments || '—'}</td>
-                    <td>
-                      <span
-                        className={`${styles.tag} ${
-                          n.confidence === 'reconstructed' ? styles.tagRecon : ''
-                        }`}
-                      >
-                        {n.confidence === 'reconstructed'
-                          ? 'reconstructed'
-                          : n.confidence === 'approximate'
-                            ? 'approx.'
-                            : 'logged'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {data.nights.length === 0 && (
+                {[...data.days].reverse().map((d) =>
+                  d.segments.map((s, i) => (
+                    <tr
+                      key={`${d.dayKey}-${s.startIso}-${i}`}
+                      className={i === 0 ? styles.dayFirst : undefined}
+                    >
+                      {i === 0 && (
+                        <>
+                          <td rowSpan={d.segments.length}>{dayLabel(d.dayKey, dayMode)}</td>
+                          <td className={`${styles.num} ${styles.total}`} rowSpan={d.segments.length}>
+                            {formatSpan(d.totalMinutes)}
+                          </td>
+                        </>
+                      )}
+                      <td>
+                        {s.clippedStart ? <span className={styles.cut}>…</span> : null}
+                        {formatClock(s.startMinutes)}
+                      </td>
+                      <td>
+                        {formatClock(s.endMinutes)}
+                        {s.clippedEnd ? <span className={styles.cut}>…</span> : null}
+                      </td>
+                      <td className={styles.num}>{formatSpan(s.minutes)}</td>
+                      <td>
+                        {s === d.main ? (
+                          <span className={styles.tag}>main</span>
+                        ) : (
+                          <span className={styles.dim}>extra</span>
+                        )}
+                      </td>
+                      <td>
+                        <span
+                          className={`${styles.tag} ${
+                            s.confidence === 'reconstructed' ? styles.tagRecon : ''
+                          }`}
+                        >
+                          {s.confidence === 'reconstructed'
+                            ? 'reconstructed'
+                            : s.confidence === 'approximate'
+                              ? 'approx.'
+                              : 'logged'}
+                        </span>
+                      </td>
+                    </tr>
+                  )),
+                )}
+                {data.days.length === 0 && (
                   <tr>
-                    <td colSpan={6}>
-                      <div className={styles.empty}>No nights in this range.</div>
+                    <td colSpan={7}>
+                      <div className={styles.empty}>No sleep in this range.</div>
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+          {dayMode === 'calendar' ? (
+            <p className={styles.cardNote}>
+              A time marked <span className={styles.cut}>…</span> is where midnight cut a sleep that
+              carried over — it is the edge of the day, not the moment you fell asleep or woke.
+            </p>
+          ) : null}
         </section>
       </div>
     </main>

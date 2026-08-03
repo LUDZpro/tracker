@@ -497,6 +497,44 @@
   text-align: right;
 }
 
+/* A day's episodes read as one block, so only the first row of each group
+   carries the rule that separates it from the previous day. */
+.table tbody tr td {
+  border-bottom: 0;
+}
+
+.table tbody tr.dayFirst td {
+  border-top: 1px solid var(--doc-line);
+}
+
+.table tbody tr:first-child td {
+  border-top: 0;
+}
+
+.total {
+  color: var(--doc-ink);
+  font-weight: 500;
+}
+
+.dim {
+  color: var(--doc-mute);
+  font-size: 11px;
+}
+
+/* The mark on a time that a midnight split produced rather than a real
+   onset or wake. */
+.cut {
+  color: var(--doc-mute);
+}
+
+.modeNote {
+  margin: -6px 0 16px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--doc-mute);
+  max-width: 78ch;
+}
+
 .tag {
   display: inline-block;
   font-size: 10px;

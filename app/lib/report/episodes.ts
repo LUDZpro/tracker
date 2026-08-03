@@ -54,14 +54,17 @@ function weakest(a: Confidence, b: Confidence): Confidence {
  * Every completed sleep span, tagged with its reporting day and marked
  * `main` (the longest of its day) or `fragment`.
  */
-export function buildEpisodes(events: readonly AppEvent[]): SleepEpisode[] {
+export function buildEpisodes(
+  events: readonly AppEvent[],
+  anchorHour = DAY_ANCHOR_HOUR,
+): SleepEpisode[] {
   const episodes = buildSleepPairs(events).map((pair) => {
     const startIso = pair.start.occurredAt;
     const endIso = pair.end.occurredAt;
     return {
       startIso,
       endIso,
-      dayKey: reportDayKey(startIso),
+      dayKey: reportDayKey(startIso, anchorHour),
       startMinutes: wallMinutes(startIso),
       endMinutes: wallMinutes(endIso),
       durationMinutes: wallMinutesBetween(startIso, endIso),

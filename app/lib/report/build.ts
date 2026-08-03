@@ -9,6 +9,7 @@
 import { wallDateKey } from '../time';
 import type { AppEvent } from '../types';
 import { buildActogram, type ActogramRow } from './actogram';
+import { buildDayRows, DAY_MODE_ANCHOR_HOUR, type DayMode, type DayRow } from './days';
 import {
   buildEpisodes,
   buildNaps,
@@ -40,17 +41,6 @@ import type {
   TimedPoint,
 } from './types';
 
-/** One night's main sleep, for the per-night charts and the appendix table. */
-export interface NightRow {
-  dayKey: string;
-  onsetMinutes: number;
-  wakeMinutes: number;
-  durationMinutes: number;
-  confidence: SleepEpisode['confidence'];
-  /** Extra episodes on the same reporting day. */
-  fragments: number;
-}
-
 export interface ReportMeta {
   fromKey: string;
   toKey: string;
@@ -66,9 +56,12 @@ export interface ReportMeta {
 
 export interface ReportData {
   meta: ReportMeta;
+  /** Which day convention every row, chart and label below was built under. */
+  dayMode: DayMode;
   rangeKeys: string[];
   episodes: SleepEpisode[];
-  nights: NightRow[];
+  /** One row per day carrying sleep, ascending. */
+  days: DayRow[];
   naps: NapRecord[];
   actogram: ActogramRow[];
   sleep: SleepSummary;
@@ -103,16 +96,17 @@ function offsetOf(iso: string): string {
 }
 
 /** The empty document, so the page renders its shell before data arrives. */
-export function emptyReport(): ReportData {
+export function emptyReport(mode: DayMode = 'night'): ReportData {
   return {
     meta: EMPTY_META,
+    dayMode: mode,
     rangeKeys: [],
     episodes: [],
-    nights: [],
+    days: [],
     naps: [],
     actogram: [],
     sleep: summariseSleep([]),
-    fragmentation: summariseFragmentation([], []),
+    fragmentation: summariseFragmentation([], [], []),
     intake: summariseIntake([], [], []),
     confidence: summariseConfidence([]),
     regularity: { sri: null, comparisons: 0 },
@@ -127,17 +121,24 @@ export function emptyReport(): ReportData {
   };
 }
 
-export function buildReport(events: readonly AppEvent[], generatedIso: string): ReportData {
-  if (events.length === 0) return { ...emptyReport(), meta: { ...EMPTY_META, generatedIso } };
+export function buildReport(
+  events: readonly AppEvent[],
+  generatedIso: string,
+  mode: DayMode = 'night',
+): ReportData {
+  const anchorHour = DAY_MODE_ANCHOR_HOUR[mode];
+  const empty = { ...emptyReport(mode), meta: { ...EMPTY_META, generatedIso } };
+  if (events.length === 0) return empty;
 
   const eventDayKeys = events.map((e) => wallDateKey(e.occurredAt));
   const range = recordRange(eventDayKeys);
-  if (!range) return { ...emptyReport(), meta: { ...EMPTY_META, generatedIso } };
+  if (!range) return empty;
 
   const coveredKeys = new Set(eventDayKeys);
   const rangeKeys = range.keys;
 
-  const episodes = buildEpisodes(events);
+  const episodes = buildEpisodes(events, anchorHour);
+  const days = buildDayRows(episodes, mode);
   const naps = buildNaps(events);
   const mealPoints = buildTimedPoints(events, 'meal', (e) => e.mealName ?? 'Meal');
   const caffeinePoints = buildTimedPoints(events, 'caffeine', (e) => e.kind ?? 'other');
@@ -154,24 +155,6 @@ export function buildReport(events: readonly AppEvent[], generatedIso: string): 
     ? rangeKeys.filter((k) => k >= caffeineTrackingFromKey && coveredKeys.has(k))
     : [];
 
-  const fragmentsByDay = new Map<string, number>();
-  for (const e of episodes) {
-    if (e.kind === 'fragment') {
-      fragmentsByDay.set(e.dayKey, (fragmentsByDay.get(e.dayKey) ?? 0) + 1);
-    }
-  }
-
-  const nights: NightRow[] = episodes
-    .filter((e) => e.kind === 'main')
-    .map((e) => ({
-      dayKey: e.dayKey,
-      onsetMinutes: e.startMinutes,
-      wakeMinutes: e.endMinutes,
-      durationMinutes: e.durationMinutes,
-      confidence: e.confidence,
-      fragments: fragmentsByDay.get(e.dayKey) ?? 0,
-    }));
-
   return {
     meta: {
       fromKey: range.fromKey,
@@ -182,13 +165,14 @@ export function buildReport(events: readonly AppEvent[], generatedIso: string): 
       blocks: coverageBlocks([...coveredKeys]),
       offsets: [...new Set(events.map((e) => offsetOf(e.occurredAt)))].sort(),
     },
+    dayMode: mode,
     rangeKeys,
     episodes,
-    nights,
+    days,
     naps,
-    actogram: buildActogram(episodes, rangeKeys, coveredKeys),
-    sleep: summariseSleep(episodes),
-    fragmentation: summariseFragmentation(episodes, naps),
+    actogram: buildActogram(episodes, rangeKeys, coveredKeys, anchorHour),
+    sleep: summariseSleep(days),
+    fragmentation: summariseFragmentation(days, episodes, naps),
     intake: summariseIntake(caffeinePoints, mealPoints, mealWindowKeys),
     confidence: summariseConfidence(episodes),
     regularity: sleepRegularityIndex(episodes, coveredKeys, rangeKeys),
@@ -206,3 +190,4 @@ export function buildReport(events: readonly AppEvent[], generatedIso: string): 
 }
 
 export { reportDayKey };
+export { DAY_MODE_ANCHOR_HOUR, dayRowEndKey, type DayMode, type DayRow, type DaySegment } from './days';
