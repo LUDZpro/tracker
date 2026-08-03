@@ -112,6 +112,13 @@ export default function ReportView() {
   const { meta, sleep, fragmentation, intake, confidence, regularity } = data;
   const scope = month === ALL ? 'Full record' : monthLabel(month);
 
+  // Meals and caffeine started being logged months after sleep did. Plotting
+  // them across the whole record leaves most of the chart empty and squeezes
+  // the actual data into a corner, so each timing chart shares the x-axis of
+  // the per-day chart above it rather than the full range.
+  const mealDayKeys = data.mealsPerDay.map((d) => d.dayKey);
+  const caffeineDayKeys = data.caffeinePerDay.map((d) => d.dayKey);
+
   return (
     <main className={styles.page}>
       <div className={styles.sheet}>
@@ -325,7 +332,7 @@ export default function ReportView() {
         <Card title="Meal timing" note="Every logged meal by clock time. The band below 07:00 is overnight eating.">
           <TimeOfDayScatter
             points={data.mealPoints}
-            dayKeys={data.rangeKeys}
+            dayKeys={mealDayKeys}
             color="var(--doc-meal)"
             label="Meals"
             cutoffHour={7}
@@ -342,7 +349,7 @@ export default function ReportView() {
         >
           <TimeOfDayScatter
             points={data.caffeinePoints}
-            dayKeys={data.rangeKeys}
+            dayKeys={caffeineDayKeys}
             color="var(--doc-caff)"
             label="Caffeine"
             cutoffHour={CAFFEINE_LATE_HOUR}
