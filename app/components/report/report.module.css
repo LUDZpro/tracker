@@ -1,37 +1,93 @@
 /*
- * The report is a document, not an app surface. It deliberately ignores the
- * dark app theme: it gets printed, exported and handed to a clinician, so it
- * commits to a light page with its own local palette.
+ * The report has two skins.
+ *
+ * Dark is the default and is built only from `styles/tokens.css`, so it reads
+ * as the same product as the rest of the console — same canvas, same raised
+ * surfaces, same event tones (sleep = accent, caffeine = warn, meals = ok,
+ * mood/energy = cyan).
+ *
+ * Light is a green-and-white document skin for the times the report leaves
+ * the screen: a printout, a shared PDF, a phone held across a desk. Print
+ * always forces it, because the dark skin costs a page of toner and reads
+ * badly on paper.
  */
 
 .page {
-  --doc-bg: #eef1f4;
-  --doc-card: #ffffff;
-  --doc-ink: #1e2a32;
-  --doc-mute: #64748b;
-  --doc-line: #dbe2e8;
-  --doc-head: #0f4c4c;
-  --doc-head-soft: #d6e6e4;
-  --doc-accent: #0d7c74;
-  --doc-sleep: #4c5fd7;
-  --doc-sleep-soft: #aab3ec;
-  --doc-frag: #d97757;
-  --doc-nap: #b48ead;
-  --doc-meal: #2f8f5b;
-  --doc-caff: #b58121;
-  --doc-void: #e6eaee;
+  /* ── dark: straight from the app's tokens ── */
+  --doc-bg: var(--canvas);
+  --doc-card: var(--surface-raised);
+  --doc-head: var(--night);
+  --doc-ink: var(--t1);
+  --doc-mute: var(--t3);
+  --doc-soft: var(--t2);
+  --doc-line: var(--line);
+  --doc-edge: var(--edge);
+  --doc-accent: var(--accent);
+  --doc-kicker: var(--a400);
+
+  --doc-sleep: var(--accent);
+  --doc-sleep-soft: var(--a700);
+  --doc-frag: var(--warn);
+  --doc-meal: var(--ok);
+  --doc-caff: var(--warn);
+  --doc-mood: var(--cyan);
+  --doc-energy: var(--warn);
+
+  --doc-void: rgba(233, 233, 237, 0.045);
+  --doc-track: rgba(233, 233, 237, 0.03);
+  --doc-grid: rgba(233, 233, 237, 0.07);
+  --doc-ref: rgba(233, 233, 237, 0.22);
+  --doc-note-bg: rgba(145, 132, 217, 0.07);
+  --doc-note-edge: rgba(145, 132, 217, 0.22);
+  --doc-tag-bg: rgba(233, 233, 237, 0.06);
+  --doc-recon-bg: rgba(216, 166, 87, 0.14);
+  --doc-recon-ink: var(--warn);
+  --doc-shadow: none;
 
   min-height: 100vh;
-  padding: 24px 16px 96px;
+  padding: 22px 16px 96px;
   background: var(--doc-bg);
   color: var(--doc-ink);
   font-size: 14px;
   line-height: 1.5;
 }
 
+/* ── light: green and white, for paper and for handing over ── */
+.page[data-theme='light'] {
+  --doc-bg: #f2f6f3;
+  --doc-card: #ffffff;
+  --doc-head: #12483a;
+  --doc-ink: #14261f;
+  --doc-mute: #5f7a6d;
+  --doc-soft: #446056;
+  --doc-line: #d7e5dd;
+  --doc-edge: #c4d8ce;
+  --doc-accent: #14795e;
+  --doc-kicker: #7fd4bc;
+
+  --doc-sleep: #1c6b78;
+  --doc-sleep-soft: #a9c8ce;
+  --doc-frag: #c4693a;
+  --doc-meal: #2c8a5a;
+  --doc-caff: #a8791d;
+  --doc-mood: #14795e;
+  --doc-energy: #a8791d;
+
+  --doc-void: #e5ece8;
+  --doc-track: #f5f9f7;
+  --doc-grid: #e6efea;
+  --doc-ref: #a9c0b5;
+  --doc-note-bg: #dcece5;
+  --doc-note-edge: #bcd8cc;
+  --doc-tag-bg: #eef4f1;
+  --doc-recon-bg: #fbeee2;
+  --doc-recon-ink: #9a5a20;
+  --doc-shadow: 0 1px 2px rgba(20, 38, 31, 0.05);
+}
+
 @media (min-width: 1024px) {
   .page {
-    padding-left: calc(var(--rail-w, 56px) + 24px);
+    padding-left: calc(var(--rail-w) + 22px);
   }
 }
 
@@ -44,10 +100,10 @@
 
 .head {
   background: var(--doc-head);
-  color: #fff;
-  border-radius: 10px;
+  border: 1px solid var(--doc-edge);
+  border-radius: var(--radius-md);
   padding: 20px 22px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -55,54 +111,70 @@
   align-items: flex-start;
 }
 
+.page[data-theme='light'] .head {
+  border-color: transparent;
+  color: #fff;
+}
+
 .kicker {
   font-size: 10px;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #7fd4c8;
-  margin-bottom: 6px;
+  color: var(--doc-kicker);
+  margin-bottom: 7px;
 }
 
 .title {
   font-size: 22px;
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
   margin: 0;
 }
 
+.page[data-theme='light'] .title,
+.page[data-theme='light'] .headStats b {
+  color: #fff;
+}
+
 .subtitle {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.75);
-  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--doc-mute);
+  margin-top: 7px;
+}
+
+.page[data-theme='light'] .subtitle,
+.page[data-theme='light'] .headStats {
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .headStats {
   text-align: right;
   font-variant-numeric: tabular-nums;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.7;
+  font-size: 11.5px;
+  color: var(--doc-mute);
+  line-height: 1.8;
 }
 
 .headStats b {
-  color: #fff;
-  font-weight: 600;
+  color: var(--doc-ink);
+  font-weight: 500;
 }
 
-/* ---- month filter ---------------------------------------------------- */
+/* ---- controls -------------------------------------------------------- */
 
 .filter {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   align-items: center;
 }
 
 .filterLabel {
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   color: var(--doc-mute);
   margin-right: 4px;
 }
@@ -111,21 +183,21 @@
   appearance: none;
   border: 1px solid var(--doc-line);
   background: var(--doc-card);
-  color: var(--doc-ink);
+  color: var(--doc-soft);
   border-radius: 999px;
   padding: 5px 13px;
   font: inherit;
-  font-size: 13px;
+  font-size: 12.5px;
   cursor: pointer;
   transition:
-    background 140ms ease,
-    border-color 140ms ease,
-    color 140ms ease;
+    background var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
 }
 
 .chip:hover {
-  border-color: var(--doc-accent);
-  color: var(--doc-accent);
+  color: var(--doc-ink);
+  border-color: var(--doc-edge);
 }
 
 .chip:focus-visible {
@@ -133,35 +205,59 @@
   outline-offset: 2px;
 }
 
-.chipOn {
-  background: var(--doc-head);
-  border-color: var(--doc-head);
+.chipOn,
+.chipOn:hover {
+  background: var(--doc-accent);
+  border-color: var(--doc-accent);
   color: #fff;
 }
 
-.chipOn:hover {
-  color: #fff;
+.page[data-theme='light'] .chipOn,
+.page[data-theme='light'] .chipOn:hover {
+  background: var(--doc-head);
+  border-color: var(--doc-head);
 }
 
 .spacer {
   flex: 1;
 }
 
-.printBtn {
+.ghostBtn {
   appearance: none;
-  border: 1px solid var(--doc-accent);
+  border: 1px solid var(--doc-line);
   background: transparent;
-  color: var(--doc-accent);
-  border-radius: 6px;
+  color: var(--doc-soft);
+  border-radius: 8px;
   padding: 5px 13px;
   font: inherit;
-  font-size: 13px;
+  font-size: 12.5px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    background var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
 }
 
-.printBtn:hover {
-  background: var(--doc-accent);
-  color: #fff;
+.ghostBtn:hover {
+  color: var(--doc-ink);
+  border-color: var(--doc-edge);
+  background: var(--doc-card);
+}
+
+.ghostBtn:focus-visible {
+  outline: 2px solid var(--doc-accent);
+  outline-offset: 2px;
+}
+
+.ghostBtn svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
 }
 
 /* ---- cards ----------------------------------------------------------- */
@@ -169,84 +265,90 @@
 .card {
   background: var(--doc-card);
   border: 1px solid var(--doc-line);
-  border-radius: 10px;
-  margin-bottom: 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
   overflow: hidden;
+  box-shadow: var(--doc-shadow);
   break-inside: avoid;
 }
 
 .cardHead {
-  padding: 14px 18px 10px;
-  border-bottom: 1px solid #eff3f6;
+  padding: 15px 18px 11px;
+  border-bottom: 1px solid var(--doc-line);
 }
 
 .cardTitle {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--doc-soft);
   margin: 0;
 }
 
 .cardNote {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--doc-mute);
-  margin-top: 3px;
+  margin-top: 6px;
+  max-width: 78ch;
 }
 
 .cardBody {
-  padding: 14px 18px 18px;
+  padding: 16px 18px 18px;
   overflow-x: auto;
 }
 
 .method {
-  background: var(--doc-head-soft);
-  border: 1px solid #bcd8d4;
-  border-radius: 8px;
+  background: var(--doc-note-bg);
+  border: 1px solid var(--doc-note-edge);
+  border-radius: var(--radius-sm);
   padding: 12px 14px;
   font-size: 12.5px;
-  color: #33555a;
-  margin-bottom: 16px;
+  color: var(--doc-soft);
+  margin-bottom: 14px;
 }
 
 .method b {
-  color: #123f3f;
+  color: var(--doc-ink);
+  font-weight: 500;
 }
 
 /* ---- stat grid ------------------------------------------------------- */
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
   gap: 1px;
   background: var(--doc-line);
-  border-top: 1px solid var(--doc-line);
 }
 
 .stat {
   background: var(--doc-card);
-  padding: 12px 16px;
+  padding: 13px 16px;
 }
 
 .statLabel {
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.12em;
   color: var(--doc-mute);
 }
 
 .statValue {
-  font-size: 21px;
-  font-weight: 600;
+  font-size: 27px;
+  font-weight: 300;
+  line-height: 1.1;
   font-variant-numeric: tabular-nums;
-  margin-top: 3px;
+  margin-top: 6px;
 }
 
 .statSub {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--doc-mute);
-  margin-top: 1px;
+  margin-top: 7px;
 }
 
-/* ---- generic chart chrome -------------------------------------------- */
+/* ---- chart chrome ---------------------------------------------------- */
 
 .chart {
   width: 100%;
@@ -267,12 +369,12 @@
 }
 
 .gridLine {
-  stroke: #e9eef2;
+  stroke: var(--doc-grid);
   stroke-width: 1;
 }
 
 .refLine {
-  stroke: #b9c4cd;
+  stroke: var(--doc-ref);
   stroke-width: 1;
   stroke-dasharray: 3 3;
 }
@@ -281,18 +383,18 @@
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-top: 12px;
-  font-size: 12px;
+  margin-top: 14px;
+  font-size: 11px;
   color: var(--doc-mute);
   align-items: center;
 }
 
 .swatch {
   display: inline-block;
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 3px;
-  margin-right: 5px;
+  margin-right: 6px;
   vertical-align: -1px;
 }
 
@@ -314,12 +416,12 @@
 
 .table th {
   text-align: left;
-  font-size: 10.5px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: var(--doc-mute);
-  font-weight: 600;
-  padding: 6px 10px;
+  font-weight: 400;
+  padding: 7px 10px;
   border-bottom: 1px solid var(--doc-line);
   position: sticky;
   top: 0;
@@ -327,8 +429,9 @@
 }
 
 .table td {
-  padding: 5px 10px;
-  border-bottom: 1px solid #f1f5f8;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--doc-line);
+  color: var(--doc-soft);
 }
 
 .table tr:last-child td {
@@ -342,38 +445,78 @@
 .tag {
   display: inline-block;
   font-size: 10px;
-  padding: 1px 6px;
+  padding: 1px 7px;
   border-radius: 999px;
-  background: #eef2f5;
+  background: var(--doc-tag-bg);
   color: var(--doc-mute);
 }
 
 .tagRecon {
-  background: #fdf0e6;
-  color: #a4551f;
+  background: var(--doc-recon-bg);
+  color: var(--doc-recon-ink);
 }
 
 .scroll {
   max-height: 460px;
   overflow-y: auto;
+  scrollbar-width: thin;
 }
 
-/* ---- print ----------------------------------------------------------- */
+/* ---- print: always the light document ------------------------------- */
 
 @media print {
-  .page {
+  .page,
+  .page[data-theme='dark'] {
+    --doc-bg: #ffffff;
+    --doc-card: #ffffff;
+    --doc-head: #12483a;
+    --doc-ink: #14261f;
+    --doc-mute: #5f7a6d;
+    --doc-soft: #446056;
+    --doc-line: #cfdfd7;
+    --doc-edge: #c4d8ce;
+    --doc-accent: #14795e;
+    --doc-kicker: #7fd4bc;
+    --doc-sleep: #1c6b78;
+    --doc-sleep-soft: #a9c8ce;
+    --doc-frag: #c4693a;
+    --doc-meal: #2c8a5a;
+    --doc-caff: #a8791d;
+    --doc-mood: #14795e;
+    --doc-energy: #a8791d;
+    --doc-void: #e9efec;
+    --doc-track: #f7faf8;
+    --doc-grid: #e6efea;
+    --doc-ref: #a9c0b5;
+    --doc-note-bg: #eaf3ef;
+    --doc-note-edge: #c4d8ce;
+    --doc-tag-bg: #eef4f1;
+    --doc-recon-bg: #fbeee2;
+    --doc-recon-ink: #9a5a20;
+    --doc-shadow: none;
+
     padding: 0;
-    background: #fff;
   }
 
-  .filter,
-  .printBtn {
+  .page .head {
+    color: #fff;
+  }
+
+  .page .title,
+  .page .headStats b {
+    color: #fff;
+  }
+
+  .page .subtitle,
+  .page .headStats {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .filter {
     display: none;
   }
 
   .card {
-    box-shadow: none;
-    border-color: #ccc;
     page-break-inside: avoid;
   }
 

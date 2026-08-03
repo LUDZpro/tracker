@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useReport } from '@/hooks/useReport';
 import { buildReport, emptyReport } from '@/lib/report/build';
 import { formatClock, formatSpan } from '@/lib/report/clockStats';
@@ -22,6 +22,62 @@ const MONTH_NAMES = [
 ];
 
 const ALL = 'all';
+
+type DocTheme = 'dark' | 'light';
+
+const THEME_KEY = 'report-theme';
+
+/**
+ * Dark matches the rest of the console and is the default. Light is the
+ * green-and-white document skin for printing or handing the screen over;
+ * printing forces it regardless of what is selected here.
+ */
+function useDocTheme(): [DocTheme, () => void] {
+  const [theme, setTheme] = useState<DocTheme>('dark');
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(THEME_KEY);
+    if (saved === 'light' || saved === 'dark') setTheme(saved);
+  }, []);
+
+  const toggle = () => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      window.localStorage.setItem(THEME_KEY, next);
+      return next;
+    });
+  };
+
+  return [theme, toggle];
+}
+
+function SunIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden strokeLinecap="round">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden strokeLinecap="round">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+    </svg>
+  );
+}
+
+function PrintIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7 8V3h10v5" />
+      <path d="M5 8h14a2 2 0 0 1 2 2v6h-4" />
+      <path d="M3 16V10a2 2 0 0 1 2-2" />
+      <path d="M7 14h10v7H7z" />
+    </svg>
+  );
+}
 
 function monthLabel(monthKey: string): string {
   const [y, m] = monthKey.split('-');
@@ -71,6 +127,7 @@ function Card({ title, note, children }: CardProps) {
 export default function ReportView() {
   const { report: payload, error } = useReport();
   const [month, setMonth] = useState<string>(ALL);
+  const [theme, toggleTheme] = useDocTheme();
 
   // Every month that carries data, for the filter chips.
   const months = useMemo(() => {
@@ -91,7 +148,7 @@ export default function ReportView() {
 
   if (error) {
     return (
-      <main className={styles.page}>
+      <main className={styles.page} data-theme={theme}>
         <div className={styles.sheet}>
           <p className={styles.empty}>Could not load the record: {error}</p>
         </div>
@@ -101,7 +158,7 @@ export default function ReportView() {
 
   if (!payload) {
     return (
-      <main className={styles.page}>
+      <main className={styles.page} data-theme={theme}>
         <div className={styles.sheet}>
           <p className={styles.empty}>Loading the record…</p>
         </div>
@@ -120,7 +177,7 @@ export default function ReportView() {
   const caffeineDayKeys = data.caffeinePerDay.map((d) => d.dayKey);
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-theme={theme}>
       <div className={styles.sheet}>
         <header className={styles.head}>
           <div>
@@ -163,7 +220,22 @@ export default function ReportView() {
             </button>
           ))}
           <span className={styles.spacer} />
-          <button type="button" className={styles.printBtn} onClick={() => window.print()}>
+          <button
+            type="button"
+            className={styles.ghostBtn}
+            onClick={toggleTheme}
+            aria-pressed={theme === 'light'}
+            title={
+              theme === 'dark'
+                ? 'Switch to the light document skin'
+                : 'Switch back to the console skin'
+            }
+          >
+            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+            {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
+          <button type="button" className={styles.ghostBtn} onClick={() => window.print()}>
+            <PrintIcon />
             Print / PDF
           </button>
         </div>

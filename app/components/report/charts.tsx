@@ -74,7 +74,7 @@ export function Actogram({ rows }: ActogramProps) {
               y={y}
               width={plotW}
               height={rowH}
-              fill={row.covered ? '#f6f8fa' : 'var(--doc-void)'}
+              fill={row.covered ? 'var(--doc-track)' : 'var(--doc-void)'}
             />
             {row.spans.map((s, j) => (
               <rect
@@ -220,7 +220,7 @@ export function OnsetWakeChart({ nights }: NightChartProps) {
             <circle cx={x} cy={yOnset} r={2.4} fill="var(--doc-sleep)">
               <title>{`${n.dayKey} — asleep ${formatClock(n.onsetMinutes)}`}</title>
             </circle>
-            <circle cx={x} cy={yWake} r={2.4} fill="var(--doc-accent)">
+            <circle cx={x} cy={yWake} r={2.4} fill="var(--doc-mood)">
               <title>{`${n.dayKey} — awake ${formatClock(n.wakeMinutes)}`}</title>
             </circle>
           </g>
@@ -395,8 +395,8 @@ export function RatingChart({ mood, energy, dayKeys }: RatingChartProps) {
     padL + (((index.get(key) ?? 0) + 0.5) * plotW) / Math.max(1, dayKeys.length);
 
   const series = [
-    { points: mood, color: 'var(--doc-accent)' },
-    { points: energy, color: 'var(--doc-caff)' },
+    { points: mood, color: 'var(--doc-mood)' },
+    { points: energy, color: 'var(--doc-energy)' },
   ];
 
   return (
