@@ -17,6 +17,7 @@ export interface EventRow {
   calories: string | number | null;
   session_duration: number | null;
   exercises: ExerciseRow[] | null;
+  notes: string | null;
 }
 
 /** `numeric` comes back as a string to preserve precision; the app wants a
@@ -38,6 +39,12 @@ export function fromEventRow(row: EventRow): AppEvent | null {
 
   const exercises = Array.isArray(row.exercises) ? row.exercises : undefined;
 
+  // Supplements reuse three existing columns rather than adding their own:
+  // kind → substance, description → dose, notes → note. Only this type reads
+  // them that way, so `notes` stays invisible on the 139 legacy rows that
+  // carry preserved Notion free text.
+  const isSupplement = type === 'supplement';
+
   return {
     id: row.id,
     type,
@@ -46,9 +53,12 @@ export function fromEventRow(row: EventRow): AppEvent | null {
     precision: (row.precision as Precision) ?? 'exact',
     ...(row.duration !== null ? { duration: row.duration } : {}),
     ...(row.intensity !== null ? { intensity: row.intensity } : {}),
-    ...(row.kind ? { kind: row.kind as CaffeineKind } : {}),
+    ...(row.kind && !isSupplement ? { kind: row.kind as CaffeineKind } : {}),
+    ...(row.kind && isSupplement ? { substance: row.kind } : {}),
     ...(row.meal_name ? { mealName: row.meal_name } : {}),
-    ...(row.description !== null ? { description: row.description } : {}),
+    ...(row.description !== null && !isSupplement ? { description: row.description } : {}),
+    ...(row.description !== null && isSupplement ? { dose: row.description } : {}),
+    ...(row.notes !== null && isSupplement ? { note: row.notes } : {}),
     ...(num(row.protein_g) !== undefined ? { proteinG: num(row.protein_g) } : {}),
     ...(num(row.calories) !== undefined ? { calories: num(row.calories) } : {}),
     ...(row.session_duration !== null ? { sessionDuration: row.session_duration } : {}),
@@ -60,5 +70,6 @@ export function fromEventRow(row: EventRow): AppEvent | null {
  *  can never drift apart. */
 export const EVENT_COLUMNS = `
   id, type, occurred_at, precision, duration, intensity, kind, scope,
-  meal_name, description, protein_g, calories, session_duration, exercises
+  meal_name, description, protein_g, calories, session_duration, exercises,
+  notes
 `;

@@ -21,6 +21,7 @@ const TONE_BY_TYPE: Record<EventType, Tone> = {
   'gym-session': 'gym',
   mood: 'state',
   energy: 'state',
+  supplement: 'intake',
   trigger: 'state',
 };
 
@@ -43,7 +44,8 @@ type IconName =
   | 'list'
   | 'trigger'
   | 'report'
-  | 'mind';
+  | 'mind'
+  | 'pill';
 
 const ICON_BODY: Record<IconName, React.ReactNode> = {
   wake: (
@@ -107,6 +109,12 @@ const ICON_BODY: Record<IconName, React.ReactNode> = {
       <path d="M10.5 9.5c.4-1 1.6-1.5 2.6-1" />
     </>
   ),
+  pill: (
+    <>
+      <rect x="2.6" y="8.6" width="18.8" height="6.8" rx="3.4" transform="rotate(-45 12 12)" />
+      <path d="M9.6 9.6l4.8 4.8" />
+    </>
+  ),
 };
 
 const CAFFEINE_ICON: Record<CaffeineKind, IconName> = {
@@ -134,6 +142,8 @@ function iconNameFor(type: EventType, kind?: CaffeineKind): IconName {
       return 'mood';
     case 'energy':
       return 'energy';
+    case 'supplement':
+      return 'pill';
     case 'trigger':
       return 'trigger';
   }
@@ -213,6 +223,14 @@ export function rowText(ev: AppEvent): RowText {
       const label = ev.type === 'mood' ? 'Mood' : 'Energy';
       return { main: ev.intensity !== undefined ? `${label} · ${ev.intensity}/5` : label };
     }
+    case 'supplement':
+      // The old Notion title convention, composed at render time now that
+      // there is no title column: `intake:{type} — {dose}`.
+      return {
+        main: ev.substance ?? 'Supplement',
+        ...(ev.note ? { meta: ev.note } : {}),
+        ...(ev.dose ? { value: ev.dose } : {}),
+      };
     case 'trigger':
       return { main: 'Trigger', meta: 'thought record' };
   }

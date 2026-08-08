@@ -13,3 +13,8 @@ app/data/
 # Per-machine Claude Code permissions (ignored in the repo, not just via a
 # personal global gitignore, so checkouts on other machines stay clean)
 .claude/settings.local.json
+
+# Personal health reports. These hold lab results and named clinicians, and the
+# remote is a real GitHub repo that also gets pulled onto the VPS — this data
+# has no business leaving the laptop.
+report/

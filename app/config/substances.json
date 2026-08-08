@@ -1,0 +1,35 @@
+{
+  "substances": [
+    {
+      "id": "hydroxyzine",
+      "name": "Hydroxyzine",
+      "type": "hydroxyzine",
+      "defaultDose": 25,
+      "unit": "mg",
+      "timeHint": "evening"
+    },
+    {
+      "id": "melatonin",
+      "name": "Melatonin",
+      "type": "melatonin",
+      "defaultDose": 1.9,
+      "unit": "mg",
+      "timeHint": "evening"
+    },
+    {
+      "id": "magnesium",
+      "name": "Magnesium",
+      "type": "magnesium_bisglycinate",
+      "defaultDose": 200,
+      "unit": "mg",
+      "timeHint": "evening"
+    },
+    {
+      "id": "vitamin_d3",
+      "name": "Vitamin D3",
+      "type": "d3",
+      "unit": "IU",
+      "timeHint": "morning"
+    }
+  ]
+}

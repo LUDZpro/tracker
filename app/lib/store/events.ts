@@ -37,8 +37,8 @@ export async function createEvent(payload: EventPayload): Promise<string> {
     `INSERT INTO events (
        type, category, occurred_at, occurred_ts, precision, duration, intensity,
        kind, scope, meal_name, description, protein_g, calories,
-       session_duration, exercises
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+       session_duration, exercises, notes
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
      RETURNING id`,
     [
       payload.type,
@@ -48,14 +48,18 @@ export async function createEvent(payload: EventPayload): Promise<string> {
       payload.precision,
       payload.duration ?? null,
       payload.intensity ?? null,
-      payload.kind ?? null,
+      // Supplements ride columns that already exist: substance shares `kind`
+      // with caffeine, dose shares `description` with meals. See lib/db/rows.ts
+      // for the read side — no supplement-only column was added.
+      payload.kind ?? payload.substance ?? null,
       payload.scope ?? null,
       payload.mealName ?? null,
-      payload.description ?? null,
+      payload.description ?? payload.dose ?? null,
       payload.proteinG ?? null,
       payload.calories ?? null,
       payload.sessionDuration ?? null,
       payload.exercises ? JSON.stringify(payload.exercises) : null,
+      payload.note ?? null,
     ],
   );
   return rows[0].id;
@@ -74,6 +78,9 @@ export interface EventFieldPatch {
   calories?: number;
   sessionDuration?: number;
   exercises?: ExerciseRow[];
+  substance?: string;
+  dose?: string;
+  note?: string;
 }
 
 const PATCH_COLUMNS: Record<keyof EventFieldPatch, string> = {
@@ -88,6 +95,12 @@ const PATCH_COLUMNS: Record<keyof EventFieldPatch, string> = {
   calories: 'calories',
   sessionDuration: 'session_duration',
   exercises: 'exercises',
+  // Aliases onto columns that already exist — validation guarantees a patch
+  // never carries both halves of a pair, and the dedupe below makes a
+  // duplicate assignment impossible even if it somehow did.
+  substance: 'kind',
+  dose: 'description',
+  note: 'notes',
 };
 
 /** Update only the fields present on `patch`. Column names come from the map
@@ -95,13 +108,15 @@ const PATCH_COLUMNS: Record<keyof EventFieldPatch, string> = {
 export async function updateEventFields(id: string, patch: EventFieldPatch): Promise<void> {
   const sets: string[] = [];
   const values: unknown[] = [];
+  const assigned = new Set<string>();
 
   for (const [key, column] of Object.entries(PATCH_COLUMNS) as [
     keyof EventFieldPatch,
     string,
   ][]) {
     const value = patch[key];
-    if (value === undefined) continue;
+    if (value === undefined || assigned.has(column)) continue;
+    assigned.add(column);
     values.push(key === 'exercises' ? JSON.stringify(value) : value);
     sets.push(`${column} = $${values.length}`);
   }

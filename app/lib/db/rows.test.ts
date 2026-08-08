@@ -16,6 +16,7 @@ const BASE: EventRow = {
   calories: null,
   session_duration: null,
   exercises: null,
+  notes: null,
 };
 
 const row = (over: Partial<EventRow>): EventRow => ({ ...BASE, ...over });
@@ -106,5 +107,48 @@ describe('fromEventRow', () => {
 
   it('falls back to exact precision when the column is null', () => {
     expect(fromEventRow(row({ precision: null }))?.precision).toBe('exact');
+  });
+});
+
+describe('supplement column aliasing', () => {
+  const supplement = row({
+    type: 'supplement',
+    kind: 'melatonin',
+    description: '1.9 mg',
+    notes: 'half a tablet',
+  });
+
+  it('reads kind/description/notes back as substance/dose/note', () => {
+    const ev = fromEventRow(supplement);
+    expect(ev).toMatchObject({
+      type: 'supplement',
+      category: 'intake',
+      substance: 'melatonin',
+      dose: '1.9 mg',
+      note: 'half a tablet',
+    });
+  });
+
+  it('does not also surface them under the caffeine/meal names', () => {
+    const ev = fromEventRow(supplement);
+    expect(ev?.kind).toBeUndefined();
+    expect(ev?.description).toBeUndefined();
+  });
+
+  it('leaves caffeine reading its own kind', () => {
+    const ev = fromEventRow(row({ type: 'caffeine', kind: 'coffee' }));
+    expect(ev?.kind).toBe('coffee');
+    expect(ev?.substance).toBeUndefined();
+  });
+
+  it('keeps legacy notes invisible on non-supplement rows', () => {
+    const ev = fromEventRow(row({ type: 'wake_up', notes: 'preserved Notion text' }));
+    expect(ev?.note).toBeUndefined();
+  });
+
+  it('survives a supplement with no dose recorded', () => {
+    const ev = fromEventRow(row({ type: 'supplement', kind: 'vitamin_d3' }));
+    expect(ev?.substance).toBe('vitamin_d3');
+    expect(ev?.dose).toBeUndefined();
   });
 });

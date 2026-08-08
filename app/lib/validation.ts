@@ -1,3 +1,4 @@
+import { isSubstanceId } from './substances/types';
 import {
   CAFFEINE_KINDS,
   CATEGORY_BY_TYPE,
@@ -41,6 +42,29 @@ function isEventType(value: unknown): value is EventType {
 }
 
 const MAX_EXERCISE_ROWS = 30;
+
+const DOSE_MAX = 40;
+const NOTE_MAX = 500;
+
+type FieldCheck = { value?: string; error?: string };
+
+/** Dose is free text on purpose (it shares the `description` column), so the
+ *  shape is checked here and the number is parsed by lib/substances/format. */
+function validateDose(v: unknown): FieldCheck {
+  if (v === undefined) return {};
+  if (typeof v !== 'string') return { error: 'dose must be a string like "25 mg"' };
+  const trimmed = v.trim();
+  if (trimmed.length === 0) return {};
+  if (trimmed.length > DOSE_MAX) return { error: `dose must be at most ${DOSE_MAX} characters` };
+  return { value: trimmed };
+}
+
+function validateNote(v: unknown): FieldCheck {
+  if (v === undefined) return {};
+  if (typeof v !== 'string') return { error: 'note must be a string' };
+  if (v.length > NOTE_MAX) return { error: `note must be at most ${NOTE_MAX} characters` };
+  return { value: v };
+}
 
 function isExerciseRow(v: unknown): v is ExerciseRow {
   if (!isRecord(v)) return false;
@@ -162,6 +186,25 @@ export function validateEventPayload(body: unknown, now = new Date()): Validatio
     };
   }
 
+  if (type === 'supplement') {
+    if (!isSubstanceId(body.substance)) {
+      return { ok: false, error: 'substance must be a registry id (lowercase slug)' };
+    }
+    const dose = validateDose(body.dose);
+    if (dose.error) return { ok: false, error: dose.error };
+    const note = validateNote(body.note);
+    if (note.error) return { ok: false, error: note.error };
+    return {
+      ok: true,
+      value: {
+        ...base,
+        substance: body.substance,
+        ...(dose.value !== undefined ? { dose: dose.value } : {}),
+        ...(note.value !== undefined ? { note: note.value } : {}),
+      },
+    };
+  }
+
   // markers: wake_up / sleep_start carry no extras
   return { ok: true, value: base };
 }
@@ -248,12 +291,29 @@ export function validatePatchBody(body: unknown, now = new Date()): PatchValidat
     }
     value.exercises = body.exercises as ExerciseRow[];
   }
+  if (body.substance !== undefined) {
+    if (!isSubstanceId(body.substance)) {
+      return { ok: false, error: 'substance must be a registry id (lowercase slug)' };
+    }
+    value.substance = body.substance;
+  }
+  if (body.dose !== undefined) {
+    const dose = validateDose(body.dose);
+    if (dose.error) return { ok: false, error: dose.error };
+    // An emptied dose field clears the column rather than being ignored.
+    value.dose = dose.value ?? '';
+  }
+  if (body.note !== undefined) {
+    const note = validateNote(body.note);
+    if (note.error) return { ok: false, error: note.error };
+    value.note = note.value ?? '';
+  }
 
   if (Object.keys(value).length === 0) {
     return {
       ok: false,
       error:
-        'Provide at least one of occurred_at, precision, kind, intensity, duration, mealName, description, proteinG, calories, sessionDuration, exercises',
+        'Provide at least one of occurred_at, precision, kind, intensity, duration, mealName, description, proteinG, calories, sessionDuration, exercises, substance, dose, note',
     };
   }
   return { ok: true, value };
@@ -281,6 +341,14 @@ export function patchMismatch(type: EventType, patch: EventPatch): string | null
   }
   if ((patch.sessionDuration !== undefined || patch.exercises !== undefined) && type !== 'gym-session') {
     return 'sessionDuration/exercises only apply to gym-session events';
+  }
+  // Not cosmetic: substance/dose alias onto the kind/description columns, so
+  // letting one through on a caffeine or meal row would quietly corrupt it.
+  if (
+    (patch.substance !== undefined || patch.dose !== undefined || patch.note !== undefined) &&
+    type !== 'supplement'
+  ) {
+    return 'substance/dose/note only apply to supplement events';
   }
   return null;
 }

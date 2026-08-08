@@ -8,6 +8,7 @@ import styles from '@/components/desktop/desktop.module.css';
 const LINKS = [
   { href: '/', label: 'Today', icon: 'clock' },
   { href: '/nutrition', label: 'Nutrition', icon: 'meal' },
+  { href: '/meds', label: 'Meds', icon: 'pill' },
   { href: '/gym', label: 'Gym', icon: 'gym' },
   { href: '/sleep', label: 'Sleep', icon: 'sleep' },
   { href: '/cbt', label: 'Mind', icon: 'mind' },

@@ -64,6 +64,9 @@ export async function PATCH(req: Request, ctx: Ctx) {
       calories: patch.calories,
       sessionDuration: patch.sessionDuration,
       exercises: patch.exercises,
+      substance: patch.substance,
+      dose: patch.dose,
+      note: patch.note,
     });
     invalidateToday();
     invalidateHistory(ev.type);

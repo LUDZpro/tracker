@@ -199,3 +199,79 @@ describe('patchMismatch', () => {
     expect(patchMismatch('gym-session', { exercises: [] })).toBeNull();
   });
 });
+
+describe('supplement events', () => {
+  const base = { type: 'supplement', occurred_at: AT, precision: 'exact' };
+
+  it('accepts a tap-logged dose', () => {
+    const r = validateEventPayload({ ...base, substance: 'melatonin', dose: '1.9 mg' }, NOW);
+    expect(r).toEqual({
+      ok: true,
+      value: { ...base, substance: 'melatonin', dose: '1.9 mg' },
+    });
+  });
+
+  it('accepts a substance with no dose recorded yet', () => {
+    const r = validateEventPayload({ ...base, substance: 'vitamin_d3' }, NOW);
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.value.dose).toBeUndefined();
+  });
+
+  it('requires a substance', () => {
+    expect(validateEventPayload(base, NOW).ok).toBe(false);
+  });
+
+  it('rejects a substance id that is not a slug', () => {
+    for (const substance of ['Melatonin', 'mela tonin', '', 'x'.repeat(41), 5]) {
+      expect(validateEventPayload({ ...base, substance }, NOW).ok).toBe(false);
+    }
+  });
+
+  it('trims the dose and drops a blank one', () => {
+    const r = validateEventPayload({ ...base, substance: 'melatonin', dose: '  25 mg ' }, NOW);
+    expect(r.ok && r.value.dose).toBe('25 mg');
+    const blank = validateEventPayload({ ...base, substance: 'melatonin', dose: '   ' }, NOW);
+    expect(blank.ok && blank.value.dose).toBeUndefined();
+  });
+
+  it('rejects an overlong dose or note', () => {
+    expect(
+      validateEventPayload({ ...base, substance: 'melatonin', dose: 'm'.repeat(41) }, NOW).ok,
+    ).toBe(false);
+    expect(
+      validateEventPayload({ ...base, substance: 'melatonin', note: 'n'.repeat(501) }, NOW).ok,
+    ).toBe(false);
+  });
+
+  it('keeps a note', () => {
+    const r = validateEventPayload(
+      { ...base, substance: 'hydroxyzine', dose: '25 mg', note: 'half a tablet' },
+      NOW,
+    );
+    expect(r.ok && r.value.note).toBe('half a tablet');
+  });
+
+  it('patches substance, dose and note', () => {
+    const r = validatePatchBody({ substance: 'magnesium', dose: '400 mg', note: 'double' });
+    expect(r).toEqual({
+      ok: true,
+      value: { substance: 'magnesium', dose: '400 mg', note: 'double' },
+    });
+  });
+
+  it('lets an emptied dose clear the column instead of being ignored', () => {
+    const r = validatePatchBody({ dose: '' });
+    expect(r).toEqual({ ok: true, value: { dose: '' } });
+  });
+
+  it('keeps supplement fields off other event types', () => {
+    expect(patchMismatch('caffeine', { substance: 'melatonin' })).toMatch(/supplement/);
+    expect(patchMismatch('meal', { dose: '25 mg' })).toMatch(/supplement/);
+    expect(patchMismatch('nap', { note: 'x' })).toMatch(/supplement/);
+    expect(patchMismatch('supplement', { substance: 'melatonin', dose: '1.9 mg' })).toBeNull();
+  });
+
+  it('keeps caffeine kind off a supplement row', () => {
+    expect(patchMismatch('supplement', { kind: 'tea' })).toMatch(/caffeine/);
+  });
+});

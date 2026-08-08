@@ -9,6 +9,7 @@ const TABS = [
   { href: '/', label: 'Today', icon: 'clock' },
   { href: '/sleep', label: 'Sleep', icon: 'sleep' },
   { href: '/nutrition', label: 'Nutrition', icon: 'meal' },
+  { href: '/meds', label: 'Meds', icon: 'pill' },
   { href: '/gym', label: 'Gym', icon: 'gym' },
   { href: '/cbt', label: 'Mind', icon: 'mind' },
   { href: '/report', label: 'Report', icon: 'report' },

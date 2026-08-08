@@ -9,6 +9,7 @@ export type EventType =
   | 'energy'
   | 'meal'
   | 'gym-session'
+  | 'supplement'
   | 'trigger';
 
 export type Precision = 'exact' | '~5min' | '~hour' | '~part_of_day';
@@ -36,6 +37,10 @@ export const CATEGORY_BY_TYPE: Record<EventType, Category> = {
   energy: 'state',
   meal: 'action',
   'gym-session': 'action',
+  // One type for every pill and capsule. Which substance it was lives in the
+  // `kind` column (exposed as `substance`), so a new entry in the registry
+  // needs no new EventType and therefore no code change.
+  supplement: 'intake',
   // Written by POST /api/cbt when a thought record is saved — the floor feed
   // shows *when* anxiety hit; the record's content lives in the CBT database.
   trigger: 'state',
@@ -79,9 +84,16 @@ export interface EventPayload {
   calories?: number; // meal only
   sessionDuration?: number; // gym-session only, minutes
   exercises?: ExerciseRow[]; // gym-session only
+  /* supplement only. `substance` shares the `kind` column and `dose` shares
+   * `description` — dose stays text on purpose, so no column was added for it.
+   * `note` is the first thing the app writes to the `notes` column, which
+   * until now only held preserved Notion free text. */
+  substance?: string;
+  dose?: string;
+  note?: string;
 }
 
-/** An event as read back from Notion. */
+/** An event as read back from the store. */
 export interface AppEvent {
   id: string;
   type: EventType;
@@ -97,6 +109,9 @@ export interface AppEvent {
   calories?: number; // meal only
   sessionDuration?: number; // gym-session only, minutes
   exercises?: ExerciseRow[]; // gym-session only
+  substance?: string; // supplement only — registry id, from the `kind` column
+  dose?: string; // supplement only — "25 mg", from the `description` column
+  note?: string; // supplement only — from the `notes` column
   editable?: boolean; // set by /api/today (48h rule) so the client doesn't guess
 }
 
@@ -113,6 +128,9 @@ export interface EventPatch {
   calories?: number;
   sessionDuration?: number;
   exercises?: ExerciseRow[];
+  substance?: string;
+  dose?: string;
+  note?: string;
 }
 
 export interface SleepPair {

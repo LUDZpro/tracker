@@ -1,0 +1,371 @@
+/*
+ * Meds: a one-handed grid of tap targets over today's doses.
+ *
+ * Same treatment as gym/ and sleep/ — a 28rem column that stays mobile-shaped
+ * on both surfaces, offset right of the rail on desktop. Every primary tap
+ * target clears 48px; the tiles are deliberately much larger than that
+ * because they are hit with a thumb, in the dark, half asleep.
+ */
+
+.page {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-2) calc(var(--tabbar-h) + var(--space-4));
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding-left: calc(var(--rail-w) + var(--space-3));
+    padding-bottom: var(--space-4);
+  }
+}
+
+.head {
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  color: var(--dim);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— quick-log grid ——— */
+
+.gridSection {
+  margin-bottom: var(--space-3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+.tile {
+  position: relative;
+  overflow: hidden;
+  min-height: 104px; /* well past the 48px floor — thumb target */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--intake);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out-expo),
+    border-color var(--duration-fast) var(--ease-out-expo);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tile:active {
+  transform: scale(0.97);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--intake);
+  outline-offset: 2px;
+}
+
+/* A dose already logged today reads as "done" without hiding the tile —
+   re-dosing has to stay possible, just not accidental. */
+.tileTaken {
+  border-color: color-mix(in oklab, var(--intake) 45%, transparent);
+}
+
+.tileFill {
+  position: absolute;
+  inset: 0;
+  background: var(--intake);
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.tileName {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tileDose {
+  font-size: var(--text-sm);
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.tileMeta {
+  font-size: var(--text-xs);
+  color: var(--t4);
+  font-variant-numeric: tabular-nums;
+}
+
+.tileMetaHit {
+  color: var(--intake);
+}
+
+.hint {
+  margin: var(--space-2) 0 0;
+  text-align: center;
+  color: var(--t4);
+  font-size: var(--text-xs);
+}
+
+/* ——— today strip ——— */
+
+.section {
+  margin-top: var(--space-3);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-1);
+}
+
+.eyebrow {
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t4);
+}
+
+.count {
+  font-size: var(--text-xs);
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.strip {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.rowBtn {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.rowBtn:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+
+.rowBtn:focus-visible {
+  outline: 2px solid var(--intake);
+  outline-offset: -2px;
+}
+
+.rowIcon {
+  color: var(--intake);
+  display: flex;
+}
+
+.rowBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rowName {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.rowLabel {
+  font-size: var(--text-xs);
+  color: var(--t4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowNote {
+  font-size: var(--text-xs);
+  color: var(--dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.rowTime {
+  font-size: var(--text-sm);
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.rowQueued,
+.rowPrecision {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--warn);
+}
+
+.rowPrecision {
+  color: var(--t4);
+}
+
+.rowPending {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: 0 var(--space-2);
+  color: var(--dim);
+  font-size: var(--text-sm);
+}
+
+.undoBtn,
+.undoToast button {
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--hairline);
+  background: none;
+  color: var(--intake);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+/* ——— undo toast ——— */
+
+.undoToast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--dim);
+  font-size: var(--text-sm);
+}
+
+.emptyHint {
+  margin: var(--space-2) 0;
+  color: var(--t4);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+/* ——— sheet extras ——— */
+
+.doseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.doseBtn {
+  width: 64px;
+  min-height: var(--tap-min);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-size: var(--text-lg);
+  cursor: pointer;
+}
+
+.doseBtn:active {
+  border-color: var(--intake);
+}
+
+.doseValue {
+  flex: 1;
+  text-align: center;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.precisionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: var(--space-2) 0;
+}
+
+.noteLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.noteLabel span {
+  color: var(--dim);
+  font-size: var(--text-xs);
+}
+
+.noteInput {
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-base);
+  padding: var(--space-1) var(--space-2);
+  resize: vertical;
+}
+
+.noteInput:focus {
+  outline: none;
+  border-color: var(--intake);
+}
+
+.previewLine {
+  margin: 0 0 var(--space-2);
+  text-align: center;
+  color: var(--t4);
+  font-size: var(--text-xs);
+}

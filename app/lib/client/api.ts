@@ -1,5 +1,6 @@
 'use client';
 
+import type { Substance } from '@/lib/substances/types';
 import type {
   EventPatch,
   EventPayload,
@@ -55,6 +56,18 @@ export async function fetchToday(offset = 0): Promise<TodayResponse> {
   if (res.status === 404) throw new Error('No more history');
   if (!res.ok) throw new Error(await readError(res));
   return res.json();
+}
+
+/** The quick-log tiles. Served from a JSON file, not a table. */
+export async function fetchSubstances(): Promise<Substance[]> {
+  const res = await fetch('/api/substances');
+  if (res.status === 401) {
+    window.location.href = '/login';
+    throw new Error('Unauthorized');
+  }
+  if (!res.ok) throw new Error(await readError(res));
+  const { substances } = await res.json();
+  return Array.isArray(substances) ? substances : [];
 }
 
 /** Last 7 days of every event type (desktop goal cards + week column). */

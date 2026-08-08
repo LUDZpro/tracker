@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { invalidateHistory, invalidateToday } from '@/lib/cache';
 import { errorResponse, jsonError, readJson } from '@/lib/http';
 import { archiveEvent, createEvent } from '@/lib/store/events';
+import { findSubstance } from '@/lib/substances/registry';
 import { addMinutes } from '@/lib/time';
 import { validateEventPayload } from '@/lib/validation';
 import type { EventPayload, Precision } from '@/lib/types';
@@ -36,6 +37,14 @@ export async function POST(req: Request) {
   const body = await readJson(req);
   const result = validateEventPayload(body);
   if (!result.ok) return jsonError(400, result.error);
+
+  // Shape is checked in validation; membership needs the registry file, which
+  // keeps validation.ts pure and synchronously testable.
+  if (result.value.type === 'supplement' && result.value.substance !== undefined) {
+    if (!(await findSubstance(result.value.substance))) {
+      return jsonError(400, `Unknown substance "${result.value.substance}"`);
+    }
+  }
 
   try {
     if (result.value.type === 'nap' && result.value.duration !== undefined) {

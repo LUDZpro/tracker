@@ -20,6 +20,7 @@ const ICON_BY_TYPE: Record<AppEvent['type'], string> = {
   // but these keep the lookup exhaustive rather than throwing if they did.
   meal: '🍽',
   'gym-session': '💪',
+  supplement: '◎',
   trigger: '⚑',
 };
 
@@ -45,6 +46,11 @@ export function eventSummary(ev: AppEvent): string {
       return ev.mealName ?? 'meal';
     case 'gym-session':
       return `${ev.exercises?.length ?? 0} exercises`;
+    case 'supplement':
+      // Mirrors the old `category:type — description` title convention.
+      return ev.dose
+        ? `intake:${ev.substance ?? 'supplement'} — ${ev.dose}`
+        : `intake:${ev.substance ?? 'supplement'}`;
     case 'trigger':
       return 'trigger · thought record';
   }

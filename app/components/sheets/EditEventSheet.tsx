@@ -34,6 +34,8 @@ export default function EditEventSheet({ event, nowIso, onClose, onSaved, onDele
   const [description, setDescription] = useState(event.description ?? '');
   const [proteinG, setProteinG] = useState(event.proteinG !== undefined ? String(event.proteinG) : '');
   const [calories, setCalories] = useState(event.calories !== undefined ? String(event.calories) : '');
+  const [dose, setDose] = useState(event.dose ?? '');
+  const [note, setNote] = useState(event.note ?? '');
   const [sessionDuration, setSessionDuration] = useState(event.sessionDuration ?? DEFAULT_GYM_DURATION);
   const [exercises, setExercises] = useState<ExerciseRow[]>(event.exercises ?? []);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +69,8 @@ export default function EditEventSheet({ event, nowIso, onClose, onSaved, onDele
       ? { sessionDuration }
       : {}),
     ...(event.type === 'gym-session' && exercisesChanged ? { exercises } : {}),
+    ...(event.type === 'supplement' && dose !== (event.dose ?? '') ? { dose } : {}),
+    ...(event.type === 'supplement' && note !== (event.note ?? '') ? { note } : {}),
   };
   const dirty = Object.keys(patch).length > 0;
   const mealNameBlank = event.type === 'meal' && mealName.trim().length === 0;
@@ -190,6 +194,34 @@ export default function EditEventSheet({ event, nowIso, onClose, onSaved, onDele
           onExercisesChange={setExercises}
           readOnly={readOnly}
         />
+      )}
+
+      {event.type === 'supplement' && (
+        <div className={styles.macroRow}>
+          <label className={styles.macroField}>
+            <span>Dose</span>
+            <input
+              type="text"
+              inputMode="decimal"
+              value={dose}
+              maxLength={40}
+              disabled={readOnly}
+              placeholder="25 mg"
+              onChange={(e) => setDose(e.target.value)}
+            />
+          </label>
+          <label className={styles.macroField}>
+            <span>Note</span>
+            <input
+              type="text"
+              value={note}
+              maxLength={500}
+              disabled={readOnly}
+              placeholder="optional"
+              onChange={(e) => setNote(e.target.value)}
+            />
+          </label>
+        </div>
       )}
 
       {mealNameBlank && <p className="error-inline">Meal name is required</p>}
